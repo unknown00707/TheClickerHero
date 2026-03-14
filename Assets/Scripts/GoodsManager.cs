@@ -1,8 +1,9 @@
+using System;
 using System.IO;
 using TMPro;
 using UnityEngine;
-[CreateAssetMenu(fileName = "GoodsData", menuName = "ScriptableObjects/GoodsData")]
-public class GoodsData : ScriptableObject
+[Serializable]
+public class GoodsData
 {
     public int GoodsCount;
 }

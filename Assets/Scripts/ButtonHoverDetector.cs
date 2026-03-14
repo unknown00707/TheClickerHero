@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class ButtonHoverDetector : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public int index;
+    public string index;
     // 마우스가 버튼 위로 들어올 때 호출
     public void OnPointerEnter(PointerEventData eventData)
     {

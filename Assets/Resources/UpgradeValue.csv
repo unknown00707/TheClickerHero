@@ -1,0 +1,5 @@
+NodeID (노드ID),Level (레벨),StatType (능력치 종류),CalcType (계산 방식),Value (오르는 수치),Cost (비용),DescID (설명 ID)
+ATK_01,1,ATK,Add,10,100,DESC_ATK_01
+ATK_01,2,ATK,Add,25,250,DESC_ATK_01
+CLICK_01,1,CLICK_COUNT,Add,1,500,DESC_CLICK_01
+CLICK_02,1,CLICK_COUNT,Multiply,2,2000,DESC_CLICK_02

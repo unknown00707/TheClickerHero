@@ -1,0 +1,7 @@
+ID,KR,EN
+BTN_START,게임 시작,Start Game
+BTN_LANGUAGE,언어,Language
+BTN_SETTING,설정,Setting
+BTN_EXIT,종료,Exit
+DESC_ATK_01,공격력을 {0} 증가시킵니다.,Up your Attack Stats
+DESC_ATK_01_TITLE,공격력 증가,Up Attack
