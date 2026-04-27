@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class SaveData 
 {
     public List<bool> upgradUnlockStatus = new() { true, false, false, false, false, false, false, false, false, false };
-    
+    public List<bool> maxUpgradNodes = new() { false, false, false, false, false, false, false, false, false, false };
     // 딕셔너리 대신 구조체 리스트를 써야 JSON 저장이 완벽하게 됩니다.
     public List<NodeLevel> nodeLevels = new(); 
 }
@@ -33,11 +33,15 @@ public class ExplainData
     public string upgradExplainID;
 }
 
-public enum StatType { ATK, DEF, HP, CLICK_COUNT, CLICK_DMG }
+public enum StatType { ATK, DEF, HP, CRITCAL_CHANCE, CRITCAL_DAMAGE, CLICK_COUNT, }
 public enum CalcType { Add, Multiply }
 
 public class UpgradManager : MonoBehaviour
 {
+    [Header("Managers")]
+    public GoodsManager GoodsManager;
+    public PlayerStatsManager PlayerStatsManager;
+    [Header("UI References")]
     public Canvas canvas;
     public List<GameObject> upgradGroupObjects = new();
     public RectTransform contantTransform;
@@ -45,31 +49,54 @@ public class UpgradManager : MonoBehaviour
     public GameObject upgradExplainObject;
     public TextMeshProUGUI[] upgradExplainTexts;
 
+    [Header("Settings")]
     // 업그레이드 설명창이 마우스를 따라다니도록 하기 위한 오프셋입니다. 필요에 따라 조정하세요.
     public float expainOffsetX = -370f;
     public float expainOffsetY = 100f;
     // 업그레이드 데이터와 설명 데이터를 관리하는 변수입니다.
     // 세이브 데이터를 하나로 합쳤습니다.
-    private SaveData mySaveData = new SaveData(); 
+    private SaveData mySaveData = new(); 
 
     // 설명 데이터(CSV) 딕셔너리
-    private Dictionary<string, Dictionary<int, ExplainData>> upgradExplainDictionary = new();
+    private readonly Dictionary<string, Dictionary<int, ExplainData>> upgradExplainDictionary = new();
     // string : 노드의 ID, int : 노드의 레벨, ExpainData : 설명 데이터
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
+        LoadUpgradData();
+        LoadUpgradValueData();
+        OpenAutoUpgradGroup();
     }
-
-    public void OpenUpgradGroup(int index)
+    // 게임 시작 시 세이브 데이터에 따라 자동으로 업그레이드 그룹을 여는 함수입니다.
+    private void OpenAutoUpgradGroup()
     {
-        upgradGroupObjects[index].SetActive(true);
-        mySaveData.upgradUnlockStatus[index] = true;
-        foreach (var data in mySaveData.upgradUnlockStatus)
+        for(int i = 0; i < mySaveData.upgradUnlockStatus.Count; i++)
         {
-            Debug.Log(data);
+            if(mySaveData.upgradUnlockStatus[i])
+                upgradGroupObjects[i].SetActive(true);
         }
         UpdateContentSize();
+    }
+    //By button
+    public void OpenUpgradGroup(string nodeID , int index)
+    {
+        if (mySaveData.upgradUnlockStatus[index]) return; // 이미 열려있으면 패스
+        for(int i = 0; i < mySaveData.nodeLevels.Count; i++)
+        {
+            if(mySaveData.nodeLevels[i].nodeID == nodeID)
+            {
+                if(mySaveData.nodeLevels[i].level >= 1) // 노드 레벨이 1 미만이면 패스
+                {
+                    upgradGroupObjects[index].SetActive(true);
+                    mySaveData.upgradUnlockStatus[index] = true;
+                    UpdateContentSize();           
+                }
+                else
+                    Debug.Log("노드 레벨이 부족하여 업그레이드 그룹을 열 수 없습니다.");
+                
+            }
+        }
     }
     public void UpdateContentSize()
     {
@@ -106,14 +133,26 @@ public class UpgradManager : MonoBehaviour
 
     public void UpgradNodeExplain(string index, bool isEnter)
     {
-        int level = mySaveData.nodeLevels.Find(x => x.nodeID == index).level; // 노드 ID로 레벨 찾기
+        int level = 0;
+        if (mySaveData.nodeLevels.Count != 0) 
+            level = mySaveData.nodeLevels.Find(x => x.nodeID == index).level; // 노드 ID로 레벨 찾기
+
         // 설명 텍스트 설정
-        string nodePath = upgradExplainDictionary[index][level].upgradExplainID;
-
+        string nodePath;
+        if(upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
+            nodePath = upgradExplainDictionary[index][level].upgradExplainID;
+        else
+        {
+            nodePath = "DESC_END_UPGRADE"; // 업그레이드 데이터가 없는 경우
+            level = 0; // 설명이 없는 경우 레벨은 0으로 초기화
+        }
+        
         upgradExplainTexts[0].text = LanguageManager.Instance.GetText(nodePath + "_TITLE");
-        upgradExplainTexts[1].text = string.Format(LanguageManager.Instance.GetText(nodePath), level);
-        upgradExplainTexts[2].text = upgradExplainDictionary[index][level].needGoods.ToString();
-
+        upgradExplainTexts[1].text = string.Format(LanguageManager.Instance.GetText(nodePath), upgradExplainDictionary[index][level].values.ToString());
+        upgradExplainTexts[2].text = LanguageManager.Instance.GetText("DESC_COST") + upgradExplainDictionary[index][level].needGoods.ToString();
+        if(nodePath == "DESC_END_UPGRADE")
+            upgradExplainTexts[2].text = "!^ o ^!"; // 업그레이드 데이터가 없는 경우 비용 텍스트 숨기기
+        
         // 위치
         Vector2 mousePos = Mouse.current.position.ReadValue();
         // 2. 스크린 좌표를 캔버스 상의 로컬 좌표로 변환합니다.
@@ -128,18 +167,112 @@ public class UpgradManager : MonoBehaviour
             upgradExplainObject.GetComponent<RectTransform>().anchoredPosition = localPoint + new Vector2(-expainOffsetX, expainOffsetY);
         upgradExplainObject.SetActive(isEnter);
     }
+    public void UpgradeNode(string index , int selfBTNId)
+    {
+        int level = 0;
+        if (mySaveData.nodeLevels.Count != 0) 
+            level = mySaveData.nodeLevels.Find(x => x.nodeID == index).level; // 노드 ID로 레벨 찾기
+
+        if(upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
+        {
+            // 업그레이드 가능 여부 체크
+            if (GoodsManager.goodsData.GoodsCount >= upgradExplainDictionary[index][level].needGoods)
+            {
+                // 비용 차감
+                GoodsManager.goodsData.GoodsCount -= upgradExplainDictionary[index][level].needGoods;
+                GoodsManager.GoodTXTUpdate();
+
+                // 레벨 업
+                NodeLevel nodeLevel = mySaveData.nodeLevels.Find(x => x.nodeID == index);
+                if (nodeLevel.nodeID == null) // 노드가 아직 리스트에 없으면 새로 추가
+                {
+                    mySaveData.nodeLevels.Add(new NodeLevel { nodeID = index, level = 1 });
+                }
+                else // 이미 있으면 레벨 업
+                {
+                    nodeLevel.level++;
+                    int idx = mySaveData.nodeLevels.FindIndex(x => x.nodeID == index);
+                    mySaveData.nodeLevels[idx] = nodeLevel; // 구조체이므로 수정 후 다시 할당 필요
+                }
+
+                // 스탯 적용
+                ExplainData explainData = upgradExplainDictionary[index][level];
+                switch (explainData.statTypes)
+                {
+                    case StatType.ATK:
+                        PlayerStatsManager.playerStats.AttackPower = CalculateStatFloat(PlayerStatsManager.playerStats.AttackPower, explainData.calcTypes, explainData.values);
+                        break;
+                    case StatType.DEF:
+                        PlayerStatsManager.playerStats.Defense = CalculateStatFloat(PlayerStatsManager.playerStats.Defense, explainData.calcTypes, explainData.values);
+                        break;
+                    case StatType.HP:
+                        PlayerStatsManager.playerStats.Health = CalculateStatFloat(PlayerStatsManager.playerStats.Health, explainData.calcTypes, explainData.values);
+                        break;
+                    case StatType.CRITCAL_CHANCE:
+                        PlayerStatsManager.playerStats.CriticalChance = CalculateStatFloat(PlayerStatsManager.playerStats.CriticalChance, explainData.calcTypes, explainData.values);
+                        break;
+                    case StatType.CRITCAL_DAMAGE:
+                        PlayerStatsManager.playerStats.CriticalDamage = CalculateStatFloat(PlayerStatsManager.playerStats.CriticalDamage, explainData.calcTypes, explainData.values);
+                        break;
+                    case StatType.CLICK_COUNT:
+                        PlayerStatsManager.playerStats.CoinByClick = CalculateStatInt(PlayerStatsManager.playerStats.CoinByClick, explainData.calcTypes, explainData.values);
+                        break;
+                }
+
+                //UI 업데이트 
+                // 나중에
+
+                // 해당 노드가 최대 레벨인지 체크
+                if (!mySaveData.maxUpgradNodes[selfBTNId] && upgradExplainDictionary.ContainsKey(index) && !upgradExplainDictionary[index].ContainsKey(level + 1))
+                {
+                    mySaveData.maxUpgradNodes[selfBTNId] = true;
+                    // UI에서 최대 레벨 도달 표시 (예시에서는 Debug.Log로 대체)
+                    Debug.Log($"노드 {index}가 최대 레벨에 도달했습니다!");
+                }
+                else
+                {
+                    Debug.Log($"노드 {index}가 레벨 {level + 1}로 업그레이드되었습니다!");
+                }
+            }
+            else
+            {
+                // UI로 코인 부족 메시지 띄우기 (예시에서는 Debug.Log로 대체)
+                Debug.Log("코인이 부족합니다!");
+            }
+        }
+        else
+        {
+            Debug.LogError($"업그레이드 데이터가 없습니다! 노드 ID: {index}, 레벨: {level}");
+        }
+    }
+    private float CalculateStatFloat(float currentStat, CalcType calcType, float value)
+    {
+        if (calcType == CalcType.Add) return currentStat + value;
+        if (calcType == CalcType.Multiply) return currentStat * value;
+        
+        return currentStat; // 혹시 몰라 넣는 안전장치
+    }
+
+    private int CalculateStatInt(int currentStat, CalcType calcType, float value)
+    {
+        if (calcType == CalcType.Add) return currentStat + (int)value;
+        if (calcType == CalcType.Multiply) return (int)(currentStat * value);
+        
+        return currentStat;
+    }
+    
     // 🌟 세이브 로직 수정본 (하나의 파일로 깔끔하게)
     public void SaveUpgradData()
     {
         string jsonData = JsonUtility.ToJson(mySaveData, true);
-        string path = Path.Combine(Application.persistentDataPath, "SaveData.json");
+        string path = Path.Combine(Application.persistentDataPath, "SaveUpgradData.json");
         File.WriteAllText(path, jsonData);
         Debug.Log("저장 완료!");
     }
 
     public void LoadUpgradData()
     {
-        string path = Path.Combine(Application.persistentDataPath, "SaveData.json");
+        string path = Path.Combine(Application.persistentDataPath, "SaveUpgradData.json");
         if (File.Exists(path))
         {
             string jsonData = File.ReadAllText(path);
@@ -155,8 +288,12 @@ public class UpgradManager : MonoBehaviour
     // 🌟 CSV 읽기 수정본 (인덱스 수정 완료)
     public void LoadUpgradValueData()
     {
-        TextAsset csvData = Resources.Load<TextAsset>("UpgradValue");
-        if (csvData == null) return;
+        TextAsset csvData = Resources.Load<TextAsset>("UpgradeValue");
+        if (csvData == null)
+        {
+            Debug.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
+            return;
+        }
 
         string[] lines = csvData.text.Split('\n');
         for (int i = 1; i < lines.Length; i++)
@@ -172,8 +309,8 @@ public class UpgradManager : MonoBehaviour
 
             upgradExplainDictionary[id][level] = new ExplainData
             {
-                statTypes = (StatType)Enum.Parse(typeof(StatType), row[2]), // 2번부터 시작!
-                calcTypes = (CalcType)Enum.Parse(typeof(CalcType), row[3]),
+                statTypes = Enum.Parse<StatType>(row[2]),
+                calcTypes = Enum.Parse<CalcType>(row[3]),
                 values = float.Parse(row[4]),
                 needGoods = int.Parse(row[5]),
                 upgradExplainID = row[6]

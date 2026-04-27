@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: BasicWeapon
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDataSo
+  weaponName: "\uB9C9\uB300\uAE30"
+  description: "\uBB34\uC2DC\uBB34\uC2DC\uD55C \uB9C9\uB300\uAE30\uC774\uB2E4."
+  unlockCost: 100
+  unlockSprite: {fileID: 0}
+  weaponSprite: {fileID: 4484074580269027458, guid: 493cef4dc1c03074484872424ee5d18a, type: 3}
+  weaponOverrideController: {fileID: 22100000, guid: a398e7b5b0a526b4c91abfe3a649eb9f, type: 2}
+  weaponEffectOverrideController: {fileID: 22100000, guid: 5eed41159f633b443af656b2da09d967, type: 2}
+  baseDamage: 1
+  meleeAttackRadius: 1
+  meleeOffset:
+  - {x: 0, y: -1.3}
+  - {x: 0, y: 1.3}
+  - {x: 1.3, y: 0}
+  - {x: -1.3, y: 0}
+  auraPrefab: {fileID: 0}
+  auraDamageMultiplier: 0
+  auraSpeed: 0
+  auraDuration: 0
+  maxAuraCount: 0
+  auraSpreadAngle: 0

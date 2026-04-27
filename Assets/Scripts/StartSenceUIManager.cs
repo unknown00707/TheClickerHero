@@ -10,7 +10,14 @@ public class StartSenceUIManager : MonoBehaviour
         languagePanel.SetActive(false);
         settingPanel.SetActive(false);
     }
-
+    public void GoToMainSence()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainSence");
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
     public void OpenLanguagePanel(bool isOpen)
     {
         languagePanel.SetActive(isOpen);

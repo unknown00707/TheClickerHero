@@ -3,5 +3,31 @@ BTN_START,게임 시작,Start Game
 BTN_LANGUAGE,언어,Language
 BTN_SETTING,설정,Setting
 BTN_EXIT,종료,Exit
-DESC_ATK_01,공격력을 {0} 증가시킵니다.,Up your Attack Stats
+DESC_END_UPGRADE,업그레이드가 끝났습니다!,Upgrade is finished!
+DESC_END_UPGRADE_TITLE,끝!,End!
+DESC_COST,비용 : ,Cost : ,
+DESC_FIRST,시작을 축하합니다!,Congratulations on the start!
+DESC_FIRST_TITLE,최초!,Welcome!
+DESC_ATK_01,공격력을 {0} 증가시킵니다.,Up {0} your Attack Stats
 DESC_ATK_01_TITLE,공격력 증가,Up Attack
+DESC_ATK_02,공격력을 {0}배 증가시킵니다.,Up {0} times your Attack Stats
+DESC_ATK_02_TITLE,공격력 배수 증가,Up Attack Multply
+DESC_DEF_01,방어력을 {0} 증가시킵니다.,Up {0} your Defence Stats
+DESC_DEF_01_TITLE,방어력 증가,Up Defence
+DESC_CLICK_01,클릭당 코인을 {0} 증가시킵니다.,Up {0} your Coin By Click
+DESC_CLICK_01_TITLE,클릭당 코인 증가,Up Coin By Click
+TXT_CLICK_WINDOW,클릭!,Click!
+TXT_STATS_WINDOW,능력치,Stats
+TXT_UPGRADE_WINDOW,업그래이드,Upgrade
+TXT_RELIC_WINDOW,유물,Relic
+TXT_DUNGEON_WINDOW,던전,Dungeon
+TXT_ATK,공격력 :,Attack :
+TXT_DEFENCE,방어력 :,Defence :
+TXT_HEALTH,생명력 :,Health :
+TXT_CTC,크리티컬 확률 :,Critical Chance :
+TXT_CTD,크리티컬 데미지 :,Critical Damage :
+TXT_CBC,클릭 당 코인 :,Coin By Click :
+TXT_RGP,희귀 아이템 드롭 확률 :,Rare Goods Probability :
+TXT_BFE,이로운 효과 :,Benfit Effect :
+TXT_SPEED,자동 사냥 배율 :,Auto Hunting Speed :
+TXT_RB,환생 보너스 :,Reincarnation Bonus :

@@ -5,25 +5,35 @@ using UnityEngine;
 [Serializable]
 public class GoodsData
 {
-    public int GoodsCount;
+    [SerializeField] private int goodsCount;
+    public int GoodsCount
+    {
+        get { return goodsCount; }
+        set { goodsCount = Mathf.Max(0, value); }
+    }
 }
 
 public class GoodsManager : MonoBehaviour
 {
+    public PlayerStatsManager playerStatsManager;
     public TextMeshProUGUI  GoodsCountTxt;
     public GoodsData goodsData;
 
     void Awake()
     {
-        GoodsCountTxt.text =  "Coins: " + goodsData.GoodsCount;
+        LoadGoods();
+        GoodTXTUpdate();
     }
 
     public void AddGoods()
     {
-        goodsData.GoodsCount++;
+        goodsData.GoodsCount += playerStatsManager.playerStats.CoinByClick;
+        GoodTXTUpdate();
+    }
+    public void GoodTXTUpdate()
+    {
         GoodsCountTxt.text =  "Coins: " + goodsData.GoodsCount;
     }
-
     public void SaveGoods()
     {
         string jsonData = JsonUtility.ToJson(goodsData, true);
@@ -39,7 +49,7 @@ public class GoodsManager : MonoBehaviour
         {
             string jsonData = File.ReadAllText(path);
             JsonUtility.FromJsonOverwrite(jsonData, goodsData);
-            GoodsCountTxt.text =  "Coins: " + goodsData.GoodsCount;
+            GoodTXTUpdate();
             Debug.Log("불러오기 완료! 경로: " + path);
         }
         else
