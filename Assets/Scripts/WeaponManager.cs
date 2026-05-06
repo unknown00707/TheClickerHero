@@ -30,7 +30,6 @@ public struct DamageInfo
 {
     public float damage;
     public AttackType type;  // 근접인지 검기인지!
-    public Vector2 hitPoint; // 맞은 위치 (이펙트 생성용)
 }
 [Serializable]
 public class UnlockWeaponData

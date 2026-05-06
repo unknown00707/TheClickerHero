@@ -1,30 +1,41 @@
 using UnityEngine;
 public class WeaponScript : MonoBehaviour
 {
+    private static readonly int YHash = Animator.StringToHash("y");
+    private static readonly int XHash = Animator.StringToHash("x");
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
+    public Transform plaerTransform; // 플레이어 위치 참조 (근접 공격 판정에 사용)
     public ActivablePlayer activablePlayer; // 무기 효과를 플레이어 애니메이션과 연동하기 위해 참조
     public Animator Animation; // 무기 자체 애니메이션 (검 휘두르는 모션)
+    public LayerMask enemyLayerMask; // 적 레이어 마스크 (적 레이어 설정 필요)
+    private readonly Collider2D[] hitResults = new Collider2D[200]; // 최대 10명까지 적을 감지할 수 있는 배열 (필요 시 크기 조절) 
+    ContactFilter2D filter = new();
+    void Awake()
+    {
+        filter.useLayerMask = true;
+        filter.layerMask = enemyLayerMask;
+        filter.useTriggers = false; // 트리거는 제외할지 선택
+    }
     // 애니메이션 이벤트에서 실행할 함수 (검을 휘두르는 타격 프레임에 실행!)
     public void OnMeleeAttackHit() 
     {
         // 1. 근접 타격 판정 (SO에 저장된 크기와 위치 사용!)
-        Vector2 hitCenter = (Vector2)activablePlayer.transform.position + activablePlayer.currentWeapon.meleeOffset[FindOffsetIndex()];
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(hitCenter, 
-        activablePlayer.currentWeapon.meleeAttackRadius, 
-        layerMask: LayerMask.GetMask("Enemy")); // "Enemy" 레이어에만 충돌 체크
-
-        foreach(Collider2D enemy in hitEnemies)
+        Vector2 hitCenter = (Vector2)plaerTransform.transform.position + activablePlayer.currentWeapon.meleeOffset[FindOffsetIndex()];
+        int hitCount = Physics2D.OverlapCircle(hitCenter, activablePlayer.currentWeapon.meleeAttackRadius, filter, hitResults);
+        Collider2D[] hitEnemies = new Collider2D[hitCount];
+        for (int i = 0; i < hitCount; i++) 
         {
-            float totalDamage = playerStatsManager.playerStats.AttackPower + (playerStatsManager.playerStats.AttackPower * activablePlayer.currentWeapon.baseDamage);
-            // 근접 데미지 정보 셋업 후 몬스터에게 전달
-            DamageInfo info = new()
-            { 
-                damage = totalDamage, 
-                type = AttackType.Melee,
-                hitPoint = enemy.ClosestPoint(hitCenter)
-            };
-            enemy.GetComponent<EnemyComme>().TakeDamage(info);
-          
+            if (hitResults[i].TryGetComponent<EnemyComme>(out var monster)) 
+            {
+                float totalDamage = playerStatsManager.playerStats.AttackPower + (playerStatsManager.playerStats.AttackPower * activablePlayer.currentWeapon.baseDamage);
+                // 근접 데미지 정보 셋업 후 몬스터에게 전달
+                DamageInfo info = new()
+                { 
+                    damage = totalDamage, 
+                    type = AttackType.Melee,
+                };
+                monster.TakeDamage(info);
+            }
         }
 
         Debug.Log("근접 공격! 맞은 적 수: " + hitEnemies.Length);
@@ -33,8 +44,8 @@ public class WeaponScript : MonoBehaviour
     int FindOffsetIndex()
     {
         int offsetIndex = 0;
-        float offsetX = Animation.GetFloat("x");
-        float offsetY = Animation.GetFloat("y");
+        float offsetX = Animation.GetFloat(XHash);
+        float offsetY = Animation.GetFloat(YHash);
         if (offsetX == 0 && offsetY == 0)
         {
             offsetIndex = 0;
@@ -62,7 +73,7 @@ public class WeaponScript : MonoBehaviour
         {
             Gizmos.color = Color.red; // 기즈모 색상 설정
             Vector2 hitCenter = (Vector2)activablePlayer.transform.position + activablePlayer.currentWeapon.meleeOffset[FindOffsetIndex()];
-            Gizmos.DrawWireSphere(new Vector3(hitCenter.x, hitCenter.y, 0), activablePlayer.currentWeapon.meleeAttackRadius);
+            Gizmos.DrawWireSphere(hitCenter, activablePlayer.currentWeapon.meleeAttackRadius);
         }
     }
     

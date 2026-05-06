@@ -39,8 +39,8 @@ public enum CalcType { Add, Multiply }
 public class UpgradManager : MonoBehaviour
 {
     [Header("Managers")]
-    public GoodsManager GoodsManager;
-    public PlayerStatsManager PlayerStatsManager;
+    public GoodsManager goodsManager;
+    public PlayerStatsManager playerStatsManager;
     [Header("UI References")]
     public Canvas canvas;
     public List<GameObject> upgradGroupObjects = new();
@@ -176,11 +176,11 @@ public class UpgradManager : MonoBehaviour
         if(upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
         {
             // 업그레이드 가능 여부 체크
-            if (GoodsManager.goodsData.GoodsCount >= upgradExplainDictionary[index][level].needGoods)
+            if (goodsManager.goodsData.GoodsCount >= upgradExplainDictionary[index][level].needGoods)
             {
                 // 비용 차감
-                GoodsManager.goodsData.GoodsCount -= upgradExplainDictionary[index][level].needGoods;
-                GoodsManager.GoodTXTUpdate();
+                goodsManager.goodsData.GoodsCount -= upgradExplainDictionary[index][level].needGoods;
+                goodsManager.GoodTXTUpdate();
 
                 // 레벨 업
                 NodeLevel nodeLevel = mySaveData.nodeLevels.Find(x => x.nodeID == index);
@@ -200,27 +200,32 @@ public class UpgradManager : MonoBehaviour
                 switch (explainData.statTypes)
                 {
                     case StatType.ATK:
-                        PlayerStatsManager.playerStats.AttackPower = CalculateStatFloat(PlayerStatsManager.playerStats.AttackPower, explainData.calcTypes, explainData.values);
+                    var (isPercentage_ATK, amount_ATK) = CalculateStatType(explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.UpgradeAttackPower(isPercentage_ATK, amount_ATK);
                         break;
                     case StatType.DEF:
-                        PlayerStatsManager.playerStats.Defense = CalculateStatFloat(PlayerStatsManager.playerStats.Defense, explainData.calcTypes, explainData.values);
+                        var (isPercentage_DEF, amount_DEF) = CalculateStatType(explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.UpgradeDefense(isPercentage_DEF, amount_DEF);
                         break;
                     case StatType.HP:
-                        PlayerStatsManager.playerStats.Health = CalculateStatFloat(PlayerStatsManager.playerStats.Health, explainData.calcTypes, explainData.values);
+                        var (isPercentage_HP, amount_HP) = CalculateStatType(explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.UpgradeHealth(isPercentage_HP, amount_HP);
                         break;
                     case StatType.CRITCAL_CHANCE:
-                        PlayerStatsManager.playerStats.CriticalChance = CalculateStatFloat(PlayerStatsManager.playerStats.CriticalChance, explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.CriticalChance += explainData.values;
                         break;
                     case StatType.CRITCAL_DAMAGE:
-                        PlayerStatsManager.playerStats.CriticalDamage = CalculateStatFloat(PlayerStatsManager.playerStats.CriticalDamage, explainData.calcTypes, explainData.values);
+                        var (isPercentage_CRITCAL_DAMAGE, amount_CRITCAL_DAMAGE) = CalculateStatType(explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.UpgradeCriticalDamage(isPercentage_CRITCAL_DAMAGE, amount_CRITCAL_DAMAGE);
                         break;
                     case StatType.CLICK_COUNT:
-                        PlayerStatsManager.playerStats.CoinByClick = CalculateStatInt(PlayerStatsManager.playerStats.CoinByClick, explainData.calcTypes, explainData.values);
+                        var (isPercentage_CLICK_COUNT, amount_CLICK_COUNT) = CalculateStatType(explainData.calcTypes, explainData.values);
+                        playerStatsManager.playerStats.UpgradeCoinByClick(isPercentage_CLICK_COUNT, (int)amount_CLICK_COUNT);
                         break;
                 }
 
                 //UI 업데이트 
-                // 나중에
+                playerStatsManager.UpDatePlayerStatsText(); // 플레이어 스탯 텍스트 업데이트
 
                 // 해당 노드가 최대 레벨인지 체크
                 if (!mySaveData.maxUpgradNodes[selfBTNId] && upgradExplainDictionary.ContainsKey(index) && !upgradExplainDictionary[index].ContainsKey(level + 1))
@@ -245,22 +250,14 @@ public class UpgradManager : MonoBehaviour
             Debug.LogError($"업그레이드 데이터가 없습니다! 노드 ID: {index}, 레벨: {level}");
         }
     }
-    private float CalculateStatFloat(float currentStat, CalcType calcType, float value)
+    private (bool isPercentage, float amount) CalculateStatType(CalcType calcType, float value)
     {
-        if (calcType == CalcType.Add) return currentStat + value;
-        if (calcType == CalcType.Multiply) return currentStat * value;
-        
-        return currentStat; // 혹시 몰라 넣는 안전장치
-    }
+        if (calcType == CalcType.Add) return (false, 0);
+        if (calcType == CalcType.Multiply) return (true, value);
 
-    private int CalculateStatInt(int currentStat, CalcType calcType, float value)
-    {
-        if (calcType == CalcType.Add) return currentStat + (int)value;
-        if (calcType == CalcType.Multiply) return (int)(currentStat * value);
-        
-        return currentStat;
+        return (false, 0); // 기본값 반환
     }
-    
+// ------------------- 세이브 & CSV 로드 ------------------ //
     // 🌟 세이브 로직 수정본 (하나의 파일로 깔끔하게)
     public void SaveUpgradData()
     {

@@ -4,8 +4,16 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Animator))]
 public class ActivablePlayer : MonoBehaviour
 {
+    private static readonly int NormalAttackHash = Animator.StringToHash("normalAttack");
+    private static readonly int YHash = Animator.StringToHash("y");
+    private static readonly int XHash = Animator.StringToHash("x");
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int SwordEffectHash = Animator.StringToHash("swordEffect");
+    private static readonly int SwordHash = Animator.StringToHash("sword");
+    private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
+    
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
-    public Transform playerTransform;
+    public Rigidbody2D playerRigidbody;
     public Vector2 inputVector;
     [Header("Animation")]
     public Animator playerAnim;
@@ -16,10 +24,11 @@ public class ActivablePlayer : MonoBehaviour
     public WeaponScript weaponScript;
     public Renderer weaponRander;
     public WeaponDataSo currentWeapon; // 현재 장착 중인 무기 SO
+    
     void Awake()
     {
         playerAnim.runtimeAnimatorController = animatorOverrideController;
-        weaponRander.enabled = false;
+        SetWeaponRanderFalse(false);
     }
     void OnMove(InputValue value)
     {
@@ -38,45 +47,46 @@ public class ActivablePlayer : MonoBehaviour
         {
             // 움직일 때만 x, y 값을 전달합니다. 
             // 멈추면 마지막으로 누른 방향을 애니메이터가 '기억'하게 됩니다!
-            playerAnim.SetFloat("x", inputVector.x);
-            playerAnim.SetFloat("y", inputVector.y);
-            weaponAnim.SetFloat("x", inputVector.x);
-            weaponAnim.SetFloat("y", inputVector.y);
-            weaponEffectAnim.SetFloat("x", inputVector.x);
-            weaponEffectAnim.SetFloat("y", inputVector.y);
+            playerAnim.SetFloat(XHash, inputVector.x);
+            playerAnim.SetFloat(YHash, inputVector.y);
+            weaponAnim.SetFloat(XHash, inputVector.x);
+            weaponAnim.SetFloat(YHash, inputVector.y);
+            weaponEffectAnim.SetFloat(XHash, inputVector.x);
+            weaponEffectAnim.SetFloat(YHash, inputVector.y);
         }
 
         // Speed에 현재 움직임의 크기(움직이면 1, 멈추면 0)를 전달합니다.
-        playerAnim.SetInteger("Speed", (int)inputVector.magnitude);
+        playerAnim.SetInteger(SpeedHash, (int)inputVector.magnitude);
     }
-    public void SetWeaponRanderFalse()
+    public void SetWeaponRanderFalse(bool isWeaponRander)
     {
-        weaponRander.enabled = false;
+        weaponRander.enabled = isWeaponRander;
     }
     void FixedUpdate()
     {
-        Vector3 moveDir = new(inputVector.x, inputVector.y, 0);
-        playerTransform.position += playerStatsManager.playerStats.Speed * Time.deltaTime * moveDir;
+        Vector2 moveDir = new Vector2(inputVector.x, inputVector.y).normalized; // 입력 벡터를 정규화하여 방향만 유지
+        Vector2 newPosition = playerRigidbody.position + moveDir * (playerStatsManager.playerStats.Speed * Time.fixedDeltaTime);
+        playerRigidbody.MovePosition(newPosition);
     }
 
     void OnUltimate()
     {
-        
+            
     }
 
     void OnNormalAttack()
     {
-        playerAnim.SetTrigger("normalAttack");
+        playerAnim.SetTrigger(NormalAttackHash);
     }
 
     void OnSwordAttack()
     {
         SetSameAnimeOverride();
-
-        weaponRander.enabled = true;
-        playerAnim.SetTrigger("swordAttack");
-        weaponAnim.SetTrigger("sword");
-        weaponEffectAnim.SetTrigger("swordEffect");
+        SetWeaponRanderFalse(true);
+        
+        playerAnim.SetTrigger(SwordAttackHash);
+        weaponAnim.SetTrigger(SwordHash);
+        weaponEffectAnim.SetTrigger(SwordEffectHash);
     }
 
     void SetSameAnimeOverride()
