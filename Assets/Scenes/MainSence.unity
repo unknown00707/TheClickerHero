@@ -1241,6 +1241,9 @@ MonoBehaviour:
   plaerTransform: {fileID: 1610518119}
   activablePlayer: {fileID: 40167125}
   Animation: {fileID: 152799553}
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &167853314
 GameObject:
   m_ObjectHideFlags: 0
@@ -2187,6 +2190,37 @@ MonoBehaviour:
   index: 
   selfBTNId: 0
   canOpenGroupId: 0
+--- !u!1 &323629256
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 323629257}
+  m_Layer: 0
+  m_Name: EnemyAura
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &323629257
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323629256}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 627687289}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &324688774
 GameObject:
   m_ObjectHideFlags: 0
@@ -4442,6 +4476,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7baab58110cc16b478259eb386fa1c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
+  enemyDataList:
+  - {fileID: 11400000, guid: 1a076630a1d71db48a6e00c75af57c03, type: 2}
+  emptyEnemyPrefab: {fileID: 0}
+  playerTransform: {fileID: 1610518119}
+  MAX_ENEMY_INSTANCES: 100
 --- !u!1 &623408039
 GameObject:
   m_ObjectHideFlags: 0
@@ -4625,6 +4664,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1235150365}
+  - {fileID: 323629257}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &627687290
@@ -8491,7 +8531,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   weaponDataArray:
-  - {fileID: 11400000, guid: afb649384fe0a914d8be4732ebe75c9d, type: 2}
+  - {fileID: 11400000, guid: 62f84056a77bb3c41aeaab457afdab94, type: 2}
   unlockWeaponData:
     weaponUnlockStatus: 01000000000000000000
     currentWeaponIndex: 0
@@ -10325,10 +10365,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d2100133080a543a071c1c0661021d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyComme
+  enemyManager: {fileID: 598883086}
   enemyTransform: {fileID: 627687289}
   playerTransform: {fileID: 1610518119}
-  maxHp: 100
-  currentHp: 0
+  animator: {fileID: 1235150367}
+  hitboxCollider: {fileID: 1235150369}
+  enemyData: {fileID: 0}
 --- !u!61 &1235150369
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10359,7 +10401,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

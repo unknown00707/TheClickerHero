@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GreenSlimeR
+  m_Name: GreenSlimeMoveL
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,21 +21,21 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 8846788702384302586, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+      value: {fileID: 6256670736958914234, guid: 8f49d856934807e4194150becf5ca542, type: 3}
     - time: 0.100000024
-      value: {fileID: 6079079942482995756, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.19999999
-      value: {fileID: -5334879911229951799, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.3
-      value: {fileID: -969896733159095448, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.40000004
-      value: {fileID: 5107216348946969648, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.50000006
-      value: {fileID: 5752897301745086858, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.59999996
-      value: {fileID: 2798556439372078301, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.69
-      value: {fileID: 2798556439372078301, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+      value: {fileID: 1630646820562983784, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.20000005
+      value: {fileID: 9098207798743861149, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.30000007
+      value: {fileID: 1007329465389382635, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.39999998
+      value: {fileID: -4811358535686747745, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.5
+      value: {fileID: -221140180257991850, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.6
+      value: {fileID: -878341045842589194, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+    - time: 0.69000006
+      value: {fileID: -878341045842589194, guid: 8f49d856934807e4194150becf5ca542, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -54,7 +54,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.7
+    m_StopTime: 0.70000005
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0

@@ -1,18 +1,24 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.Video;
+[RequireComponent(typeof(Animator))]
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class EnemyComme : MonoBehaviour
 {
+    public EnemyManager enemyManager;
     public Transform enemyTransform;
     public Transform playerTransform;
-    public EnemyDataSo enemyData = new();
+    private Animator animator;
+    private BoxCollider2D hitboxCollider;
+    private EnemyDataSo enemyData;
 
     private float currentHp = 0f;
 
     void Awake()
     {
-        enemyTransform = transform.parent; // 적 인스턴스의 부모 오브젝트를 참조 (적 프리팹의 구조에 따라 조정 필요)
-        playerTransform = GameObject.FindGameObjectWithTag("Player").transform; // 플레이어 태그로 플레이어 위치 참조 (적절한 태그 설정 필요)
+        animator = GetComponent<Animator>();
+        hitboxCollider = GetComponent<BoxCollider2D>();
     }
     void FixedUpdate()
     {
@@ -28,6 +34,11 @@ public class EnemyComme : MonoBehaviour
     public void SynchronizeBySo(EnemyDataSo data)
     {
         enemyData = data;
+
+        currentHp = enemyData.maxHp;
+        animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; // 애니메이터 컨트롤러 동기화
+        hitboxCollider.size = enemyData.hitboxSize; // 히트박스 크기 동기화
+        hitboxCollider.offset = enemyData.hitboxOffset; // 히트박스 오프셋 동기화
     }
 
     public void TakeDamage(DamageInfo info)
@@ -48,10 +59,19 @@ public class EnemyComme : MonoBehaviour
             //Instantiate(auraHitEffect, info.hitPoint, Quaternion.identity);
         }
     }
+
+    public void Die()
+    {
+        Debug.Log("적이 사망했습니다!");
+        // 사망 처리 (예: 사망 애니메이션 재생, 아이템 드랍 등)
+        // 사망 애니메이션이 끝난 후 적 인스턴스를 풀에 반환
+        enemyTransform.SetParent(enemyManager.transform); // 적 인스턴스를 매니저의 자식으로 다시 설정하여 풀링 시스템과 호환되도록 함
+        enemyManager.ReturnEnemyToPool(this);
+    }
     
 
     void OnEnable()
     {
-        currentHp = enemyData.maxHp;
+        enemyTransform = transform.parent; // 적 인스턴스의 부모 오브젝트를 참조 (적 프리팹의 구조에 따라 조정 필요)
     }
 }

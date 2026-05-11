@@ -8,8 +8,6 @@ public class ActivablePlayer : MonoBehaviour
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
-    private static readonly int SwordEffectHash = Animator.StringToHash("swordEffect");
-    private static readonly int SwordHash = Animator.StringToHash("sword");
     private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
     
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
@@ -85,8 +83,8 @@ public class ActivablePlayer : MonoBehaviour
         SetWeaponRanderFalse(true);
         
         playerAnim.SetTrigger(SwordAttackHash);
-        weaponAnim.SetTrigger(SwordHash);
-        weaponEffectAnim.SetTrigger(SwordEffectHash);
+        weaponAnim.SetTrigger(SwordAttackHash);
+        weaponEffectAnim.SetTrigger(SwordAttackHash);
     }
 
     void SetSameAnimeOverride()

@@ -9,18 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 22612ef1861e69c44832f2a62eb27556, type: 3}
   m_Name: BasicWeapon
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDataSo
-  weaponName: "\uB9C9\uB300\uAE30"
-  description: "\uBB34\uC2DC\uBB34\uC2DC\uD55C \uB9C9\uB300\uAE30\uC774\uB2E4."
-  unlockCost: 100
+  weaponName: 
+  description: 
+  unlockCost: 0
   unlockSprite: {fileID: 0}
-  weaponSprite: {fileID: 4484074580269027458, guid: 493cef4dc1c03074484872424ee5d18a, type: 3}
-  weaponOverrideController: {fileID: 22100000, guid: a398e7b5b0a526b4c91abfe3a649eb9f, type: 2}
-  weaponEffectOverrideController: {fileID: 22100000, guid: 5eed41159f633b443af656b2da09d967, type: 2}
-  baseDamage: 1
-  meleeAttackRadius: 1
+  weaponSprite: {fileID: 0}
+  weaponOverrideController: {fileID: 0}
+  weaponEffectOverrideController: {fileID: 0}
+  baseDamage: 0
+  meleeAttackRadius: 0
   meleeOffset:
   - {x: 0, y: 0}
   - {x: 0, y: 1.3}
