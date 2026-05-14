@@ -55,7 +55,8 @@ public class UpgradManager : MonoBehaviour
     public float expainOffsetY = 100f;
     // 업그레이드 데이터와 설명 데이터를 관리하는 변수입니다.
     // 세이브 데이터를 하나로 합쳤습니다.
-    private SaveData mySaveData = new(); 
+    private readonly SaveData mySaveData = new(); 
+    private readonly string UPGRAD_SAVE_FILE_NAME = "SaveUpgradData.json";
 
     // 설명 데이터(CSV) 딕셔너리
     private readonly Dictionary<string, Dictionary<int, ExplainData>> upgradExplainDictionary = new();
@@ -90,7 +91,8 @@ public class UpgradManager : MonoBehaviour
                 {
                     upgradGroupObjects[index].SetActive(true);
                     mySaveData.upgradUnlockStatus[index] = true;
-                    UpdateContentSize();           
+                    UpdateContentSize(); 
+                    GameManger.instance.SaveGame(); // 변경된 데이터 저장          
                 }
                 else
                     Debug.Log("노드 레벨이 부족하여 업그레이드 그룹을 열 수 없습니다.");
@@ -226,7 +228,7 @@ public class UpgradManager : MonoBehaviour
 
                 //UI 업데이트 
                 playerStatsManager.UpDatePlayerStatsText(); // 플레이어 스탯 텍스트 업데이트
-
+                GameManger.instance.SaveGame(); // 변경된 데이터 저장
                 // 해당 노드가 최대 레벨인지 체크
                 if (!mySaveData.maxUpgradNodes[selfBTNId] && upgradExplainDictionary.ContainsKey(index) && !upgradExplainDictionary[index].ContainsKey(level + 1))
                 {
@@ -259,28 +261,9 @@ public class UpgradManager : MonoBehaviour
     }
 // ------------------- 세이브 & CSV 로드 ------------------ //
     // 🌟 세이브 로직 수정본 (하나의 파일로 깔끔하게)
-    public void SaveUpgradData()
-    {
-        string jsonData = JsonUtility.ToJson(mySaveData, true);
-        string path = Path.Combine(Application.persistentDataPath, "SaveUpgradData.json");
-        File.WriteAllText(path, jsonData);
-        Debug.Log("저장 완료!");
-    }
+    public void SaveUpgradData() => GameManger.instance.SaveData(mySaveData, UPGRAD_SAVE_FILE_NAME);
 
-    public void LoadUpgradData()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "SaveUpgradData.json");
-        if (File.Exists(path))
-        {
-            string jsonData = File.ReadAllText(path);
-            JsonUtility.FromJsonOverwrite(jsonData, mySaveData);
-            Debug.Log("불러오기 완료! 경로: " + path);
-        }
-        else
-        {
-            Debug.LogWarning("저장된 데이터가 없습니다. 경로: " + path);
-        }
-    }
+    public void LoadUpgradData() => GameManger.instance.LoadData(mySaveData, UPGRAD_SAVE_FILE_NAME);
 
     // 🌟 CSV 읽기 수정본 (인덱스 수정 완료)
     public void LoadUpgradValueData()

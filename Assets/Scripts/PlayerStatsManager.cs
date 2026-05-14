@@ -157,6 +157,7 @@ public class PlayerStatsManager : MonoBehaviour
 {
     public PlayerStasData playerStats = new();
     public TextMeshProUGUI[] playerStatsText;
+    private readonly String SAVE_FILE_NAME = "SavePlayerStatsData.json";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -177,26 +178,6 @@ public class PlayerStatsManager : MonoBehaviour
         playerStatsText[9].text = (playerStats.ReincarnationBonus * 100).ToString("F1") + "%";
     }
 
-    public void SavePlayerStats()
-    {
-        string jsonData = JsonUtility.ToJson(playerStats, true);
-        string path = Path.Combine(Application.persistentDataPath, "SavePlayerStatsData.json");
-        File.WriteAllText(path, jsonData);
-        Debug.Log("저장 완료!" + path);
-    }
-
-    public void LoadPlayerStats()
-    {
-        string path = Path.Combine(Application.persistentDataPath, "SavePlayerStatsData.json");
-        if (File.Exists(path))
-        {
-            string jsonData = File.ReadAllText(path);
-            JsonUtility.FromJsonOverwrite(jsonData, playerStats);
-            Debug.Log("불러오기 완료!" + path);
-        }
-        else
-        {
-            Debug.LogWarning("저장된 플레이어 스탯 데이터가 없습니다.");
-        }
-    }
+    public void SavePlayerStats() => GameManger.instance.SaveData(playerStats, SAVE_FILE_NAME);
+    public void LoadPlayerStats() => GameManger.instance.LoadData(playerStats, SAVE_FILE_NAME);
 }

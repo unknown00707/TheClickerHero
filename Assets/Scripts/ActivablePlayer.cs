@@ -10,12 +10,11 @@ public class ActivablePlayer : MonoBehaviour
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
     
-    public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
+    public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조  
     public Rigidbody2D playerRigidbody;
     public Vector2 inputVector;
     [Header("Animation")]
     public Animator playerAnim;
-    public AnimatorOverrideController animatorOverrideController; // 애니메이터 오버라이드 컨트롤러 참조
     public Animator weaponAnim;
     public Animator weaponEffectAnim;
     [Header("Weapon Animation")]
@@ -25,7 +24,6 @@ public class ActivablePlayer : MonoBehaviour
     
     void Awake()
     {
-        playerAnim.runtimeAnimatorController = animatorOverrideController;
         SetWeaponRanderFalse(false);
     }
     void OnMove(InputValue value)
@@ -66,7 +64,7 @@ public class ActivablePlayer : MonoBehaviour
         Vector2 newPosition = playerRigidbody.position + moveDir * (playerStatsManager.playerStats.Speed * Time.fixedDeltaTime);
         playerRigidbody.MovePosition(newPosition);
     }
-
+    // ----------------------- 공격 입력 메서드 -----------------------
     void OnUltimate()
     {
             
@@ -86,11 +84,15 @@ public class ActivablePlayer : MonoBehaviour
         weaponAnim.SetTrigger(SwordAttackHash);
         weaponEffectAnim.SetTrigger(SwordAttackHash);
     }
-
+    // ----------------------- 애니메이션 관련 메서드 -----------------------
     void SetSameAnimeOverride()
     {
         // 플레이어는 나중에
         weaponAnim.runtimeAnimatorController = currentWeapon.weaponOverrideController;
         weaponEffectAnim.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
+    }
+    public Animator SetSkinAnimeOverride()
+    {
+        return playerAnim;
     }
 }

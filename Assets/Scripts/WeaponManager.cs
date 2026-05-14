@@ -28,4 +28,8 @@ public class WeaponManager : MonoBehaviour
     {
         
     }
+    public void SaveWeaponData()
+    {
+        
+    }
 }
