@@ -15,20 +15,20 @@ public class EnemyManager : MonoBehaviour
         for (int i = 0; i < MAX_ENEMY_INSTANCES; i++)
         {
             GameObject enemyInstance = Instantiate(emptyEnemyPrefab, transform);
-            // 적 인스턴스에 EnemyComme 컴포넌트를 추가하고 초기 설정 (예: 체력, 애니메이션 등)
-            EnemyComme enemyComme = enemyInstance.AddComponent<EnemyComme>();
+            // 적 인스턴스에 EnemyComme 컴포넌트를 참조하고 초기 설정 (예: 체력, 애니메이션 등)
+            EnemyComme enemyComme = enemyInstance.GetComponentInChildren<EnemyComme>();
             enemyComme.playerTransform = playerTransform; // 플레이어 위치 참조 설정
             enemyComme.enemyManager = this; // 적 매니저 참조 설정
             // 초기 설정은 나중에 활성화 시점에 해당 적 데이터로 적용할 예정
+            enemyComme.enemyTransform.SetParent(transform); // 적 인스턴스를 EnemyManager의 자식으로 설정
+            enemyComme.enemyTransform.gameObject.SetActive(false); // 초기에는 비활성화 상태로 시작
             ReturnEnemyToPool(enemyComme); // 초기에는 모든 인스턴스를 풀에 반환하여 비활성화 상태로 시작
         }
         EnemyPoolDictInit(); // 스테이지 레벨에 따른 적 데이터 딕셔너리 초기화
     }
     void EnemyPoolDictInit()
     {
-        // 예시
-        enemyPoolDict[1] = new List<EnemyDataSo> { enemyDataList[0], enemyDataList[1], enemyDataList[2] }; // 슬라임, 고블린, 오크
-        enemyPoolDict[2] = new List<EnemyDataSo> { enemyDataList[2], enemyDataList[3] }; // 오크, 트롤
+        LoadCSVDataToInitPoolDict(); // CSV 파일에서 스테이지 레벨에 따른 적 데이터 딕셔너리 초기화
     }
     public void SpawnEnemy(int stageLevel, int enemySpawnCount)
     {
@@ -46,12 +46,12 @@ public class EnemyManager : MonoBehaviour
                     EnemyDataSo selectedEnemyData = possibleEnemies[selectedEnemyIndex];
                     // 적 인스턴스 활성화 및 위치 설정 (예: 플레이어 주변 랜덤 위치)
                     Transform grandEnemyTransform = enemyComme.enemyTransform;
-                    grandEnemyTransform.gameObject.SetActive(true);
                     Vector2 spawnPosition = (Vector2)playerTransform.position + Random.insideUnitCircle.normalized * 5f; // 플레이어 주변 반경 5 내에서 랜덤 위치
-                    grandEnemyTransform.SetParent(null); // 적 인스턴스를 매니저에서 분리하여 독립적으로 움직일 수 있도록 설정
                     grandEnemyTransform.position = spawnPosition;
                     // 적 데이터 적용 (체력, 애니메이션 등)
                     enemyComme.SynchronizeBySo(selectedEnemyData); // 적 인스턴스에 선택된 적 데이터 적용
+
+                    grandEnemyTransform.gameObject.SetActive(true);
                 }
                 else
                 {
@@ -107,5 +107,72 @@ public class EnemyManager : MonoBehaviour
         // 적 인스턴스를 비활성화하고 풀에 반환
         enemyComme.enemyTransform.gameObject.SetActive(false);
         emptyEnemyInstancePool.Push(enemyComme);
+    }
+
+
+    // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
+
+    public void LoadCSVDataToInitPoolDict()
+    {
+        TextAsset csvData = Resources.Load<TextAsset>("EnemyIDByStageLevelData");
+        if (csvData == null)
+        {
+            Debug.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
+            return;
+        }
+
+        // 1. \r\n과 \n 모두 완벽하게 분리하고 빈 줄은 무시
+        string[] lines = csvData.text.Split(new char[] { '\n', '\r' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+        bool isFirstLine = true;
+
+        foreach (string line in lines)
+        {
+            // 2. 첫 줄(헤더) 건너뛰기
+            if (isFirstLine) 
+            { 
+                isFirstLine = false; 
+                continue; 
+            }
+
+            // 3. 쌍따옴표(") 제거 후 콤마(,)로 분리
+            // 예: 1,"0,1" -> 1,0,1 로 바꾼 뒤 쪼갬 -> ["1", "0", "1"]
+            string cleanLine = line.Replace("\"", "");
+            string[] parts = cleanLine.Split(',');
+
+            if (parts.Length < 2) continue;
+
+            // 4. parts[0]은 스테이지 레벨
+            if (!int.TryParse(parts[0], out int stageLevel))
+            {
+                Debug.LogWarning($"스테이지 파싱 에러: {parts[0]}");
+                continue;
+            }
+
+            List<EnemyDataSo> enemyDataForStage = new();
+
+            // 5. parts[1] 부터 끝까지는 전부 몬스터 ID
+            for (int i = 1; i < parts.Length; i++)
+            {
+                if (int.TryParse(parts[i], out int id))
+                {
+                    if (id >= 0 && id < enemyDataList.Count) // 안전 장치
+                    {
+                        enemyDataForStage.Add(enemyDataList[id]);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"EnemyID {id}가 리스트 범위를 벗어났습니다!");
+                    }
+                }
+            }
+
+            // 6. 딕셔너리에 추가
+            if (enemyDataForStage.Count > 0)
+            {
+                enemyPoolDict[stageLevel] = enemyDataForStage;
+            }
+        }
+        Debug.Log("스테이지 적 데이터 CSV 로드 완료!");
     }
 }

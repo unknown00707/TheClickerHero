@@ -10,17 +10,16 @@ using UnityEngine.UI;
 [Serializable]
 public class SaveData 
 {
-    public List<bool> upgradUnlockStatus = new() { true, false, false, false, false, false, false, false, false, false };
-    public List<bool> maxUpgradNodes = new() { false, false, false, false, false, false, false, false, false, false };
-    // 딕셔너리 대신 구조체 리스트를 써야 JSON 저장이 완벽하게 됩니다.
-    public List<NodeLevel> nodeLevels = new(); 
+    public List<NodeInfo> nodeInfos = new();
+    public List<bool> upgradGroupUnlockStatus = new(); // 업그레이드 그룹 잠금 해제 상태 리스트
 }
-
 [Serializable]
-public struct NodeLevel
+public struct NodeInfo
 {
     public string nodeID;
     public int level;
+    public bool isUnLock;
+    public bool isMaxLevel;
 }
 
 // 오타 수정: Expain -> Explain
@@ -55,26 +54,26 @@ public class UpgradManager : MonoBehaviour
     public float expainOffsetY = 100f;
     // 업그레이드 데이터와 설명 데이터를 관리하는 변수입니다.
     // 세이브 데이터를 하나로 합쳤습니다.
-    private readonly SaveData mySaveData = new(); 
+    private readonly SaveData upradeSaveData = new(); 
     private readonly string UPGRAD_SAVE_FILE_NAME = "SaveUpgradData.json";
-
+    private readonly Dictionary<string, NodeInfo> upgradNodeInfoDictionary = new(); // 노드 ID로 노드 정보 조회 딕셔너리
     // 설명 데이터(CSV) 딕셔너리
     private readonly Dictionary<string, Dictionary<int, ExplainData>> upgradExplainDictionary = new();
     // string : 노드의 ID, int : 노드의 레벨, ExpainData : 설명 데이터
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+    void Start()
     {
         scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
-        LoadUpgradData();
         LoadUpgradValueData();
+        LoadUpgradData();
         OpenAutoUpgradGroup();
     }
     // 게임 시작 시 세이브 데이터에 따라 자동으로 업그레이드 그룹을 여는 함수입니다.
     private void OpenAutoUpgradGroup()
     {
-        for(int i = 0; i < mySaveData.upgradUnlockStatus.Count; i++)
+        for(int i = 0; i < upradeSaveData.upgradGroupUnlockStatus.Count; i++)
         {
-            if(mySaveData.upgradUnlockStatus[i])
+            if(upradeSaveData.upgradGroupUnlockStatus[i])
                 upgradGroupObjects[i].SetActive(true);
         }
         UpdateContentSize();
@@ -82,22 +81,11 @@ public class UpgradManager : MonoBehaviour
     //By button
     public void OpenUpgradGroup(string nodeID , int index)
     {
-        if (mySaveData.upgradUnlockStatus[index]) return; // 이미 열려있으면 패스
-        for(int i = 0; i < mySaveData.nodeLevels.Count; i++)
+        if(upgradNodeInfoDictionary[nodeID].isUnLock && upgradGroupObjects[index].activeInHierarchy == false)
         {
-            if(mySaveData.nodeLevels[i].nodeID == nodeID)
-            {
-                if(mySaveData.nodeLevels[i].level >= 1) // 노드 레벨이 1 미만이면 패스
-                {
-                    upgradGroupObjects[index].SetActive(true);
-                    mySaveData.upgradUnlockStatus[index] = true;
-                    UpdateContentSize(); 
-                    GameManger.instance.SaveGame(); // 변경된 데이터 저장          
-                }
-                else
-                    Debug.Log("노드 레벨이 부족하여 업그레이드 그룹을 열 수 없습니다.");
-                
-            }
+            upgradGroupObjects[index].SetActive(true);
+            upradeSaveData.upgradGroupUnlockStatus[index] = true; // 세이브 데이터에도 잠금 해제 상태 저장
+            UpdateContentSize(); 
         }
     }
     public void UpdateContentSize()
@@ -135,9 +123,8 @@ public class UpgradManager : MonoBehaviour
 
     public void UpgradNodeExplain(string index, bool isEnter)
     {
-        int level = 0;
-        if (mySaveData.nodeLevels.Count != 0) 
-            level = mySaveData.nodeLevels.Find(x => x.nodeID == index).level; // 노드 ID로 레벨 찾기
+        upgradNodeInfoDictionary.TryGetValue(index, out NodeInfo nodeInfo);
+        int level = nodeInfo.level;
 
         // 설명 텍스트 설정
         string nodePath;
@@ -169,13 +156,12 @@ public class UpgradManager : MonoBehaviour
             upgradExplainObject.GetComponent<RectTransform>().anchoredPosition = localPoint + new Vector2(-expainOffsetX, expainOffsetY);
         upgradExplainObject.SetActive(isEnter);
     }
-    public void UpgradeNode(string index , int selfBTNId)
+    public void UpgradeNode(string index) // index = 노드 ID
     {
-        int level = 0;
-        if (mySaveData.nodeLevels.Count != 0) 
-            level = mySaveData.nodeLevels.Find(x => x.nodeID == index).level; // 노드 ID로 레벨 찾기
+        upgradNodeInfoDictionary.TryGetValue(index, out NodeInfo nodeInfo);
+        int level = nodeInfo.level;
 
-        if(upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
+        if (upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
         {
             // 업그레이드 가능 여부 체크
             if (goodsManager.goodsData.GoodsCount >= upgradExplainDictionary[index][level].needGoods)
@@ -185,17 +171,8 @@ public class UpgradManager : MonoBehaviour
                 goodsManager.GoodTXTUpdate();
 
                 // 레벨 업
-                NodeLevel nodeLevel = mySaveData.nodeLevels.Find(x => x.nodeID == index);
-                if (nodeLevel.nodeID == null) // 노드가 아직 리스트에 없으면 새로 추가
-                {
-                    mySaveData.nodeLevels.Add(new NodeLevel { nodeID = index, level = 1 });
-                }
-                else // 이미 있으면 레벨 업
-                {
-                    nodeLevel.level++;
-                    int idx = mySaveData.nodeLevels.FindIndex(x => x.nodeID == index);
-                    mySaveData.nodeLevels[idx] = nodeLevel; // 구조체이므로 수정 후 다시 할당 필요
-                }
+                if (nodeInfo.isUnLock == false) nodeInfo.isUnLock = true; // 노드가 잠겨있다면 잠금 해제
+                nodeInfo.level += 1;
 
                 // 스탯 적용
                 ExplainData explainData = upgradExplainDictionary[index][level];
@@ -230,9 +207,9 @@ public class UpgradManager : MonoBehaviour
                 playerStatsManager.UpDatePlayerStatsText(); // 플레이어 스탯 텍스트 업데이트
                 GameManger.instance.SaveGame(); // 변경된 데이터 저장
                 // 해당 노드가 최대 레벨인지 체크
-                if (!mySaveData.maxUpgradNodes[selfBTNId] && upgradExplainDictionary.ContainsKey(index) && !upgradExplainDictionary[index].ContainsKey(level + 1))
+                if (!upgradNodeInfoDictionary[index].isMaxLevel && upgradExplainDictionary.ContainsKey(index) && !upgradExplainDictionary[index].ContainsKey(level + 1))
                 {
-                    mySaveData.maxUpgradNodes[selfBTNId] = true;
+                    nodeInfo.isMaxLevel = true;
                     // UI에서 최대 레벨 도달 표시 (예시에서는 Debug.Log로 대체)
                     Debug.Log($"노드 {index}가 최대 레벨에 도달했습니다!");
                 }
@@ -240,6 +217,12 @@ public class UpgradManager : MonoBehaviour
                 {
                     Debug.Log($"노드 {index}가 레벨 {level + 1}로 업그레이드되었습니다!");
                 }
+
+                // 노드 정보 업데이트
+                upgradNodeInfoDictionary[index] = nodeInfo; 
+                
+                // 게임 데이터 저장
+                GameManger.instance.SaveGame();
             }
             else
             {
@@ -261,10 +244,55 @@ public class UpgradManager : MonoBehaviour
     }
 // ------------------- 세이브 & CSV 로드 ------------------ //
     // 🌟 세이브 로직 수정본 (하나의 파일로 깔끔하게)
-    public void SaveUpgradData() => GameManger.instance.SaveData(mySaveData, UPGRAD_SAVE_FILE_NAME);
+    public void SaveUpgradData()
+    {
+        upradeSaveData.nodeInfos.Clear();
+        foreach (var kvp in upgradNodeInfoDictionary.Values)        
+        {
+            upradeSaveData.nodeInfos.Add(kvp); // 딕셔너리의 노드 정보를 리스트에 추가
+        }
+        GameManger.instance.SaveData(upradeSaveData, UPGRAD_SAVE_FILE_NAME);
+    }
 
-    public void LoadUpgradData() => GameManger.instance.LoadData(mySaveData, UPGRAD_SAVE_FILE_NAME);
+    public void LoadUpgradData()
+    {
+        if(File.Exists(Path.Combine(Application.persistentDataPath, UPGRAD_SAVE_FILE_NAME)))
+        {
+            GameManger.instance.LoadData(upradeSaveData, UPGRAD_SAVE_FILE_NAME);
+            // 세이브 데이터에서 딕셔너리로 변환
+            foreach (var nodeInfo in upradeSaveData.nodeInfos)
+            {
+                upgradNodeInfoDictionary[nodeInfo.nodeID] = nodeInfo; // 노드 ID로 노드 정보 업데이트
+            }
+        }
+        else
+        {
+            // 초기 데이터 설정
+            foreach (string nodeID in upgradExplainDictionary.Keys)
+            {
+                bool index = false;
+                if (upgradNodeInfoDictionary.ContainsKey(nodeID)) continue; // 이미 초기화된 노드는 건너뜁니다.
+                if (nodeID == "FIRST_UPGRADE") index = true;
 
+                upgradNodeInfoDictionary[nodeID] = new NodeInfo
+                {
+                    nodeID = nodeID,
+                    level = 0,
+                    isUnLock = index,
+                    isMaxLevel = false
+                };
+                upradeSaveData.nodeInfos.Add(upgradNodeInfoDictionary[nodeID]);
+            }
+            
+            upradeSaveData.upgradGroupUnlockStatus = new List<bool>(new bool[upgradGroupObjects.Count])
+            {
+                [0] = true // 첫 번째 그룹은 기본적으로 열려있도록 설정
+            };
+
+            GameManger.instance.SaveData(upradeSaveData, UPGRAD_SAVE_FILE_NAME); // 초기 데이터 저장
+            GameManger.instance.LoadData(upradeSaveData, UPGRAD_SAVE_FILE_NAME); // 저장된 초기 데이터 로드
+        }
+    }
     // 🌟 CSV 읽기 수정본 (인덱스 수정 완료)
     public void LoadUpgradValueData()
     {

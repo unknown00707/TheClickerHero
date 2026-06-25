@@ -17,4 +17,10 @@ public class EnemyDataSo : ScriptableObject
     public AnimatorOverrideController enemyAnimatorOverride; // 적 애니메이션 오버라이드 (예: 슬라임이 점프하는 모션)
     public Vector2 hitboxSize;         // 적의 히트박스 크기 (예: 슬라임은 1x1 크기의 히트박스)
     public Vector2 hitboxOffset;       // 적의 히트박스 오프셋 (예: 슬라임은 중심에서 약간 아래로 히트박스 위치)
+    [Header("Aura Settings")]
+    public GameObject auraPrefab;       // 적이 발사하는 오라 프리팹 
+    public float auraDamage;         // 오라 데미지
+    public float auraDuration;       // 오라 지속 시간
+    public float auraSpeed;          // 오라 이동 속도
+    public int auraCount;         // 오라 개수 (동시 발사 수)
 }

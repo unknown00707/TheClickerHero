@@ -17,10 +17,10 @@ MonoBehaviour:
   unlockCost: 0
   unlockSprite: {fileID: 0}
   weaponSprite: {fileID: 0}
-  weaponOverrideController: {fileID: 0}
-  weaponEffectOverrideController: {fileID: 0}
-  baseDamage: 0
-  meleeAttackRadius: 0
+  weaponOverrideController: {fileID: 22100000, guid: a398e7b5b0a526b4c91abfe3a649eb9f, type: 2}
+  weaponEffectOverrideController: {fileID: 22100000, guid: 5eed41159f633b443af656b2da09d967, type: 2}
+  baseDamage: 15
+  meleeAttackRadius: 1
   meleeOffset:
   - {x: 0, y: 0}
   - {x: 0, y: 1.3}

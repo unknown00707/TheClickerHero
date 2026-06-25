@@ -16,10 +16,15 @@ MonoBehaviour:
   enemySprite: {fileID: 0}
   maxHp: 0
   attackPower: 0
-  moveSpeed: 0
+  moveSpeed: 5
   coinDrop: 0
   attackRange: 0
   attackCooldown: 0
   enemyAnimatorOverride: {fileID: 22100000, guid: f677711e46d14e24699ea41aeaea75ca, type: 2}
   hitboxSize: {x: 0, y: 0}
   hitboxOffset: {x: 0, y: 0}
+  auraPrefab: {fileID: 0}
+  auraDamage: 0
+  auraDuration: 0
+  auraSpeed: 0
+  auraCount: 0

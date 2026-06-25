@@ -31,7 +31,7 @@ public class AuraProjectile : MonoBehaviour
     }
 
     // 애니메이션 이벤트에서 실행할 함수 (검기가 뿜어져 나가는 프레임에 실행!)
-    public void OnFireAura()
+    public void OnFirePlayerAura()
     {
         if (activablePlayer.currentWeapon.auraPrefab != null)
         {
@@ -50,4 +50,21 @@ public class AuraProjectile : MonoBehaviour
                 activablePlayer.currentWeapon.auraSpreadAngle);
         }
     }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy") && gameObject.activeSelf)
+        {
+            if (other.TryGetComponent<EnemyComme>(out var enemyComme))
+            {
+                DamageInfo damage = new()
+                {
+                    damage = this.damage,
+                    type = AttackType.Aura
+                };
+                enemyComme.TakeDamage(damage);
+            }
+        }
+    }
+
 }

@@ -17,10 +17,10 @@ public class GoodsManager : MonoBehaviour
 {
     public PlayerStatsManager playerStatsManager;
     public TextMeshProUGUI  GoodsCountTxt;
-    public GoodsData goodsData;
+    public GoodsData goodsData = new();
     private readonly string fileName = "SaveGoodsData.json";
 
-    void Awake()
+    void Start()
     {
         LoadGoods();
         GoodTXTUpdate();
@@ -39,6 +39,9 @@ public class GoodsManager : MonoBehaviour
 
     public void LoadGoods()
     {
+        if (!File.Exists(Path.Combine(Application.persistentDataPath, fileName)))
+            SaveGoods(); // 파일이 없으면 새로 생성
+            
         GameManger.instance.LoadData(goodsData, fileName);
         GoodTXTUpdate();
     }

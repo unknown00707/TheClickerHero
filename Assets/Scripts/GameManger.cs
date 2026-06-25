@@ -12,7 +12,15 @@ public class GameManger : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
-        instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        else
+        {
+            instance = this;
+        }
     }
 
     public void SaveGame()
@@ -29,21 +37,22 @@ public class GameManger : MonoBehaviour
         string jsonData = JsonUtility.ToJson(data, true);
         string path = Path.Combine(Application.persistentDataPath, fileName);
         File.WriteAllText(path, jsonData);
-        Debug.Log($"저장 완료! 경로: {path}");
+        Debug.Log($"저장 완료! 데이터: {data.GetType().Name} 경로: {path}");
     }
 
-    public void LoadData<T>(T data, string fileName)
+    public void LoadData<T>(T data, string fileName) 
     {
         string path = Path.Combine(Application.persistentDataPath, fileName);
         if (File.Exists(path))
         {
             string jsonData = File.ReadAllText(path);
             JsonUtility.FromJsonOverwrite(jsonData, data);
-            Debug.Log($"불러오기 완료! 경로: {path}");
+            Debug.Log($"불러오기 완료! 데이터: {data.GetType().Name} 경로: {path}");
         }
         else
         {
-            Debug.LogWarning($"저장된 데이터가 없습니다. 경로: {path}");
+            Debug.LogWarning($"저장된 데이터/{data.GetType().Name}/가 없습니다. 경로: {path}");
         }
+        
     }
 }

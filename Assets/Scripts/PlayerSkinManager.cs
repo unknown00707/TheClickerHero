@@ -14,7 +14,7 @@ public class PlayerSkinManager : MonoBehaviour
     public ActivablePlayer activablePlayer; // 플레이어 참조
     public List<PlayerSkinDataSo> allSkins; // 게임에 존재하는 모든 스킨 데이터
     private readonly SaveSkinData saveData = new(); // 저장할 스킨 데이터
-    private readonly String SAVE_FILE_NAME = "SaveSkinsData.json"; // 저장 파일 이름
+    private readonly string SAVE_FILE_NAME = "SaveSkinsData.json"; // 저장 파일 이름
 
     public void UnlockSkin(int skinIndex)
     {

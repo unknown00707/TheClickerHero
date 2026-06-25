@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
@@ -6,14 +7,18 @@ using UnityEngine.Video;
 [RequireComponent(typeof(BoxCollider2D))]
 public class EnemyComme : MonoBehaviour
 {
+    private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
     public EnemyManager enemyManager;
     public Transform enemyTransform;
+    public Rigidbody2D enemyRigidbody;
     public Transform playerTransform;
     private Animator animator;
     private BoxCollider2D hitboxCollider;
     private EnemyDataSo enemyData;
 
-    private float currentHp = 0f;
+    [SerializeField]private float currentHp = 0f;
+    private Coroutine trackCoroutine; 
+    private Vector2 distanceToPlayer;
 
     void Awake()
     {
@@ -23,12 +28,10 @@ public class EnemyComme : MonoBehaviour
     void FixedUpdate()
     {
         if (enemyData == null) return; // 적 데이터가 설정되지 않았으면 이동 로직 실행하지 않음
-        var distanceToPlayer = enemyTransform.transform.position - playerTransform.transform.position;
-        if (distanceToPlayer.magnitude > enemyData.attackRange) // 적이 플레이어와 일정 거리 이상 떨어져 있을 때만 이동
-        {
-            // 적이 플레이어를 향하도록 회전
-            enemyTransform.position += enemyData.moveSpeed * Time.fixedDeltaTime * distanceToPlayer.normalized; // 이동 속도 조절 (필요 시)
-        }
+        if (distanceToPlayer.magnitude >= enemyData.attackRange) // 적이 플레이어와 일정 거리 이상 떨어져 있을 때만 이동
+            enemyRigidbody.linearVelocity = enemyData.moveSpeed * distanceToPlayer.normalized; // 이동 속도 조절 (필요 시)
+        else
+            enemyRigidbody.linearVelocity = Vector2.zero; // 공격 범위 내에 들어오면 이동을 멈춤
     }
 
     public void SynchronizeBySo(EnemyDataSo data)
@@ -69,9 +72,38 @@ public class EnemyComme : MonoBehaviour
         enemyManager.ReturnEnemyToPool(this);
     }
     
+    IEnumerator UpdateTargetDirectionRoutine()
+    {
+        // 에러 방지를 위해 Start() 등이 끝날 때까지 한 프레임 쉬어주는 게 안전합니다
+        yield return null; 
+
+        while (true)
+        {
+            // 플레이어가 씬에 존재하고 타겟이 지정되어 있을 때만 연산
+            if (playerTransform != null)
+            {
+                distanceToPlayer = playerTransform.position - enemyTransform.position;
+            }
+            
+            yield return _waitForSeconds0_1;
+        }
+    }
 
     void OnEnable()
     {
         enemyTransform = transform.parent; // 적 인스턴스의 부모 오브젝트를 참조 (적 프리팹의 구조에 따라 조정 필요)
+
+        if (trackCoroutine != null) StopCoroutine(trackCoroutine);
+            trackCoroutine = StartCoroutine(UpdateTargetDirectionRoutine());
+    }
+
+    void OnDisable()
+    {
+        // 오브젝트가 비활성화될 때 코루틴을 확실히 종료
+        if (trackCoroutine != null)
+        {
+            StopCoroutine(trackCoroutine);
+            trackCoroutine = null;
+        }
     }
 }
