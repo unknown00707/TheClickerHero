@@ -6,6 +6,7 @@ public class EnemyDataSo : ScriptableObject
     [Header("Enemy Information")]
     public string enemyName;          // 적 이름 (예: 슬라임)
     public Sprite enemySprite;       // 적 스프라이트
+    public Sprite deadSprite;       // 죽을 때 보일 스프라이트
     public float maxHp;             // 최대 체력
     public float attackPower;       // 공격력
     public float moveSpeed;         // 이동 속도

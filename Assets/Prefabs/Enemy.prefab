@@ -32,7 +32,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7637908795833583685}
-  - {fileID: 2605568717357323107}
   - {fileID: 4534676703270280154}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -241,6 +240,9 @@ MonoBehaviour:
   enemyTransform: {fileID: 4272807103443607973}
   enemyRigidbody: {fileID: 8497953345816182935}
   playerTransform: {fileID: 0}
+  spriteRenderer: {fileID: 7142464961081525221}
+  animator: {fileID: 4210919166089505664}
+  currentHp: 0
 --- !u!61 &6537327567138097717
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -337,34 +339,3 @@ MonoBehaviour:
   duration: 1
   maxCount: 1
   spreadAngle: 0
---- !u!1 &7720987811113301920
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2605568717357323107}
-  m_Layer: 6
-  m_Name: EnemyWeaponEffect
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2605568717357323107
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7720987811113301920}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4272807103443607973}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

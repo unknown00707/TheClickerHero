@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Video;
@@ -7,37 +8,87 @@ using UnityEngine.Video;
 [RequireComponent(typeof(BoxCollider2D))]
 public class EnemyComme : MonoBehaviour
 {
-    private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
     public EnemyManager enemyManager;
     public Transform enemyTransform;
     public Rigidbody2D enemyRigidbody;
     public Transform playerTransform;
-    private Animator animator;
+    public SpriteRenderer spriteRenderer;
+    public Animator animator;
     private BoxCollider2D hitboxCollider;
     private EnemyDataSo enemyData;
 
     [SerializeField]private float currentHp = 0f;
+    private bool isDead = false;
     private Coroutine trackCoroutine; 
-    private Vector2 distanceToPlayer;
+    private Vector2 vectorToPlayer ;
+    private Vector2 dirToPlayer;
+    [SerializeField] private LayerMask playerLayer;
+    [Header("Animation")]
+    private static readonly int YHash = Animator.StringToHash("y");
+    private static readonly int XHash = Animator.StringToHash("x");
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private float attackCoolTime = 0f;
+    private static readonly WaitForSeconds _waitForSeconds0_1 = new(0.1f);
 
     void Awake()
     {
-        animator = GetComponent<Animator>();
         hitboxCollider = GetComponent<BoxCollider2D>();
+    }
+    void Update()
+    {
+        if (currentHp <= 0f && !isDead) 
+        {
+            Die();
+        }
     }
     void FixedUpdate()
     {
-        if (enemyData == null) return; // 적 데이터가 설정되지 않았으면 이동 로직 실행하지 않음
-        if (distanceToPlayer.magnitude >= enemyData.attackRange) // 적이 플레이어와 일정 거리 이상 떨어져 있을 때만 이동
-            enemyRigidbody.linearVelocity = enemyData.moveSpeed * distanceToPlayer.normalized; // 이동 속도 조절 (필요 시)
+        if (enemyData == null || isDead) return; // 적 데이터가 설정되지 않았으면 이동 로직 실행하지 않음
+        if (vectorToPlayer .magnitude > enemyData.attackRange) // 적이 플레이어와 일정 거리 이상 떨어져 있을 때만 이동
+            enemyRigidbody.linearVelocity = enemyData.moveSpeed * vectorToPlayer .normalized; // 이동 속도 조절 (필요 시)
         else
-            enemyRigidbody.linearVelocity = Vector2.zero; // 공격 범위 내에 들어오면 이동을 멈춤
+        {
+            AttackSign();
+        }
+    }
+
+    void AttackSign()
+    {
+        if (Time.time < attackCoolTime) return;
+        
+        enemyRigidbody.linearVelocity = Vector2.zero; // 공격 범위 내에 들어오면 이동을 멈춤
+        enemyRigidbody.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
+        animator.SetTrigger(AttackHash); // 공격 계시
+    }
+
+    public void OnAttackHitTrigger()
+    {
+        // 몬스터 중심에서 공격 방향으로 BoxCast를 발사하여 판정
+        RaycastHit2D hit = Physics2D.BoxCast(
+            transform.position,         // 발사 시작 위치
+            enemyData.hitboxSize,                    // 박스의 크기
+            0f,                         // 회전 각도
+            dirToPlayer,     // 발사 방향 (동서남북 중 하나)
+            enemyData.attackRange,               // 사정거리
+            playerLayer                 // 레이어 마스크
+        );
+
+        if (hit.collider != null)
+        {
+            Debug.Log($"플레이어 히트! 대미지를 입힙니다.");
+            // hit.collider.GetComponent<PlayerHealth>()?.TakeDamage(10);
+        }
+    } 
+    public void OnAttackAnimationEnd()
+    {
+        // 다시 움직일 수 있도록 물리 고정 해제
+        enemyRigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
     public void SynchronizeBySo(EnemyDataSo data)
     {
         enemyData = data;
-
+        spriteRenderer.sprite = data.enemySprite;
         currentHp = enemyData.maxHp;
         animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; // 애니메이터 컨트롤러 동기화
         hitboxCollider.size = enemyData.hitboxSize; // 히트박스 크기 동기화
@@ -66,10 +117,11 @@ public class EnemyComme : MonoBehaviour
     public void Die()
     {
         Debug.Log("적이 사망했습니다!");
-        // 사망 처리 (예: 사망 애니메이션 재생, 아이템 드랍 등)
-        // 사망 애니메이션이 끝난 후 적 인스턴스를 풀에 반환
-        enemyTransform.SetParent(enemyManager.transform); // 적 인스턴스를 매니저의 자식으로 다시 설정하여 풀링 시스템과 호환되도록 함
-        enemyManager.ReturnEnemyToPool(this);
+        isDead = true;
+        spriteRenderer.sprite = enemyData.deadSprite;
+        // 몇 초있다가 초기 상태로 리셋하는 로직
+
+        enemyManager.ReturnEnemyToPool(this); // 인스턴스를 풀에 반환 
     }
     
     IEnumerator UpdateTargetDirectionRoutine()
@@ -82,7 +134,20 @@ public class EnemyComme : MonoBehaviour
             // 플레이어가 씬에 존재하고 타겟이 지정되어 있을 때만 연산
             if (playerTransform != null)
             {
-                distanceToPlayer = playerTransform.position - enemyTransform.position;
+                vectorToPlayer  = playerTransform.position - enemyTransform.position;
+                dirToPlayer = Vector2.zero;
+                if (Mathf.Abs(vectorToPlayer.x) > Mathf.Abs(vectorToPlayer.y))
+                {
+                    // x축 거리가 더 멀다면 -> 좌(왼쪽) 우(오른쪽) 중 하나
+                    dirToPlayer.x = dirToPlayer.x > 0 ? 1f : -1f;
+                }
+                else
+                {
+                    // y축 거리가 더 멀다면 -> 상(위쪽) 하(아래쪽) 중 하나
+                    dirToPlayer.y = dirToPlayer.y > 0 ? 1f : -1f;
+                }
+                animator.SetFloat(XHash, dirToPlayer.x);
+                animator.SetFloat(YHash, dirToPlayer.y);
             }
             
             yield return _waitForSeconds0_1;
@@ -91,8 +156,6 @@ public class EnemyComme : MonoBehaviour
 
     void OnEnable()
     {
-        enemyTransform = transform.parent; // 적 인스턴스의 부모 오브젝트를 참조 (적 프리팹의 구조에 따라 조정 필요)
-
         if (trackCoroutine != null) StopCoroutine(trackCoroutine);
             trackCoroutine = StartCoroutine(UpdateTargetDirectionRoutine());
     }

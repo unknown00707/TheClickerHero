@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Slime
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDataSo
   enemyName: 
-  enemySprite: {fileID: 0}
+  enemySprite: {fileID: 2132816331755856287, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+  deadSprite: {fileID: -905545356714321652, guid: af0ec21d16dd4b446b86918698e019bc, type: 3}
   maxHp: 0
   attackPower: 0
-  moveSpeed: 5
+  moveSpeed: 2
   coinDrop: 0
   attackRange: 0
   attackCooldown: 0
