@@ -12,7 +12,9 @@ public class ActivablePlayer : MonoBehaviour
     
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조  
     public Rigidbody2D playerRigidbody;
-    public Vector2 inputVector;
+    private Vector2 inputVector;
+    private Vector2 dirPlayerVector;
+    public Vector2 ReturnDirPlayerVec => dirPlayerVector;
     [Header("Animation")]
     public Animator playerAnim;
     public Animator weaponAnim;
@@ -49,6 +51,8 @@ public class ActivablePlayer : MonoBehaviour
             weaponAnim.SetFloat(YHash, inputVector.y);
             weaponEffectAnim.SetFloat(XHash, inputVector.x);
             weaponEffectAnim.SetFloat(YHash, inputVector.y);
+
+            dirPlayerVector = inputVector;
         }
 
         // Speed에 현재 움직임의 크기(움직이면 1, 멈추면 0)를 전달합니다.

@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GreenSlimeMoveF
+  m_Name: MoveL_snow
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,21 +21,23 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 2132816331755856287, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.1
-      value: {fileID: -7825471729476649926, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.2
-      value: {fileID: 1142179499542555044, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.3
-      value: {fileID: 695892391009727293, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.4
-      value: {fileID: -8377281540175767439, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+      value: {fileID: 1362052220369657657, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.099999905
+      value: {fileID: 9045467373654219218, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.19999981
+      value: {fileID: -2442273564255940993, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.29999995
+      value: {fileID: 8503751358456707489, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.39999986
+      value: {fileID: -8621283552344054788, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
     - time: 0.5
-      value: {fileID: 162829400786199520, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.6
-      value: {fileID: -2772239980876164541, guid: 8f49d856934807e4194150becf5ca542, type: 3}
-    - time: 0.69000006
-      value: {fileID: -2772239980876164541, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+      value: {fileID: -2260026603017882864, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.5999999
+      value: {fileID: 2839098364547945980, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.6999998
+      value: {fileID: -8823876555414311964, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
+    - time: 0.78999984
+      value: {fileID: -8823876555414311964, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -54,7 +56,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.70000005
+    m_StopTime: 0.79999983
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0

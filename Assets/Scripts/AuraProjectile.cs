@@ -1,70 +1,77 @@
-using System;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class AuraProjectile : MonoBehaviour
 {
-    public ActivablePlayer activablePlayer;
-    public float speed = 1;
-    public float damage = 0;
-    public float duration = 1;
-    public int maxCount = 1;
-    public float spreadAngle = 0;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [Header("오브젝트 풀 설정 (인스펙터 조절용)")]
+    public int poolDefaultCapacity = 10; // 처음에 미리 만들어둘 개수
+    public int poolMaxSize = 50;         // 풀에 최대로 쌓아둘 개수
+
+    private float speed;
+    private float damage;
+    private float duration;
+    private float currentLifetime;
+    private bool isPlayerAttack;
+
+    private IObjectPool<GameObject> myPool;
+    private Animator animator;
+
+    private void Awake()
     {
-        
+        // 최적화를 위해 애니메이터 컴포넌트 사전 캐싱
+        animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetupAura(IObjectPool<GameObject> pool, float damage, float speed, float duration, bool isPlayerAttack)
     {
-        
-    }
-
-    public void SetupAura(float damage, float speed, float duration, int maxCount, float spreadAngle)
-    {
+        this.myPool = pool;
         this.damage = damage;
         this.speed = speed;
         this.duration = duration;
-        this.maxCount = maxCount;
-        this.spreadAngle = spreadAngle;
+        this.isPlayerAttack = isPlayerAttack;
+        this.currentLifetime = 0f;
+
+        // 🌟 [기능 구현] 애니메이터 리셋 (처음 프레임부터 다시 재생)
+        if (animator != null)
+        {
+            // "Base Layer"의 0번째 시간(처음)으로 강제 되돌림
+            animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
+        }
     }
 
-    // 애니메이션 이벤트에서 실행할 함수 (검기가 뿜어져 나가는 프레임에 실행!)
-    public void OnFirePlayerAura()
+    void Update()
     {
-        if (activablePlayer.currentWeapon.auraPrefab != null)
+        // 유니티 2D에서는 대개 transform.right(오른쪽 화살표 방향) 방향을 정면(0도)으로 잡고 회전시킵니다.
+        transform.Translate(Vector3.right * speed * Time.deltaTime);
+
+        currentLifetime += Time.deltaTime;
+        if (currentLifetime >= duration)
         {
-            // 2. 검기 프리팹 생성! (이후 움직임은 프리팹 자체 스크립트가 알아서 함)
-            GameObject aura = Instantiate(activablePlayer.currentWeapon.auraPrefab, transform.position, transform.rotation);
-            
-            // 검기에 데미지 정보 세팅 (검기 전용 스크립트에 값 넘겨주기)
-            AuraProjectile auraScript = aura.GetComponent<AuraProjectile>();
-            float totalDamage = activablePlayer.playerStatsManager.playerStats.AttackPower + 
-            (activablePlayer.currentWeapon.baseDamage 
-            * activablePlayer.currentWeapon.auraDamageMultiplier 
-            * activablePlayer.playerStatsManager.playerStats.AttackPower); // 이미 계산된 데미지 사용
-            auraScript.SetupAura(totalDamage, 
-                activablePlayer.currentWeapon.auraSpeed, activablePlayer.currentWeapon.auraDuration, 
-                activablePlayer.currentWeapon.maxAuraCount, 
-                activablePlayer.currentWeapon.auraSpreadAngle);
+            ReturnToPool();
         }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy") && gameObject.activeSelf)
+        if (isPlayerAttack && other.CompareTag("EnemyHit"))
         {
             if (other.TryGetComponent<EnemyComme>(out var enemyComme))
             {
-                DamageInfo damage = new()
-                {
-                    damage = this.damage,
-                    type = AttackType.Aura
-                };
-                enemyComme.TakeDamage(damage);
+                DamageInfo dmgInfo = new() { damage = this.damage, type = AttackType.Aura };
+                enemyComme.TakeDamage(dmgInfo);
+                ReturnToPool();
             }
+        }
+        else if (!isPlayerAttack && other.CompareTag("Player"))
+        {
+            // 플레이어 피격 로직 처리...
+            ReturnToPool();
         }
     }
 
+    private void ReturnToPool()
+    {
+        if (myPool != null) myPool.Release(this.gameObject);
+        else Destroy(gameObject);
+    }
 }

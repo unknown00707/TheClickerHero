@@ -14,7 +14,7 @@ public class WeaponScript : MonoBehaviour
     {
         filter.useLayerMask = true;
         filter.layerMask = enemyLayerMask;
-        filter.useTriggers = false; // 트리거는 제외할지 선택
+        filter.useTriggers = true; // 트리거는 제외할지 선택
     }
     // 애니메이션 이벤트에서 실행할 함수 (검을 휘두르는 타격 프레임에 실행!)
     public void OnMeleeAttackHit() 
@@ -77,4 +77,27 @@ public class WeaponScript : MonoBehaviour
         }
     }
     
+    public void OnRangeAttack()
+    {
+        var weapon = activablePlayer.currentWeapon;
+        if (weapon == null) return;
+
+        // 플레이어의 최종 데미지 계산
+        float totalDamage = (activablePlayer.playerStatsManager.playerStats.AttackPower + weapon.baseDamage) * weapon.auraDamageMultiplier;
+
+        Vector2 lookDirection = activablePlayer.ReturnDirPlayerVec; 
+
+        // 매니저 인스턴스를 통해 바로 호출!
+        AuraManager.Instance.FireSpreadAura(
+            weapon.auraPrefab,
+            transform.position,
+            lookDirection,
+            weapon.maxAuraCount,
+            weapon.auraSpreadAngle,
+            totalDamage,
+            weapon.auraSpeed,
+            weapon.auraDuration,
+            isPlayerAttack: true
+        );
+    }
 }

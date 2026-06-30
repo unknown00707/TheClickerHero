@@ -105,7 +105,6 @@ public class EnemyManager : MonoBehaviour
     public void ReturnEnemyToPool(EnemyComme enemyComme)
     {
         // 적 인스턴스를 비활성화하고 풀에 반환
-        enemyComme.enemyTransform.gameObject.SetActive(false);
         emptyEnemyInstancePool.Push(enemyComme);
     }
 

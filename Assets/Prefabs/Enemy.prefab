@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 4210919166089505664}
   - component: {fileID: 5382730557777498420}
   - component: {fileID: 6537327567138097717}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: EnemyBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -242,7 +242,16 @@ MonoBehaviour:
   playerTransform: {fileID: 0}
   spriteRenderer: {fileID: 7142464961081525221}
   animator: {fileID: 4210919166089505664}
+  groundCol2D: {fileID: 7267437001725706949}
+  auraProjectile: {fileID: 0}
+  enemyData: {fileID: 0}
   currentHp: 0
+  vectorToPlayer: {x: 0, y: 0}
+  dirToPlayer: {x: 0, y: 0}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  deadTime: 3
 --- !u!61 &6537327567138097717
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -273,7 +282,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -298,7 +307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4534676703270280154}
-  - component: {fileID: 8198659582487674923}
+  - component: {fileID: 3720173640736780276}
   m_Layer: 6
   m_Name: EnemyAura
   m_TagString: Untagged
@@ -321,7 +330,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4272807103443607973}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8198659582487674923
+--- !u!114 &3720173640736780276
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -330,12 +339,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 5991746702532649554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d0c3d1281a3c384eb5a8c4ab1cb77d3, type: 3}
+  m_Script: {fileID: 11500000, guid: 281f703ebd2069148b2026a978a398f8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AuraProjectile
+  m_EditorClassIdentifier: Assembly-CSharp::AuraSpawner
   activablePlayer: {fileID: 0}
-  speed: 1
-  damage: 0
-  duration: 1
-  maxCount: 1
-  spreadAngle: 0
+  auraPrefab: {fileID: 0}
