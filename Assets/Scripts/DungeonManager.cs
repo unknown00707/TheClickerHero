@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
+using TMPro;
 using UnityEngine;
 
 [Serializable]
@@ -17,11 +18,13 @@ public class DungeonDataFromCSV
 }
 public class DungeonManager : MonoBehaviour
 {
+    [Header("던전 관련 설정")]
     public Transform playerTransform;
     public MainSenceUIManager mainSenceUIManager;
     public EnemyManager enemyManager;
     public List<DungeonDataFromCSV> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
     public DungeonDataToJson dungeonDataToJson; // JSON으로 저장할 던전
+    [Header("던전 UI 설정")]
 
     private readonly string dungeonDataFileName = "DungeonData.json"; // JSON 파일 이름
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -30,11 +33,6 @@ public class DungeonManager : MonoBehaviour
         LoadDungeonDataFromCSV();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void LoadDungeon(int mainStageID)
     {

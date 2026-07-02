@@ -1,15 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
+    public DungeonManager dungeonManager;
     public List<EnemyDataSo> enemyDataList; // 다양한 적 데이터를 리스트로 관리
     public GameObject emptyEnemyPrefab; // 적 프리팹 (공통된 기본 형태)
     public Transform playerTransform; // 플레이어 위치 참조 (적 스폰 시 플레이어를 기준으로 위치 설정)
     public int MAX_ENEMY_INSTANCES = 100; // 최대 적 인스턴스 수 (풀링 시스템에서 활용)
+    [Header("적 던전 UI관련")]
+    public TextMeshProUGUI leftEnemyText; // 남은 적 수 표시용 텍스트
     private readonly Dictionary<int, List<EnemyDataSo>> enemyPoolDict = new(); // 스테이지 기반으로 적 데이터를 빠르게 조회할 수 있는 딕셔너리
     private readonly Stack<EnemyComme> emptyEnemyInstancePool = new(); // 적 인스턴스 풀링 리스트
+    private readonly List<EnemyComme> activeEnemies = new(); // 현재 활성화된 적 인스턴스 리스트
     void Awake()
     {
         for (int i = 0; i < MAX_ENEMY_INSTANCES; i++)
@@ -52,6 +57,7 @@ public class EnemyManager : MonoBehaviour
                     enemyComme.SynchronizeBySo(selectedEnemyData); // 적 인스턴스에 선택된 적 데이터 적용
 
                     grandEnemyTransform.gameObject.SetActive(true);
+                    activeEnemies.Add(enemyComme); // 활성화된 적 리스트에 추가
                 }
                 else
                 {
@@ -106,6 +112,8 @@ public class EnemyManager : MonoBehaviour
     {
         // 적 인스턴스를 비활성화하고 풀에 반환
         emptyEnemyInstancePool.Push(enemyComme);
+        activeEnemies.Remove(enemyComme);
+        leftEnemyText.text = activeEnemies.Count.ToString(); // 남은 적 수 표시
     }
 
 

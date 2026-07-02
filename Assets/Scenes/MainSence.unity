@@ -1146,7 +1146,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ActivablePlayer
   playerStatsManager: {fileID: 1866507182}
   playerRigidbody: {fileID: 1610518121}
-  inputVector: {x: 0, y: 0}
   playerAnim: {fileID: 40167124}
   weaponAnim: {fileID: 152799553}
   weaponEffectAnim: {fileID: 713527563}
@@ -5827,11 +5826,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7baab58110cc16b478259eb386fa1c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
+  dungeonManager: {fileID: 0}
   enemyDataList:
   - {fileID: 11400000, guid: 1a076630a1d71db48a6e00c75af57c03, type: 2}
   emptyEnemyPrefab: {fileID: 3181922414714076711, guid: 3eaf3bef85fefb240a131b7190a8fde5, type: 3}
   playerTransform: {fileID: 1610518119}
   MAX_ENEMY_INSTANCES: 100
+  leftEnemyText: {fileID: 1766782039}
 --- !u!1 &623408039
 GameObject:
   m_ObjectHideFlags: 0

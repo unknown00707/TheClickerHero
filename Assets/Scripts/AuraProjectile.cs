@@ -6,6 +6,8 @@ public class AuraProjectile : MonoBehaviour
     [Header("오브젝트 풀 설정 (인스펙터 조절용)")]
     public int poolDefaultCapacity = 10; // 처음에 미리 만들어둘 개수
     public int poolMaxSize = 50;         // 풀에 최대로 쌓아둘 개수
+    public Animator animator;
+    public Rigidbody2D rb;
 
     private float speed;
     private float damage;
@@ -14,12 +16,12 @@ public class AuraProjectile : MonoBehaviour
     private bool isPlayerAttack;
 
     private IObjectPool<GameObject> myPool;
-    private Animator animator;
 
     private void Awake()
     {
-        // 최적화를 위해 애니메이터 컴포넌트 사전 캐싱
-        animator = GetComponent<Animator>();
+        rb.gravityScale = 0f;
+        rb.angularDamping = 0f;
+        rb.linearDamping = 0f; 
     }
 
     public void SetupAura(IObjectPool<GameObject> pool, float damage, float speed, float duration, bool isPlayerAttack)
@@ -37,13 +39,12 @@ public class AuraProjectile : MonoBehaviour
             // "Base Layer"의 0번째 시간(처음)으로 강제 되돌림
             animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
         }
+
+        rb.linearVelocity = transform.right * speed;
     }
 
     void Update()
     {
-        // 유니티 2D에서는 대개 transform.right(오른쪽 화살표 방향) 방향을 정면(0도)으로 잡고 회전시킵니다.
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
-
         currentLifetime += Time.deltaTime;
         if (currentLifetime >= duration)
         {

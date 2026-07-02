@@ -6,7 +6,7 @@ public class AuraManager : MonoBehaviour
 {
     public static AuraManager Instance { get; private set; }
 
-    private Dictionary<GameObject, IObjectPool<GameObject>> poolDictionary = new();
+    private readonly Dictionary<GameObject, IObjectPool<GameObject>> poolDictionary = new();
 
     private void Awake()
     {
