@@ -2035,8 +2035,6 @@ MonoBehaviour:
   playerTransform: {fileID: 1610518119}
   mainSenceUIManager: {fileID: 145284797}
   enemyManager: {fileID: 598883086}
-  dungeonDataToJson:
-    isCleared: 
 --- !u!1 &167853314
 GameObject:
   m_ObjectHideFlags: 0
@@ -5826,7 +5824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7baab58110cc16b478259eb386fa1c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager
-  dungeonManager: {fileID: 0}
+  dungeonManager: {fileID: 157230179}
   enemyDataList:
   - {fileID: 11400000, guid: 1a076630a1d71db48a6e00c75af57c03, type: 2}
   emptyEnemyPrefab: {fileID: 3181922414714076711, guid: 3eaf3bef85fefb240a131b7190a8fde5, type: 3}

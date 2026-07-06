@@ -71,6 +71,7 @@ public class EnemyManager : MonoBehaviour
                 break; // 더 이상 인스턴스를 사용할 수 없으므로 루프 종료
             }
         }
+        UpdateLeftEnemyCountUI(); // 남은 적 수 UI 업데이트
     }
 
     // 등장 가능한 몬스터 수(N)를 받아, 가중치 확률에 따라 인덱스를 하나 뽑아주는 함수
@@ -113,9 +114,18 @@ public class EnemyManager : MonoBehaviour
         // 적 인스턴스를 비활성화하고 풀에 반환
         emptyEnemyInstancePool.Push(enemyComme);
         activeEnemies.Remove(enemyComme);
-        leftEnemyText.text = activeEnemies.Count.ToString(); // 남은 적 수 표시
-    }
+        UpdateLeftEnemyCountUI();
 
+        if (activeEnemies.Count == 0)
+        {
+            // 모든 적이 제거되었을 때 던전 클리어 처리
+            dungeonManager.NextStageDungeonLoad();
+        }
+    }
+    private void UpdateLeftEnemyCountUI()
+    {
+        leftEnemyText.text = activeEnemies.Count.ToString();
+    }
 
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
 

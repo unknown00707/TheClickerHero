@@ -22,8 +22,10 @@ public class DungeonManager : MonoBehaviour
     public Transform playerTransform;
     public MainSenceUIManager mainSenceUIManager;
     public EnemyManager enemyManager;
-    public List<DungeonDataFromCSV> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
-    public DungeonDataToJson dungeonDataToJson; // JSON으로 저장할 던전
+    private Dictionary<string, Dictionary<string, DungeonDataFromCSV>> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
+    private DungeonDataToJson dungeonDataToJson; // JSON으로 저장할 던전
+    private string currentDungeonMainFloor = "0"; 
+    private string currentDungeonSubFloor = "0";
     [Header("던전 UI 설정")]
 
     private readonly string dungeonDataFileName = "DungeonData.json"; // JSON 파일 이름
@@ -31,44 +33,46 @@ public class DungeonManager : MonoBehaviour
     void Awake()
     {
         LoadDungeonDataFromCSV();
+        LoadDungeonDataFromJson();
     }
-
 
     public void LoadDungeon(int mainStageID)
     {
         // 던전 순회 
-        int findIndex = -1;
-        for (int i = 0; i < dungeonDataList.Count; i++)
-        {  
-            string[] floorParts = dungeonDataList[i].floor.Split('-'); // "0-0" -> ["0", "0"]
-            string floorMainStageID = floorParts[0];
-            string floorSubStageID = floorParts[1];
-            if (floorMainStageID == mainStageID.ToString())
-            {
-                if (floorSubStageID == "0") // 메인 스테이지인 경우
-                {
-                    findIndex = i;
-                    break;
-                }
-            }
-        }
+        string startDungeonIndex = "0"; // 각 스테이지의 첫 번째 던전만 로드
+        LoadDungeonLogic(mainStageID.ToString(), startDungeonIndex);
+    }
 
-        // 찾은 인덱스가 유효한 경우에만 던전 로드 진행
-        if (findIndex != -1)
+    public void NextStageDungeonLoad()
+    {
+        if(dungeonDataList[currentDungeonMainFloor].ContainsKey(currentDungeonSubFloor + 1))
         {
-            playerTransform.position = Vector3.zero; 
-            enemyManager.SpawnEnemy(dungeonDataList[findIndex].stageLevel, dungeonDataList[findIndex].enemyCount); // 적 스폰
-            mainSenceUIManager.OpenMainUI(false); // 메인 UI 닫기
-            Debug.Log($"던전 로드 성공! 찾은 인덱스: {findIndex}, 층 정보: {dungeonDataList[findIndex].floor}");
+            LoadDungeonLogic(currentDungeonMainFloor, currentDungeonSubFloor);
         }
         else
         {
-            Debug.LogError($"던전 로드 실패! mainStageID {mainStageID}에 해당하는 던전을 찾을 수 없습니다.");
+            Debug.Log($"모든 던전을 클리어했습니다! 현재 메인 스테이지: {currentDungeonMainFloor}");
+            // clearDungeon . . .
         }
     }
 
+    private void LoadDungeonLogic(string mainID, string subID)
+    {
+        DungeonDataFromCSV selectedDungeonData = dungeonDataList[mainID][subID];
+        if (selectedDungeonData != null)
+        {
+            playerTransform.position = Vector3.zero; 
+            enemyManager.SpawnEnemy(selectedDungeonData.stageLevel, selectedDungeonData.enemyCount); // 적 스폰
+            mainSenceUIManager.OpenMainUI(false); // 메인 UI 닫기
 
-
+            currentDungeonMainFloor = mainID; // 현재 던전의 메인 층 정보 업데이트
+            currentDungeonSubFloor = subID; // 현재 던전의 서브 층 정보 업데이트
+        }
+        else
+        {
+            Debug.LogError($"던전 로드 실패! mainStageID {mainID}, subStageID {subID}에 해당하는 던전을 찾을 수 없습니다.");
+        }
+    }
 // ----------- CSV 데이터 로드 및 JSON 저장/로드 메서드 -----------
     void LoadDungeonDataFromCSV()
     {
@@ -97,9 +101,15 @@ public class DungeonManager : MonoBehaviour
                 enemyCount = int.Parse(part[1]),
                 stageLevel = int.Parse(part[2])
             };
+            string mainStageID = part[0].Split('-')[0];
+            string subStageID = part[0].Split('-')[1];
 
             // 리스트에 순서대로 추가 (인덱스 관리가 필요 없음)
-            dungeonDataList.Add(data);
+            if (!dungeonDataList.ContainsKey(mainStageID))
+            {
+                dungeonDataList[mainStageID] = new Dictionary<string, DungeonDataFromCSV>();
+            }
+            dungeonDataList[mainStageID][subStageID] = data;
         }
     }
 
@@ -113,19 +123,8 @@ public class DungeonManager : MonoBehaviour
         if (!File.Exists(Path.Combine(Application.persistentDataPath, dungeonDataFileName)))
         {
             Debug.Log($"{dungeonDataFileName} 파일이 존재하지 않습니다. 기본 데이터를 사용합니다.");
-            int floorCount = 0;
-            foreach (var dungeon in dungeonDataList)
-            {
-               string part1 = dungeon.floor.Split('-')[0];
-               if (int.TryParse(part1, out int mainStageID))
-               {
-                   if (mainStageID > floorCount)
-                   {
-                       floorCount = mainStageID;
-                   }
-               } 
-            }
-            dungeonDataToJson.isCleared = new List<bool>(new bool[floorCount + 1]); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
+            int floorCount = dungeonDataList.Count;
+            dungeonDataToJson.isCleared = new List<bool>(new bool[floorCount]); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
             SaveDungeonDataToJson(); // 기본 데이터를 JSON으로 저장
             return;
         }

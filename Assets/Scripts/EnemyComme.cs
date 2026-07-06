@@ -136,7 +136,6 @@ public class EnemyComme : MonoBehaviour
 
     public void OnAttackAnimationEnd()
     {
-        print("슬라임 어택 끝!");
         enemyRigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
         attackCoolTime = Time.time + enemyData.attackCooldown;
         isAttacking = false;
@@ -200,7 +199,6 @@ public class EnemyComme : MonoBehaviour
 
     public void Die()
     {
-        Debug.Log("적이 사망했습니다!");
         FreezePos();
         isDead = true;
         isAttacking = false; // 사망 시 플래그 초기화
