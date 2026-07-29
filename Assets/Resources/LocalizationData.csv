@@ -38,3 +38,8 @@ DGN_TITLE_04,화산,Volcano
 DGN_TITLE_05,심해,Deep Sea
 DGN_TITLE_06,우주,Space
 DGN_TITLE_07,지옥,Hell
+DGN_DESC_REWARD_SUCCESS,던전 클리어!, Dungeon Clear!
+DGN_DESC_REWARD_FAILED,던전 실패!, Dungeon Failed!
+DGN_DESC_REWARD_CLICK,던전 돌파 기본 보상 : {0} * 클릭 배수 : {1}\n = {2},Dungeon Clear Basic Reward : {0} * Click Multply {1}\n = {2}
+DGN_DESC_REWARD_COIN,던전 돌파 기본 보상 : {0} + 몬스터 격파 {1}\n = {2},Dungeon Clear Basic Reward : {0} + Monster Defeat {1}\n = {2}
+DGN_DESC_REWARD_RELIC,유물 획득 : {0},Relic Getten : {0}

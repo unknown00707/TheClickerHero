@@ -3,9 +3,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class EnemyComme : MonoBehaviour
+public class EnemyComme : Entity
 {
+    [Header("Basic Settings")]
     public EnemyManager enemyManager;
+    public DungeonManager dungeonManager;
     public Transform enemyTransform;
     public Rigidbody2D enemyRigidbody;
     public Transform playerTransform;
@@ -15,16 +17,14 @@ public class EnemyComme : MonoBehaviour
     public Transform auraSpwanTransform;
     private BoxCollider2D hitboxCollider;
     [SerializeField] private EnemyDataSo enemyData;
-
-    [SerializeField] private float currentHp = 0f;
-    private bool isDead = false;
-    private bool isAttacking = false;
+    [Header("Attack")]
+    [SerializeField] private bool isAttacking = false;
     private Coroutine trackCoroutine; 
-    [SerializeField] private Vector2 vectorToPlayer = new();
-    [SerializeField] private Vector2 dirToPlayer = new();
+    private Vector2 vectorToPlayer = new();
+    private Vector2 dirToPlayer = new();
     [SerializeField] private LayerMask playerLayer;
     [Header("Animation")]
-    [SerializeField] private float deadTime = 3f;
+    public float deadTime = 1.5f;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private float attackCoolTime = 0; 
     private static readonly WaitForSeconds _waitForSeconds0_1 = new(0.1f);
@@ -37,13 +37,6 @@ public class EnemyComme : MonoBehaviour
 
     }
 
-    void Update()
-    {
-        if (currentHp <= 0f && !isDead) 
-        {
-            Die();
-        }
-    }
 
     void FixedUpdate()
     {
@@ -110,7 +103,13 @@ public class EnemyComme : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Debug.Log($"플레이어 히트! 대미지를 입힙니다.");
+            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
+            DamageInfo damageInfo = new()
+            {
+                damage = enemyData.attackPower,
+                type = AttackType.Melee
+            };
+            playerHealth.TakeDamage(damageInfo);
         }
     }
     public void OnRangedAttack()
@@ -182,7 +181,7 @@ public class EnemyComme : MonoBehaviour
     {
         enemyData = data;
         spriteRenderer.sprite = enemyData.enemySprite;
-        currentHp = enemyData.maxHp;
+        HealthInit(enemyData.maxHp);
         animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; 
         hitboxCollider.size = enemyData.hitboxSize; 
         hitboxCollider.offset = enemyData.hitboxOffset; 
@@ -191,22 +190,18 @@ public class EnemyComme : MonoBehaviour
         transform.localPosition = new Vector3(0f, enemyData.transformOffset, 0f);
     }
 
-    public void TakeDamage(DamageInfo info)
-    {
-        Debug.Log("적이 " + info.damage + " 데미지를 받았습니다! 공격 타입: " + info.type);
-        currentHp -= info.damage;
-    }
-
-    public void Die()
+    public override void Die()
     {
         FreezePos();
-        isDead = true;
         isAttacking = false; // 사망 시 플래그 초기화
         groundCol2D.enabled = false;
         animator.enabled = false; 
         spriteRenderer.sortingOrder = -10;
         spriteRenderer.sprite = enemyData.deadSprite;
-        enemyManager.ReturnEnemyToPool(this); 
+
+        dungeonManager.AddCoinByEnemy(enemyData.coinDrop); // 적 처치 시 코인 획득
+        enemyManager.ReturnEnemyToPool(this, true); // 사망 시 풀에 반환
+
         Invoke(nameof(DisableSelf), deadTime);
     }
     

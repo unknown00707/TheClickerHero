@@ -26,7 +26,7 @@ public class AuraManager : MonoBehaviour
         float damage,           // 최종 계산된 데미지
         float speed,            // 검기 이동 속도
         float duration,         // 검기 지속 시간
-        bool isPlayerAttack     // 플레이어 공격 여부 (피격 판정용)
+        bool isPlayerAttack     // 플레이어의 공격 여부 (피격 판정용)
     )
     {
         if (prefab == null || count <= 0) return;

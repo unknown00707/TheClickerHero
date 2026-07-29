@@ -162,6 +162,7 @@ public class PlayerStatsManager : MonoBehaviour
     void Awake()
     {
         LoadPlayerStats();
+        UpDatePlayerStatsText();
     }
 
     public void UpDatePlayerStatsText()

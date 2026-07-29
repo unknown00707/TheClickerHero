@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7dbb06a1fa3cd41817e96a817ecf92, type: 3}
   m_Name: Slime
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDataSo
-  enemyName: 
+  enemyName: Slime
   enemySprite: {fileID: -8388445940808544989, guid: 8f49d856934807e4194150becf5ca542, type: 3}
   deadSprite: {fileID: 21300000, guid: 0685c43c2c3471d4c97bc000068f8994, type: 2}
   maxHp: 10
   attackPower: 5
   moveSpeed: 1
-  coinDrop: 0
+  coinDrop: 1
   attackRange: 0.72
   attackCooldown: 5
   attackBoxSize: {x: 0.53, y: 0.8}
@@ -30,7 +30,8 @@ MonoBehaviour:
   groundSize: {x: 0.8, y: 0.15}
   groundOffset: {x: -0.02, y: 0.09}
   auraPrefab: {fileID: 0}
-  auraDamage: 0
+  auraDamageToAttackMultipule: 0
   auraDuration: 0
   auraSpeed: 0
   auraCount: 0
+  auraSpreadAngle: 0

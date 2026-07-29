@@ -7,6 +7,7 @@ public class ClickBTN : MonoBehaviour
 {
     public GoodsManager goodsManager;
     public DungeonManager dungeonManager;
+    public MainSenceUIManager mainSenceUIManager;
     public GameObject[] tapObjects;
     public GameObject[] tapLeftObjects;
     public DungeonDataSo[] dungeonDataSos;
@@ -83,6 +84,9 @@ public class ClickBTN : MonoBehaviour
     {
         // 선택된 던전의 메인 스테이지 ID를 가져와서 던전 매니저에 전달
         if (currentDungeonID == dungeonDataSos[currentDungeonID].dungeonMainStageID) // 동일한게 정상이지만 확인 용
+        {
+            mainSenceUIManager.OpenMainUI(false); // 메인 UI 닫기
             dungeonManager.LoadDungeon(currentDungeonID);
+        }
     }
 }

@@ -24,6 +24,7 @@ public class EnemyManager : MonoBehaviour
             EnemyComme enemyComme = enemyInstance.GetComponentInChildren<EnemyComme>();
             enemyComme.playerTransform = playerTransform; // 플레이어 위치 참조 설정
             enemyComme.enemyManager = this; // 적 매니저 참조 설정
+            enemyComme.dungeonManager = dungeonManager; // 던전 매니저 참조 설정
             // 초기 설정은 나중에 활성화 시점에 해당 적 데이터로 적용할 예정
             enemyComme.enemyTransform.SetParent(transform); // 적 인스턴스를 EnemyManager의 자식으로 설정
             enemyComme.enemyTransform.gameObject.SetActive(false); // 초기에는 비활성화 상태로 시작
@@ -55,6 +56,9 @@ public class EnemyManager : MonoBehaviour
                     grandEnemyTransform.position = spawnPosition;
                     // 적 데이터 적용 (체력, 애니메이션 등)
                     enemyComme.SynchronizeBySo(selectedEnemyData); // 적 인스턴스에 선택된 적 데이터 적용
+
+                    // 디버깅용
+                    grandEnemyTransform.name = $"Enemy_{selectedEnemyData.enemyName}_Stage{stageLevel}_ID{i}";
 
                     grandEnemyTransform.gameObject.SetActive(true);
                     activeEnemies.Add(enemyComme); // 활성화된 적 리스트에 추가
@@ -109,23 +113,20 @@ public class EnemyManager : MonoBehaviour
         // 수학적으로 여기까지 올 일은 없지만, 안전장치로 마지막 인덱스 반환
         return possibleEnemyCount - 1; 
     }
-    public void ReturnEnemyToPool(EnemyComme enemyComme)
+    public void ReturnEnemyToPool(EnemyComme enemyComme, bool isDead = false)
     {
         // 적 인스턴스를 비활성화하고 풀에 반환
         emptyEnemyInstancePool.Push(enemyComme);
         activeEnemies.Remove(enemyComme);
         UpdateLeftEnemyCountUI();
-
-        if (activeEnemies.Count == 0)
+        if (activeEnemies.Count == 0 && isDead)
         {
             // 모든 적이 제거되었을 때 던전 클리어 처리
-            dungeonManager.NextStageDungeonLoad();
+            Invoke(nameof(NextStageDungeonInvoke), enemyComme.deadTime + 0.1f); // 모두 죽은 후에 다음 스테이지 로드
         }
     }
-    private void UpdateLeftEnemyCountUI()
-    {
-        leftEnemyText.text = activeEnemies.Count.ToString();
-    }
+    private void NextStageDungeonInvoke() => dungeonManager.NextStageDungeonLoad();
+    private void UpdateLeftEnemyCountUI() => leftEnemyText.text = activeEnemies.Count.ToString();
 
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
 

@@ -38,7 +38,7 @@ public class WeaponScript : MonoBehaviour
             }
         }
 
-        Debug.Log("근접 공격! 맞은 적 수: " + hitEnemies.Length);
+        
     }
 
     int FindOffsetIndex()
