@@ -2135,6 +2135,7 @@ MonoBehaviour:
   playerTransform: {fileID: 1610518119}
   mainSenceUIManager: {fileID: 145284797}
   enemyManager: {fileID: 598883086}
+  playerStatsManager: {fileID: 1866507182}
   dungeonClearUIObj: {fileID: 98540069}
   dungeonClearRewardTxt: {fileID: 822224357}
   dungeonClearClickRewardTxt: {fileID: 1145292855}
@@ -4341,6 +4342,7 @@ MonoBehaviour:
   goodsManager: {fileID: 140919187}
   playerStatsManager: {fileID: 1866507182}
   canvas: {fileID: 368779181}
+  canvasRectTransform: {fileID: 368779182}
   upgradGroupObjects:
   - {fileID: 2003047193}
   - {fileID: 901497186}
@@ -4348,6 +4350,7 @@ MonoBehaviour:
   contantTransform: {fileID: 1195073728}
   scrollRect: {fileID: 1228780171}
   upgradExplainObject: {fileID: 2060690379}
+  upgradExplainRectTransform: {fileID: 2060690380}
   upgradExplainTexts:
   - {fileID: 212794238}
   - {fileID: 2143170872}
@@ -23913,6 +23916,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1195073728}
+  - component: {fileID: 1195073729}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -23944,6 +23948,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0.0005187988, y: -0.0007324219}
   m_SizeDelta: {x: 245.5935, y: 301.5588}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1195073729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1195073727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 0
 --- !u!1 &1206258028
 GameObject:
   m_ObjectHideFlags: 0
@@ -24142,7 +24160,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1228780170}
   - component: {fileID: 1228780173}
-  - component: {fileID: 1228780172}
   - component: {fileID: 1228780171}
   m_Layer: 5
   m_Name: Scroll View
@@ -24201,36 +24218,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1228780172
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1228780169}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1228780173
 CanvasRenderer:
   m_ObjectHideFlags: 0

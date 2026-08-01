@@ -9,13 +9,13 @@ public class ButtonHoverDetector : MonoBehaviour, IPointerEnterHandler, IPointer
     // 마우스가 버튼 위로 들어올 때 호출
     public void OnPointerEnter(PointerEventData eventData)
     {
-        GameManger.instance.upgradManager.UpgradNodeExplain(index, true);
+        upgradManager.UpgradNodeExplain(index, true);
     }
 
     // 마우스가 버튼에서 나갈 때 호출
     public void OnPointerExit(PointerEventData eventData)
     {
-        GameManger.instance.upgradManager.UpgradNodeExplain(index, false);
+        upgradManager.UpgradNodeExplain(index, false);
     }
 
     public void BTNClick()

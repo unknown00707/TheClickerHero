@@ -42,10 +42,12 @@ public class UpgradManager : MonoBehaviour
     public PlayerStatsManager playerStatsManager;
     [Header("UI References")]
     public Canvas canvas;
+    public RectTransform canvasRectTransform;
     public List<GameObject> upgradGroupObjects = new();
     public RectTransform contantTransform;
     public ScrollRect scrollRect;
     public GameObject upgradExplainObject;
+    public RectTransform upgradExplainRectTransform;
     public TextMeshProUGUI[] upgradExplainTexts;
 
     [Header("Settings")]
@@ -151,9 +153,10 @@ public class UpgradManager : MonoBehaviour
             canvas.worldCamera, // Overlay 모드라면 null을 넣어도 됩니다.
             out Vector2 localPoint
         );
-        upgradExplainObject.GetComponent<RectTransform>().anchoredPosition = localPoint + new Vector2(expainOffsetX, expainOffsetY);
-        if(upgradExplainObject.GetComponent<RectTransform>().anchoredPosition.x > canvas.GetComponent<RectTransform>().sizeDelta.x)
-            upgradExplainObject.GetComponent<RectTransform>().anchoredPosition = localPoint + new Vector2(-expainOffsetX, expainOffsetY);
+    
+        upgradExplainRectTransform.anchoredPosition = localPoint + new Vector2(expainOffsetX, expainOffsetY);
+        if(upgradExplainRectTransform.anchoredPosition.x > canvasRectTransform.sizeDelta.x)
+            upgradExplainRectTransform.anchoredPosition = localPoint + new Vector2(-expainOffsetX, expainOffsetY);
         upgradExplainObject.SetActive(isEnter);
     }
     public void UpgradeNode(string index) // index = 노드 ID
