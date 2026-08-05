@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinDataSo
   skinName: 
   description: 
-  unlockCost: 0
-  unlockSprite: {fileID: 0}
-  skinSprite: {fileID: 0}
+  unlockCost: 300
+  unlockSprite: {fileID: -8388445940808544989, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+  skinSprite: {fileID: 1544562712022778277, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
   skinOverrideController: {fileID: 22100000, guid: 99dbf0ba50277d04bafe7c5ee92ffb6e, type: 2}

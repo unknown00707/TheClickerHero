@@ -31,6 +31,8 @@ TXT_RGP,희귀 아이템 드롭 확률 :,Rare Goods Probability :
 TXT_BFE,이로운 효과 :,Benfit Effect :
 TXT_SPEED,자동 사냥 배율 :,Auto Hunting Speed :
 TXT_RB,환생 보너스 :,Reincarnation Bonus :
+TXT_SKIN_EQUIP,스킨 장착,Equip Skin
+TXT_SKIN_UNEQUIP,스킨 해제,Unequip Skin
 DGN_TITLE_01,초원,Grassland
 DGN_TITLE_02,사막,Desert
 DGN_TITLE_03,빙하,Glacier
