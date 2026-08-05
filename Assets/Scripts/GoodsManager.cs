@@ -28,7 +28,7 @@ public class GoodsManager : MonoBehaviour
 
     public void AddGoods()
     {
-        goodsData.GoodsCount += playerStatsManager.playerStats.CoinByClick;
+        goodsData.GoodsCount += (int)playerStatsManager.playerStats.CoinByClick;
         GoodTXTUpdate();
     }
     public void GoodTXTUpdate()

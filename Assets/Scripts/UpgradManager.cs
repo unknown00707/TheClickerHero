@@ -183,26 +183,26 @@ public class UpgradManager : MonoBehaviour
                 {
                     case StatType.ATK:
                     var (isPercentage_ATK, amount_ATK) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.UpgradeAttackPower(isPercentage_ATK, amount_ATK);
+                        playerStatsManager.playerStats.attackPower.Upgrade(isPercentage_ATK, amount_ATK);
                         break;
                     case StatType.DEF:
                         var (isPercentage_DEF, amount_DEF) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.UpgradeDefense(isPercentage_DEF, amount_DEF);
+                        playerStatsManager.playerStats.defense.Upgrade(isPercentage_DEF, amount_DEF);
                         break;
                     case StatType.HP:
                         var (isPercentage_HP, amount_HP) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.UpgradeHealth(isPercentage_HP, amount_HP);
+                        playerStatsManager.playerStats.health.Upgrade(isPercentage_HP, amount_HP);
                         break;
                     case StatType.CRITCAL_CHANCE:
-                        playerStatsManager.playerStats.CriticalChance += explainData.values;
+                        playerStatsManager.playerStats.criticalChance.Upgrade(false, explainData.values);
                         break;
                     case StatType.CRITCAL_DAMAGE:
                         var (isPercentage_CRITCAL_DAMAGE, amount_CRITCAL_DAMAGE) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.UpgradeCriticalDamage(isPercentage_CRITCAL_DAMAGE, amount_CRITCAL_DAMAGE);
+                        playerStatsManager.playerStats.criticalDamage.Upgrade(isPercentage_CRITCAL_DAMAGE, amount_CRITCAL_DAMAGE);
                         break;
                     case StatType.CLICK_COUNT:
                         var (isPercentage_CLICK_COUNT, amount_CLICK_COUNT) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.UpgradeCoinByClick(isPercentage_CLICK_COUNT, (int)amount_CLICK_COUNT);
+                        playerStatsManager.playerStats.coinByClick.Upgrade(isPercentage_CLICK_COUNT, (int)amount_CLICK_COUNT);
                         break;
                 }
 

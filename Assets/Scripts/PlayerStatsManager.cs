@@ -2,152 +2,75 @@ using System;
 using System.IO;
 using TMPro;
 using UnityEngine;
+[Serializable]
+public class Stat
+{
+    public float baseValue;
+    public float flatUpgrade;
+    public float multiplier = 1.0f;
+
+    // 생성자: 처음 스탯을 만들 때 기본값을 쏙 넣어줍니다.
+    public Stat(float initialBase)
+    {
+        baseValue = initialBase;
+    }
+
+    // 최종 스탯 계산 기능! 
+    // (전체 혜택과 환생 보너스는 외부에서 던져줍니다)
+    public float GetFinalValue(float benefitEffect, float reincarnationBonus)
+    {
+        return (baseValue + flatUpgrade) * multiplier * (1.0f + benefitEffect) * (1.0f + reincarnationBonus);
+    }
+
+    // 업그레이드 기능!
+    public void Upgrade(bool isPercentage, float amount)
+    {
+        if (isPercentage)
+            multiplier += amount / 100.0f;
+        else
+            flatUpgrade += amount;
+    }
+}
 
 [Serializable]
 public class PlayerStasData
 {
-    [SerializeField] private float health = 100.0f;
-    [SerializeField] private float upgradeHealth = 0.0f; // 업그레이드로 증가한 체력
-    [SerializeField] private float multiplierHealth = 1.0f; // 배수로 증가한 체력
-    [SerializeField] public float attackPower = 10.0f;
-    [SerializeField] private float upgradeAttackPower = 0.0f; // 업그레이드로 증가한 공격력
-    [SerializeField] private float multiplierAttackPower = 1.0f; // 배수로 증가한 공격력
-    [SerializeField] private float defense = 5.0f;
-    [SerializeField] private float upgradeDefense = 0.0f; // 업그레이드로 증가한 방어력
-    [SerializeField] private float multiplierDefense = 1.0f; // 배수로 증가한 방어력
-    [SerializeField] private float speed = 1.0f;
-    [SerializeField] private float criticalChance = 0.0f;
-    [SerializeField] private float criticalDamage = 0.0f;
-    [SerializeField] private float upgradeCriticalDamage = 0.0f; // 업그레이드로 증가한 크리티컬 데미지
-    [SerializeField] private float multiplierCriticalDamage = 1.0f; // 배수로 증가한 크리티컬 데미지
-    [SerializeField] private int coinByClick = 1;
-    [SerializeField] private int upgradeCoinByClick = 0; // 업그레이드로 증가한 클릭당 코인
-    [SerializeField] private float multiplierCoinByClick = 1.0f; // 배수로 증가한 클릭당 코인
-    [SerializeField] private float rareGoodsProbability = 0.01f;
-    [SerializeField] private float benfitEffect = 0.0f;
-    [SerializeField] private float reincarnationBonus = 0.0f;
-    public float Health
-    {
-        get { return  (health + upgradeHealth) * multiplierHealth * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 체력 얼마인지 보여줘!
-    }
-    public void UpgradeHealth(bool isPercentage, float amount)
-    {
-        if (isPercentage)
-            multiplierHealth += amount / 100.0f; // 퍼센트로 증가
-        
-        else
-            upgradeHealth += amount; // 고정값으로 증가
-    }
-    public float AttackPower
-    {
-        get { return  (attackPower + upgradeAttackPower) * multiplierAttackPower * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 공격력 얼마인지 보여줘!
-    }
-    public void UpgradeAttackPower(bool isPercentage, float amount)
-    {
-        if (isPercentage)
-            multiplierAttackPower += amount / 100.0f; // 퍼센트로 증가
-        else
-            upgradeAttackPower += amount; // 고정값으로 증가
-    }
-    public float Defense
-    {
-        get { return  (defense + upgradeDefense) * multiplierDefense * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 방어력 얼마인지 보여줘!
-    }
-    public void UpgradeDefense(bool isPercentage, float amount)
-    {
-        if (isPercentage)
-            multiplierDefense += amount / 100.0f; // 퍼센트로 증가
-        else
-            upgradeDefense += amount; // 고정값으로 증가
-    }
-    public float Speed
-    {
-        get { return speed * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 속도 얼마인지 보여줘!
-        set 
-        { 
-            speed = Mathf.Max(1, value); 
-        }
-    }
-    public float CriticalChance
-    {
-        get { return criticalChance * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 크리티컬 확률 얼마인지 보여줘!
-        set 
-        { 
-            criticalChance = Mathf.Clamp01(value); 
-        }
-    }
-    public float CriticalDamage
-    {
-        get { return  (criticalDamage + upgradeCriticalDamage) * multiplierCriticalDamage * (1.0f + benfitEffect) * (1.0f + reincarnationBonus); } // 크리티컬 데미지 amount
-    }
-    public void UpgradeCriticalDamage(bool isPercentage, float amount)
-    {
-        if (isPercentage)
-            multiplierCriticalDamage += amount / 100.0f; // 퍼센트로 증가
-        else
-            upgradeCriticalDamage += amount; // 고정값으로 증가
-    }
-    public int CoinByClick
-    {
-        get { return (int)((coinByClick + upgradeCoinByClick) * multiplierCoinByClick * (1.0f + benfitEffect) * (1.0f + reincarnationBonus)); } // 클릭당 코인 amount
-    }
-    public void UpgradeCoinByClick(bool isPercentage, int amount)
-    {
-        if (isPercentage)
-            multiplierCoinByClick += amount / 100.0f; // 퍼센트로 증가
-        else
-            upgradeCoinByClick += amount; // 고정값으로 증가
-    }
-    public float RareGoodsProbability
-    {
-        get { return rareGoodsProbability; } // 희귀 아이템 확률
-        set 
-        { 
-            rareGoodsProbability = Mathf.Clamp01(value); 
-        }
-    }
-    public float BenfitEffect
-    {
-        get { return benfitEffect; } // 혜택 효과
-        set 
-        { 
-            benfitEffect = Mathf.Max(0, value); 
-        }
-    }
-    public float ReincarnationBonus
-    {
-        get { return reincarnationBonus; } // 환생 보너스
-        set 
-        { 
-            reincarnationBonus = Mathf.Max(0, value); 
-        }
-    }
+    public Stat health = new(100.0f);
+    public Stat attackPower = new(10.0f);
+    public Stat defense = new(5.0f);
+    public Stat criticalChance = new(0.001f);
+    public Stat criticalDamage = new(1.0f);
+    public Stat coinByClick = new(1);
+    public Stat speed = new(1.0f);
+    public Stat rareGoodsProbability = new(0.01f);
+    public float benfitEffect = 0.0f;
+    public float reincarnationBonus = 0.0f;
+    
+    public float Health => health.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float AttackPower => attackPower.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float Defense => defense.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float CriticalChance => criticalChance.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float CriticalDamage => criticalDamage.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float CoinByClick => coinByClick.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float Speed => speed.GetFinalValue(benfitEffect, reincarnationBonus);
+    public float RareGoodsProbability => rareGoodsProbability.GetFinalValue(benfitEffect, reincarnationBonus);
 
     public void ResetStatsForReincarnation(bool keepBonus)
     {
         // 1. 초기값으로 되돌릴 스탯들
-        health = 100.0f;
-        upgradeHealth = 0.0f;
-        multiplierHealth = 1.0f;
-        attackPower = 10.0f;
-        upgradeAttackPower = 0.0f;
-        multiplierAttackPower = 1.0f;
-        defense = 5.0f;
-        upgradeDefense = 0.0f;
-        multiplierDefense = 1.0f;
-        speed = 1.0f;
-        criticalChance = 0.0f;
-        criticalDamage = 0.0f;
-        upgradeCriticalDamage = 0.0f;
-        multiplierCriticalDamage = 1.0f;
-        coinByClick = 1;
-        upgradeCoinByClick = 0;
-        multiplierCoinByClick = 1.0f;
+        health = new Stat(100.0f);
+        attackPower = new Stat(10.0f);
+        defense = new Stat(5.0f);
+    
+        criticalChance = new Stat(0.0f);
+        criticalDamage = new Stat(1.0f);
+        coinByClick = new Stat(1);
 
+        speed = new Stat(1.0f);
         // 2. 환생 보너스나 특수 혜택은 유지하거나 누적
         if (!keepBonus)
         {
-            rareGoodsProbability = 0.01f;
+            rareGoodsProbability = new Stat(0.01f);
             benfitEffect = 0.0f;
             reincarnationBonus = 0.0f;
         }
@@ -173,10 +96,10 @@ public class PlayerStatsManager : MonoBehaviour
         playerStatsText[3].text = (playerStats.CriticalChance * 100).ToString("F1") + " + " + "무기 보정" +"%";
         playerStatsText[4].text = (playerStats.CriticalDamage * 100).ToString("F1") + " + " + "무기 보정" +"%";
         playerStatsText[5].text = playerStats.CoinByClick.ToString();
-        playerStatsText[6].text = (playerStats.BenfitEffect * 100).ToString("F1") + "%";
+        playerStatsText[6].text = (playerStats.benfitEffect * 100).ToString("F1") + "%";
         playerStatsText[7].text = playerStats.Speed.ToString("F1");
         playerStatsText[8].text = (playerStats.RareGoodsProbability * 100).ToString("F1") + "%";
-        playerStatsText[9].text = (playerStats.ReincarnationBonus * 100).ToString("F1") + "%";
+        playerStatsText[9].text = (playerStats.reincarnationBonus * 100).ToString("F1") + "%";
     }
 
     public void SavePlayerStats() => GameManger.instance.SaveData(playerStats, SAVE_FILE_NAME);

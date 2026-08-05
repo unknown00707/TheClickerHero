@@ -108,7 +108,7 @@ public class DungeonManager : MonoBehaviour
         string rewardText = isSuccessful ? LanguageManager.Instance.GetText(DUNGEON_REWARD_SUCCESS) 
                                          : LanguageManager.Instance.GetText(DUNGEON_REWARD_FAILED);
         dungeonClearRewardTxt.text = rewardText;     
-        dungeonClearClickRewardTxt.text = string.Format(LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK), gettenClick, playerStatsManager.playerStats.BenfitEffect); // 클릭 보상 텍스트 업데이트
+        dungeonClearClickRewardTxt.text = string.Format(LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK), gettenClick, playerStatsManager.playerStats.benfitEffect); // 클릭 보상 텍스트 업데이트
         dungeonClearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN);
         dungeonClearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC);
     }   
