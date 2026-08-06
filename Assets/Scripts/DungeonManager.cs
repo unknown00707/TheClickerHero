@@ -22,7 +22,6 @@ public class DungeonManager : MonoBehaviour
 {
     [Header("던전 관련 설정")]
     public Transform playerTransform;
-    public MainSenceUIManager mainSenceUIManager;
     public EnemyManager enemyManager;
     public PlayerStatsManager playerStatsManager;
     private readonly Dictionary<string, Dictionary<string, DungeonDataFromCSV>> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
@@ -97,12 +96,17 @@ public class DungeonManager : MonoBehaviour
             Debug.LogError($"던전 로드 실패! mainStageID {mainID}, subStageID {subID}에 해당하는 던전을 찾을 수 없습니다.");
         }
     }
-
-    private void SetRewardUI(bool isOpen, bool isSuccessful = false)
+    public void DungeonUIInit()
+    {
+        dungeonClearUIObj.SetActive(false);
+        gettenCoin = 0;
+        gettenClick = 0;
+    }
+    public void SetRewardUI(bool isOpen, bool isSuccessful = false)
     {
        // float totalCoinReward = 
 
-
+        enemyManager.ClearAllActiveEnemies(); // 모든 적 제거
 
         dungeonClearUIObj.SetActive(isOpen);
         string rewardText = isSuccessful ? LanguageManager.Instance.GetText(DUNGEON_REWARD_SUCCESS) 

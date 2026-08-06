@@ -7,6 +7,11 @@ public abstract class Entity : MonoBehaviour
     public float currentHealth;
     public bool isDead;
 
+    public virtual void ChangeDieState()
+    {
+        isDead = !isDead;
+    }
+
     public virtual void HealthInit(float hp)
     {
         currentHealth = maxHealth = hp;

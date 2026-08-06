@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class ClickBTN : MonoBehaviour
 {
+    public PlayerHealth playerHealth;
     public GoodsManager goodsManager;
     public DungeonManager dungeonManager;
     public MainSenceUIManager mainSenceUIManager;
@@ -86,7 +87,16 @@ public class ClickBTN : MonoBehaviour
         if (currentDungeonID == dungeonDataSos[currentDungeonID].dungeonMainStageID) // 동일한게 정상이지만 확인 용
         {
             mainSenceUIManager.OpenMainUI(false); // 메인 UI 닫기
+            playerHealth.PlayerHealthInit(); // 플레이어 체력 초기화
+            playerHealth.ChangePlayerActiveState(!playerHealth.isDead); // 플레이어 오브젝트 활성화
             dungeonManager.LoadDungeon(currentDungeonID);
         }
+    }
+
+    public void RetrunToMainSence()
+    {
+        playerHealth.ChangePlayerActiveState(false); // 플레이어 오브젝트 비활성화
+        dungeonManager.DungeonUIInit(); // 던전 UI 초기화
+        mainSenceUIManager.OpenMainUI(true); // 메인 UI 열기
     }
 }

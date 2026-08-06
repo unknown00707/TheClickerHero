@@ -127,6 +127,17 @@ public class EnemyManager : MonoBehaviour
     }
     private void NextStageDungeonInvoke() => dungeonManager.NextStageDungeonLoad();
     private void UpdateLeftEnemyCountUI() => leftEnemyText.text = activeEnemies.Count.ToString();
+    public void ClearAllActiveEnemies()
+    {
+        // 현재 활성화된 모든 적 인스턴스를 비활성화하고 풀에 반환
+        foreach (var enemy in activeEnemies.ToList()) // ToList()로 복사하여 foreach 중에 컬렉션 변경 방지
+        {
+            enemy.DisableSelf(); // 적 비활성화
+            ReturnEnemyToPool(enemy);
+        }
+        activeEnemies.Clear();
+        UpdateLeftEnemyCountUI();
+    }
 
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
 

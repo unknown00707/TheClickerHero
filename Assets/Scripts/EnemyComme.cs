@@ -132,10 +132,13 @@ public class EnemyComme : Entity
         enemyRigidbody.linearVelocity = Vector2.zero; 
         enemyRigidbody.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
     }
-
-    public void OnAttackAnimationEnd()
+    void UnfreezePos()
     {
         enemyRigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
+    public void OnAttackAnimationEnd()
+    {
+        UnfreezePos();
         attackCoolTime = Time.time + enemyData.attackCooldown;
         isAttacking = false;
     }
@@ -192,6 +195,7 @@ public class EnemyComme : Entity
 
     public override void Die()
     {
+        ChangeDieState();
         FreezePos();
         isAttacking = false; // 사망 시 플래그 초기화
         groundCol2D.enabled = false;
@@ -200,12 +204,12 @@ public class EnemyComme : Entity
         spriteRenderer.sprite = enemyData.deadSprite;
 
         dungeonManager.AddCoinByEnemy(enemyData.coinDrop); // 적 처치 시 코인 획득
-        enemyManager.ReturnEnemyToPool(this, true); // 사망 시 풀에 반환
+        enemyManager.ReturnEnemyToPool(this, isDead); // 사망 시 풀에 반환
 
         Invoke(nameof(DisableSelf), deadTime);
     }
     
-    void DisableSelf()
+    public void DisableSelf()
     {
         enemyTransform.gameObject.SetActive(false);
     }
@@ -224,10 +228,8 @@ public class EnemyComme : Entity
                 Vector2 playerCenter = (Vector2)playerTransform.position + new Vector2(0f, 0.5f);
 
                 vectorToPlayer = playerCenter - enemyCenter;
-                
-                float finalX = 0f;
-                float finalY = 0f;
-
+                float finalX;
+                float finalY;
                 if (Mathf.Abs(vectorToPlayer.x) > Mathf.Abs(vectorToPlayer.y))
                 {
                     // 가로축 정형화 (Float 값 1.0f 또는 -1.0f 주입)
@@ -240,7 +242,7 @@ public class EnemyComme : Entity
                     finalX = 0f;
                     finalY = vectorToPlayer.y > 0 ? 1f : -1f;
                 }
-                
+
                 // [핵심 변경] 다시 Float형 파라미터 전송 방식으로 복구!
                 animator.SetFloat(XHash, finalX);
                 animator.SetFloat(YHash, finalY);
@@ -253,11 +255,9 @@ public class EnemyComme : Entity
         }
     }
 
-
-
     void OnEnable()
     {
-        isDead = false;
+        ChangeDieState();
         isAttacking = false; // 풀에서 재활용될 때 플래그 리셋 필수
         groundCol2D.enabled = true;
         animator.enabled = true;
@@ -265,7 +265,7 @@ public class EnemyComme : Entity
         {
             spriteRenderer.sortingOrder = 0;
         }
-        enemyRigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+        UnfreezePos();
         if (trackCoroutine != null) StopCoroutine(trackCoroutine);
         trackCoroutine = StartCoroutine(UpdateTargetDirectionRoutine()); 
     }
