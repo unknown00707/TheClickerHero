@@ -42,6 +42,9 @@ public class GameManger : MonoBehaviour
 
     public void LoadData<T>(T data, string fileName) 
     {
+        if(!File.Exists(Path.Combine(Application.persistentDataPath, fileName)))
+            SaveData(data, fileName); // 파일이 없으면 새로 저장
+    
         string path = Path.Combine(Application.persistentDataPath, fileName);
         if (File.Exists(path))
         {

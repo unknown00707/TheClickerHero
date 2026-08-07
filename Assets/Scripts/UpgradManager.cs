@@ -292,7 +292,6 @@ public class UpgradManager : MonoBehaviour
                 [0] = true // 첫 번째 그룹은 기본적으로 열려있도록 설정
             };
 
-            GameManger.instance.SaveData(upradeSaveData, UPGRAD_SAVE_FILE_NAME); // 초기 데이터 저장
             GameManger.instance.LoadData(upradeSaveData, UPGRAD_SAVE_FILE_NAME); // 저장된 초기 데이터 로드
         }
     }

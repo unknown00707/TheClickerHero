@@ -11,6 +11,7 @@ public class ActivablePlayer : MonoBehaviour
     private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
     
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조  
+    public WeaponManager weaponManager; // 무기 매니저 참조
     public Rigidbody2D playerRigidbody;
     private Vector2 inputVector;
     private Vector2 dirPlayerVector;
@@ -22,7 +23,6 @@ public class ActivablePlayer : MonoBehaviour
     [Header("Weapon Animation")]
     public WeaponScript weaponScript;
     public Renderer weaponRander;
-    public WeaponDataSo currentWeapon; // 현재 장착 중인 무기 SO
     
     void Awake()
     {
@@ -81,7 +81,7 @@ public class ActivablePlayer : MonoBehaviour
 
     void OnSwordAttack()
     {
-        SetSameAnimeOverride();
+        SetSameAnimeOverride(weaponManager.GetCurrentWeaponData());
         SetWeaponRanderFalse(true);
         
         playerAnim.SetTrigger(SwordAttackHash);
@@ -89,7 +89,7 @@ public class ActivablePlayer : MonoBehaviour
         weaponEffectAnim.SetTrigger(SwordAttackHash);
     }
     // ----------------------- 애니메이션 관련 메서드 -----------------------
-    void SetSameAnimeOverride()
+    public void SetSameAnimeOverride(WeaponDataSo currentWeapon)
     {
         // 플레이어는 나중에
         weaponAnim.runtimeAnimatorController = currentWeapon.weaponOverrideController;

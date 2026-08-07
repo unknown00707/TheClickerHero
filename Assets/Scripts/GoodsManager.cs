@@ -39,9 +39,7 @@ public class GoodsManager : MonoBehaviour
 
     public void LoadGoods()
     {
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, fileName)))
-            SaveGoods(); // 파일이 없으면 새로 생성
-            
+        
         GameManger.instance.LoadData(goodsData, fileName);
         GoodTXTUpdate();
     }

@@ -188,13 +188,8 @@ public class DungeonManager : MonoBehaviour
     public void LoadDungeonDataFromJson()
     {
         if (!File.Exists(Path.Combine(Application.persistentDataPath, dungeonDataFileName)))
-        {
-            Debug.Log($"{dungeonDataFileName} 파일이 존재하지 않습니다. 기본 데이터를 사용합니다.");
-            int floorCount = dungeonDataList.Count;
-            dungeonDataToJson.isCleared = new List<bool>(new bool[floorCount]); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
-            SaveDungeonDataToJson(); // 기본 데이터를 JSON으로 저장
-            return;
-        }
+            dungeonDataToJson.isCleared = new(); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
+        
         GameManger.instance.LoadData(dungeonDataToJson, dungeonDataFileName);
     }
 }

@@ -4,6 +4,7 @@ public class WeaponScript : MonoBehaviour
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
+    public WeaponManager weaponManager; // 무기 매니저 참조
     public Transform plaerTransform; // 플레이어 위치 참조 (근접 공격 판정에 사용)
     public ActivablePlayer activablePlayer; // 무기 효과를 플레이어 애니메이션과 연동하기 위해 참조
     public Animator Animation; // 무기 자체 애니메이션 (검 휘두르는 모션)
@@ -19,15 +20,16 @@ public class WeaponScript : MonoBehaviour
     // 애니메이션 이벤트에서 실행할 함수 (검을 휘두르는 타격 프레임에 실행!)
     public void OnMeleeAttackHit() 
     {
+        var currentWeapon = weaponManager.GetCurrentWeaponData();
         // 1. 근접 타격 판정 (SO에 저장된 크기와 위치 사용!)
-        Vector2 hitCenter = (Vector2)plaerTransform.transform.position + activablePlayer.currentWeapon.meleeOffset[FindOffsetIndex()];
-        int hitCount = Physics2D.OverlapCircle(hitCenter, activablePlayer.currentWeapon.meleeAttackRadius, filter, hitResults);
+        Vector2 hitCenter = (Vector2)plaerTransform.transform.position + currentWeapon.meleeOffset[FindOffsetIndex()];
+        int hitCount = Physics2D.OverlapCircle(hitCenter, currentWeapon.meleeAttackRadius, filter, hitResults);
         Collider2D[] hitEnemies = new Collider2D[hitCount];
         for (int i = 0; i < hitCount; i++) 
         {
             if (hitResults[i].TryGetComponent<EnemyComme>(out var monster)) 
             {
-                float totalDamage = playerStatsManager.playerStats.AttackPower + (playerStatsManager.playerStats.AttackPower * activablePlayer.currentWeapon.baseDamage);
+                float totalDamage = playerStatsManager.playerStats.AttackPower + (playerStatsManager.playerStats.AttackPower * currentWeapon.baseDamage);
                 // 근접 데미지 정보 셋업 후 몬스터에게 전달
                 DamageInfo info = new()
                 { 
@@ -69,17 +71,18 @@ public class WeaponScript : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (activablePlayer != null && activablePlayer.currentWeapon != null)
+        var currentWeapon = weaponManager.GetCurrentWeaponData();
+        if (activablePlayer != null && currentWeapon != null)
         {
             Gizmos.color = Color.red; // 기즈모 색상 설정
-            Vector2 hitCenter = (Vector2)activablePlayer.transform.position + activablePlayer.currentWeapon.meleeOffset[FindOffsetIndex()];
-            Gizmos.DrawWireSphere(hitCenter, activablePlayer.currentWeapon.meleeAttackRadius);
+            Vector2 hitCenter = (Vector2)activablePlayer.transform.position + currentWeapon.meleeOffset[FindOffsetIndex()];
+            Gizmos.DrawWireSphere(hitCenter, currentWeapon.meleeAttackRadius);
         }
     }
     
     public void OnRangeAttack()
     {
-        var weapon = activablePlayer.currentWeapon;
+        var weapon = weaponManager.GetCurrentWeaponData();
         if (weapon == null) return;
 
         // 플레이어의 최종 데미지 계산

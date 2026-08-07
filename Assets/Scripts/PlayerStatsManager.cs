@@ -105,8 +105,6 @@ public class PlayerStatsManager : MonoBehaviour
     public void SavePlayerStats() => GameManger.instance.SaveData(playerStats, SAVE_FILE_NAME);
     public void LoadPlayerStats()
     {
-        if (!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME)))
-            SavePlayerStats(); // 파일이 없으면 새로 생성
         GameManger.instance.LoadData(playerStats, SAVE_FILE_NAME);
     } 
 }

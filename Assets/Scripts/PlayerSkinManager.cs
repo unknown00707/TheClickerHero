@@ -101,9 +101,6 @@ public class PlayerSkinManager : MonoBehaviour
     public void SaveSkins() => GameManger.instance.SaveData(saveData, SAVE_FILE_NAME);
     public void LoadSkins()
     {
-        if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME)))
-            SaveSkins(); // 파일이 없으면 새로 저장
-
         GameManger.instance.LoadData(saveData, SAVE_FILE_NAME);
         UpPlayerSkin();
     }
