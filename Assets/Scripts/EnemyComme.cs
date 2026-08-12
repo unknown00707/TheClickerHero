@@ -114,6 +114,8 @@ public class EnemyComme : Entity
     }
     public void OnRangedAttack()
     {
+        if (isDead) return;
+        
         float totalDamage = enemyData.attackPower * enemyData.auraDamageToAttackMultipule;
         AuraManager.Instance.FireSpreadAura(
         enemyData.auraPrefab,
@@ -195,7 +197,7 @@ public class EnemyComme : Entity
 
     public override void Die()
     {
-        ChangeDieState();
+        isDead = true;
         FreezePos();
         isAttacking = false; // 사망 시 플래그 초기화
         groundCol2D.enabled = false;
@@ -257,7 +259,7 @@ public class EnemyComme : Entity
 
     void OnEnable()
     {
-        ChangeDieState();
+        isDead = false;
         isAttacking = false; // 풀에서 재활용될 때 플래그 리셋 필수
         groundCol2D.enabled = true;
         animator.enabled = true;

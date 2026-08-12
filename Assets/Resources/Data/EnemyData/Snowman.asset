@@ -12,26 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7dbb06a1fa3cd41817e96a817ecf92, type: 3}
   m_Name: Snowman
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDataSo
-  enemyName: 
+  enemyName: SnowMan
   enemySprite: {fileID: 8414822295260627880, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
-  deadSprite: {fileID: 21300000, guid: 0685c43c2c3471d4c97bc000068f8994, type: 2}
+  deadSprite: {fileID: 21300000, guid: 6b9b339cb1786ae4a85f1ce82e64715f, type: 2}
   maxHp: 10
   attackPower: 5
-  moveSpeed: 1
+  moveSpeed: 0.7
   coinDrop: 0
-  attackRange: 0.72
+  attackRange: 5
   attackCooldown: 5
-  attackBoxSize: {x: 0.53, y: 0.8}
-  attackOffsetPos: 0.3
+  attackBoxSize: {x: 1, y: 1}
+  attackOffsetPos: 1
   enemyAnimatorOverride: {fileID: 22100000, guid: d30a08e086b5f6e4283eacc81d75b9a7, type: 2}
-  transformOffset: -0.35
-  hitboxSize: {x: 0.53, y: 0.41}
-  hitboxOffset: {x: -0.01, y: 0.45}
-  groundSize: {x: 0.8, y: 0.15}
-  groundOffset: {x: -0.02, y: 0.09}
-  auraPrefab: {fileID: 0}
-  auraDamageToAttackMultipule: 0
-  auraDuration: 0
-  auraSpeed: 0
-  auraCount: 0
-  auraSpreadAngle: 0
+  transformOffset: 0
+  hitboxSize: {x: 0.9, y: 1}
+  hitboxOffset: {x: 0, y: 0.5}
+  groundSize: {x: 1, y: 0.25}
+  groundOffset: {x: 0, y: 0.12}
+  auraPrefab: {fileID: 6696637663084433381, guid: 6b758ca99c3a569499f33e2a1348316d, type: 3}
+  auraDamageToAttackMultipule: 0.7
+  auraDuration: 7
+  auraSpeed: 2
+  auraCount: 1
+  auraSpreadAngle: 30

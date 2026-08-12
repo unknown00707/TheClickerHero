@@ -32,6 +32,11 @@ public class WeaponManager : MonoBehaviour
     public GameObject unlockButton; // 무기 잠금 해제 버튼
     public GameObject equipButton; // 무기 장착 버튼
     private readonly string SAVE_FILE_NAME = "SaveWeaponData.json"; // 저장 파일 이름
+    private void Start()
+    {
+        LoadWeaponData(); // 게임 시작 시 무기 데이터 로드
+        UpdateWeaponUI(); // 현재 장착된 무기 UI 업데이트
+    }
     public void MoveToNextWeapon(int direction)
     {
         if (Mathf.Abs(direction) != 1)

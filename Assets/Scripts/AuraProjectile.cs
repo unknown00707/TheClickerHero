@@ -26,12 +26,12 @@ public class AuraProjectile : MonoBehaviour
 
     public void SetupAura(IObjectPool<GameObject> pool, float damage, float speed, float duration, bool isPlayerAttack)
     {
-        this.myPool = pool;
+        myPool = pool;
         this.damage = damage;
         this.speed = speed;
         this.duration = duration;
         this.isPlayerAttack = isPlayerAttack;
-        this.currentLifetime = 0f;
+        currentLifetime = 0f;
 
         // 🌟 [기능 구현] 애니메이터 리셋 (처음 프레임부터 다시 재생)
         if (animator != null)
@@ -40,7 +40,7 @@ public class AuraProjectile : MonoBehaviour
             animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
         }
 
-        rb.linearVelocity = transform.right * speed;
+        rb.linearVelocity = transform.right * this.speed;
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class AuraProjectile : MonoBehaviour
         {
             if (other.TryGetComponent<EnemyComme>(out var enemyComme))
             {
-                DamageInfo dmgInfo = new() { damage = this.damage, type = AttackType.Aura };
+                DamageInfo dmgInfo = new() { damage = damage, type = AttackType.Aura };
                 enemyComme.TakeDamage(dmgInfo);
                 ReturnToPool();
             }

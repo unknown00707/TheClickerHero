@@ -6929,6 +6929,7 @@ MonoBehaviour:
   dungeonManager: {fileID: 157230179}
   enemyDataList:
   - {fileID: 11400000, guid: 1a076630a1d71db48a6e00c75af57c03, type: 2}
+  - {fileID: 11400000, guid: 36125c82b88696d4ea4d5d92893b18fb, type: 2}
   emptyEnemyPrefab: {fileID: 3181922414714076711, guid: 3eaf3bef85fefb240a131b7190a8fde5, type: 3}
   playerTransform: {fileID: 1610518119}
   MAX_ENEMY_INSTANCES: 100
@@ -23430,9 +23431,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 975170233}
-        m_TargetAssemblyTypeName: PlayerSkinManager, Assembly-CSharp
-        m_MethodName: 
+      - m_Target: {fileID: 975170235}
+        m_TargetAssemblyTypeName: WeaponManager, Assembly-CSharp
+        m_MethodName: EquipWeapon
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -23931,19 +23932,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 022ca2fa5bc218c43948b1a2feb31ca3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
-  goodsManager: {fileID: 0}
-  activablePlayer: {fileID: 0}
+  goodsManager: {fileID: 140919187}
+  activablePlayer: {fileID: 40167125}
   weaponDataArray:
   - {fileID: 11400000, guid: 62f84056a77bb3c41aeaab457afdab94, type: 2}
   unlockWeaponData:
     weaponUnlockStatus: 0100000000000000
     equippedWeaponIndex: 0
-  weaponNameText: {fileID: 0}
-  weaponDescriptionText: {fileID: 0}
-  weaponCostText: {fileID: 0}
-  weaponImage: {fileID: 0}
-  unlockButton: {fileID: 0}
-  equipButton: {fileID: 0}
+  weaponNameText: {fileID: 2018151417}
+  weaponDescriptionText: {fileID: 658191270}
+  weaponCostText: {fileID: 267753523}
+  weaponImage: {fileID: 2109944961}
+  unlockButton: {fileID: 745462157}
+  equipButton: {fileID: 912249177}
 --- !u!1 &1006693218
 GameObject:
   m_ObjectHideFlags: 0
@@ -29809,6 +29810,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   textID: TXT_STATS_WINDOW
+--- !u!1 &1511410119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1511410120}
+  - component: {fileID: 1511410121}
+  m_Layer: 0
+  m_Name: AutoManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1511410120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511410119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1511410121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511410119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211a95b1c54160e4bad9898a394041d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoManager
+  playerStatsManager: {fileID: 1866507182}
+  totalClickReward: 0
 --- !u!1 &1520312055
 GameObject:
   m_ObjectHideFlags: 0
@@ -36499,7 +36546,7 @@ Animator:
   m_GameObject: {fileID: 5788596331224472270}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: f677711e46d14e24699ea41aeaea75ca, type: 2}
+  m_Controller: {fileID: 22100000, guid: d30a08e086b5f6e4283eacc81d75b9a7, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -36559,15 +36606,15 @@ MonoBehaviour:
   currentHealth: 0
   isDead: 0
   enemyManager: {fileID: 598883086}
-  dungeonManager: {fileID: 0}
+  dungeonManager: {fileID: 157230179}
   enemyTransform: {fileID: 4272807104771113919}
   enemyRigidbody: {fileID: 8497953346032181901}
   playerTransform: {fileID: 1610518119}
   spriteRenderer: {fileID: 7142464961901502975}
   animator: {fileID: 4210919165332441498}
   groundCol2D: {fileID: 7267437000867995871}
-  auraSpwanTransform: {fileID: 0}
-  enemyData: {fileID: 11400000, guid: 1a076630a1d71db48a6e00c75af57c03, type: 2}
+  auraSpwanTransform: {fileID: 4534676704627161536}
+  enemyData: {fileID: 11400000, guid: 36125c82b88696d4ea4d5d92893b18fb, type: 2}
   isAttacking: 0
   playerLayer:
     serializedVersion: 2
@@ -36643,17 +36690,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.01, y: 0.45}
+  m_Offset: {x: 0, y: 0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5294118, y: -0.61538464}
-    oldSize: {x: 0.53125, y: 0.40625}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 0.875, y: 1}
     newSize: {x: 0.5625, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.53, y: 0.41}
+  m_Size: {x: 0.9, y: 1}
   m_EdgeRadius: 0
 --- !u!212 &7142464961901502975
 SpriteRenderer:
@@ -36704,7 +36751,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8388445940808544989, guid: 8f49d856934807e4194150becf5ca542, type: 3}
+  m_Sprite: {fileID: -751597124316235429, guid: ec7b11585eb3f2c4e9f2136c9f1269a7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -36748,7 +36795,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.02, y: 0.09}
+  m_Offset: {x: 0, y: 0.12}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -36758,7 +36805,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.8, y: 0.14999998}
+  m_Size: {x: 1, y: 0.25}
   m_EdgeRadius: 0
 --- !u!4 &7637908797156911711
 Transform:
@@ -36769,7 +36816,7 @@ Transform:
   m_GameObject: {fileID: 5788596331224472270}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.35, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36823,5 +36870,6 @@ SceneRoots:
   - {fileID: 157230178}
   - {fileID: 145284796}
   - {fileID: 2060068297}
+  - {fileID: 1511410120}
   - {fileID: 4272807104771113919}
   - {fileID: 1610518119}

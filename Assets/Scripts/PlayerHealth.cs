@@ -18,7 +18,7 @@ public class PlayerHealth : Entity
     }
     public override void Die()
     {
-        ChangeDieState();
+        isDead = true;
         playerBoxCollider.enabled = !isDead;
         activablePlayer.SetSkinAnimeOverride().enabled = !isDead;
         spriteRenderer.sprite = diedSprite;
@@ -33,7 +33,7 @@ public class PlayerHealth : Entity
     }
     public void PlayerHealthInit()
     {
-        ChangeDieState();
+        isDead = false;
         HealthInit(playerStatsManager.playerStats.Health);
         activablePlayer.SetSkinAnimeOverride().enabled = !isDead;
         playerBoxCollider.enabled = !isDead;

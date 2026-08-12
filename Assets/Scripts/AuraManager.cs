@@ -58,8 +58,7 @@ public class AuraManager : MonoBehaviour
 
             // 4. 풀에서 꺼내서 배치
             GameObject auraGo = targetPool.Get();
-            auraGo.transform.position = spawnPosition;
-            auraGo.transform.rotation = spawnRotation;
+            auraGo.transform.SetPositionAndRotation(spawnPosition, spawnRotation);
 
             // 5. 데이터 주입 및 애니메이터 리셋 실행
             if (auraGo.TryGetComponent<AuraProjectile>(out var projectile))

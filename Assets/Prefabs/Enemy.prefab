@@ -236,18 +236,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d2100133080a543a071c1c0661021d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyComme
+  maxHealth: 0
+  currentHealth: 0
+  isDead: 0
   enemyManager: {fileID: 0}
+  dungeonManager: {fileID: 0}
   enemyTransform: {fileID: 4272807103443607973}
   enemyRigidbody: {fileID: 8497953345816182935}
   playerTransform: {fileID: 0}
   spriteRenderer: {fileID: 7142464961081525221}
   animator: {fileID: 4210919166089505664}
   groundCol2D: {fileID: 7267437001725706949}
-  auraProjectile: {fileID: 0}
+  auraSpwanTransform: {fileID: 4534676703270280154}
   enemyData: {fileID: 0}
-  currentHp: 0
-  vectorToPlayer: {x: 0, y: 0}
-  dirToPlayer: {x: 0, y: 0}
+  isAttacking: 0
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -307,7 +309,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4534676703270280154}
-  - component: {fileID: 3720173640736780276}
   m_Layer: 6
   m_Name: EnemyAura
   m_TagString: Untagged
@@ -330,17 +331,3 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4272807103443607973}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3720173640736780276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5991746702532649554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 281f703ebd2069148b2026a978a398f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AuraSpawner
-  activablePlayer: {fileID: 0}
-  auraPrefab: {fileID: 0}
