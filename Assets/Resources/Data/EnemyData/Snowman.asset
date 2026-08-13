@@ -29,7 +29,7 @@ MonoBehaviour:
   hitboxOffset: {x: 0, y: 0.5}
   groundSize: {x: 1, y: 0.25}
   groundOffset: {x: 0, y: 0.12}
-  auraPrefab: {fileID: 6696637663084433381, guid: 6b758ca99c3a569499f33e2a1348316d, type: 3}
+  auraPrefab: {fileID: 1128918339432567915, guid: 395fd06cf9b3cea40b20e091394776b2, type: 3}
   auraDamageToAttackMultipule: 0.7
   auraDuration: 7
   auraSpeed: 2
