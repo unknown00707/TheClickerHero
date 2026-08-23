@@ -303,9 +303,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1211209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,6 +578,7 @@ RectTransform:
   - {fileID: 102345708}
   - {fileID: 777302216}
   - {fileID: 948806656}
+  - {fileID: 1723751609}
   m_Father: {fileID: 368779182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -644,9 +645,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &17363943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2638,16 +2639,28 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 181848290}
-        m_TargetAssemblyTypeName: ButtonHoverDetector, Assembly-CSharp
-        m_MethodName: BTNClick
-        m_Mode: 1
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: UpgradeNode
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: FIRST_UPGRADE
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: OpenUpgradGroup
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: FIRST_UPGRADE/0
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &181848288
@@ -2700,9 +2713,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 418948931}
-  index: FIRST_UPGRADE
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: FIRST_UPGRADE
+  tooltipPivot: {x: 0.5, y: 1}
 --- !u!1 &206767861
 GameObject:
   m_ObjectHideFlags: 0
@@ -2968,8 +2981,9 @@ GameObject:
   - component: {fileID: 212794237}
   - component: {fileID: 212794239}
   - component: {fileID: 212794238}
+  - component: {fileID: 212794240}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2989,10 +3003,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1723751609}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3.069, y: 50.073}
-  m_SizeDelta: {x: 438.92, y: 49.853}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &212794238
 MonoBehaviour:
@@ -3008,7 +3022,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3058,7 +3072,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -3094,6 +3108,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 212794236}
   m_CullTransparentMesh: 1
+--- !u!114 &212794240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212794236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: 1
+  m_LayoutPriority: 1
 --- !u!1 &267753521
 GameObject:
   m_ObjectHideFlags: 0
@@ -3751,9 +3785,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &324688774
 GameObject:
   m_ObjectHideFlags: 0
@@ -5124,12 +5158,6 @@ MonoBehaviour:
   - {fileID: 206767861}
   contantTransform: {fileID: 1195073728}
   scrollRect: {fileID: 1228780171}
-  upgradExplainObject: {fileID: 2060690379}
-  upgradExplainRectTransform: {fileID: 2060690380}
-  upgradExplainTexts:
-  - {fileID: 212794238}
-  - {fileID: 2143170872}
-  - {fileID: 569961623}
   expainOffsetX: -700
   expainOffsetY: 130
 --- !u!1 &431863250
@@ -5459,16 +5487,28 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 461788558}
-        m_TargetAssemblyTypeName: ButtonHoverDetector, Assembly-CSharp
-        m_MethodName: BTNClick
-        m_Mode: 1
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: UpgradeNode
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: CLICK_01
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: OpenUpgradGroup
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: CLICK_01/2
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &461788556
@@ -5521,9 +5561,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 418948931}
-  index: CLICK_01
-  canOpenGroupId: 2
+  tooltipDataType: 0
+  id: CLICK_01
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &470338395
 GameObject:
   m_ObjectHideFlags: 0
@@ -6536,143 +6576,6 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 546442296}
-  m_CullTransparentMesh: 1
---- !u!1 &569961621
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 569961622}
-  - component: {fileID: 569961624}
-  - component: {fileID: 569961623}
-  m_Layer: 5
-  m_Name: Text (TMP) (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &569961622
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 569961621}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1723751609}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0010576, y: -50}
-  m_SizeDelta: {x: 445.06, y: 52.2935}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &569961623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 569961621}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: 5000
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 638c8ce1356271341b1a27cfdafa16b8, type: 2}
-  m_sharedMaterial: {fileID: 7125789764135793371, guid: 638c8ce1356271341b1a27cfdafa16b8, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_characterHorizontalScale: 1
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 1.3812256, y: 0, z: -1.3404541, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!222 &569961624
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 569961621}
   m_CullTransparentMesh: 1
 --- !u!1 &583427534
 GameObject:
@@ -9598,7 +9501,6 @@ RectTransform:
   m_Children:
   - {fileID: 2132085357}
   - {fileID: 1228780170}
-  - {fileID: 2060690380}
   m_Father: {fileID: 15195171}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -24078,9 +23980,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1013546486
 GameObject:
   m_ObjectHideFlags: 0
@@ -24513,9 +24415,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1089749611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25113,9 +25015,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1132249271
 GameObject:
   m_ObjectHideFlags: 0
@@ -25454,9 +25356,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1167083739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26597,9 +26499,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1267120092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26998,9 +26900,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1278324012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27364,6 +27266,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1308310671}
   m_CullTransparentMesh: 1
+--- !u!1 &1316846438
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1316846439}
+  - component: {fileID: 1316846440}
+  m_Layer: 0
+  m_Name: TooltipManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1316846439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316846438}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1316846440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316846438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f274b86bf013194e85470014cbe620c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TooltipManager
+  canvasRect: {fileID: 368779182}
+  upgradManager: {fileID: 418948931}
+  dungeonManager: {fileID: 157230179}
+  playerSkinManager: {fileID: 172727097}
+  tooltipWindow: {fileID: 1723751608}
+  titleText: {fileID: 212794238}
+  contentText: {fileID: 2143170872}
+  tooltiprectTransform: {fileID: 1723751609}
 --- !u!1 &1327944994
 GameObject:
   m_ObjectHideFlags: 0
@@ -28142,9 +28096,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1413753347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28857,16 +28811,28 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1456007283}
-        m_TargetAssemblyTypeName: ButtonHoverDetector, Assembly-CSharp
-        m_MethodName: BTNClick
-        m_Mode: 1
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: UpgradeNode
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: ATK_01
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 418948931}
+        m_TargetAssemblyTypeName: UpgradManager, Assembly-CSharp
+        m_MethodName: OpenUpgradGroup
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ATK_01/1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1456007281
@@ -28919,9 +28885,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 418948931}
-  index: ATK_01
-  canOpenGroupId: 1
+  tooltipDataType: 0
+  id: ATK_01
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1468224394
 GameObject:
   m_ObjectHideFlags: 0
@@ -29055,9 +29021,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1468726342
 GameObject:
   m_ObjectHideFlags: 0
@@ -30454,9 +30420,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!114 &1586964369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32118,8 +32084,10 @@ GameObject:
   - component: {fileID: 1723751609}
   - component: {fileID: 1723751611}
   - component: {fileID: 1723751610}
+  - component: {fileID: 1723751613}
+  - component: {fileID: 1723751612}
   m_Layer: 5
-  m_Name: Image
+  m_Name: ExpainObj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32132,18 +32100,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1723751608}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 212794237}
   - {fileID: 2143170871}
-  - {fileID: 569961622}
-  m_Father: {fileID: 2060690380}
+  m_Father: {fileID: 15195171}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -32185,6 +32152,46 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1723751608}
   m_CullTransparentMesh: 1
+--- !u!114 &1723751612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723751608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
+--- !u!114 &1723751613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723751608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 20
+    m_Right: 20
+    m_Top: 20
+    m_Bottom: 20
+  m_ChildAlignment: 1
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1725911360
 GameObject:
   m_ObjectHideFlags: 0
@@ -32766,9 +32773,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1766782037
 GameObject:
   m_ObjectHideFlags: 0
@@ -33570,9 +33577,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &1857962913
 GameObject:
   m_ObjectHideFlags: 0
@@ -33655,35 +33662,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsManager
   playerStats:
     health:
-      baseValue: 100
       flatUpgrade: 0
       multiplier: 1
     attackPower:
-      baseValue: 10
       flatUpgrade: 0
       multiplier: 1
     defense:
-      baseValue: 5
       flatUpgrade: 0
       multiplier: 1
     criticalChance:
-      baseValue: 0.001
       flatUpgrade: 0
       multiplier: 1
     criticalDamage:
-      baseValue: 1
       flatUpgrade: 0
       multiplier: 1
     coinByClick:
-      baseValue: 1
       flatUpgrade: 0
       multiplier: 1
     speed:
-      baseValue: 1
       flatUpgrade: 0
       multiplier: 1
     rareGoodsProbability:
-      baseValue: 0.01
       flatUpgrade: 0
       multiplier: 1
     benfitEffect: 0
@@ -35613,42 +35612,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281f703ebd2069148b2026a978a398f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AuraManager
---- !u!1 &2060690379
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2060690380}
-  m_Layer: 5
-  m_Name: ExpainObj
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &2060690380
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2060690379}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1723751609}
-  m_Father: {fileID: 829637879}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 72.53, y: -4.0135}
-  m_SizeDelta: {x: 445.0601, y: 158.027}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2063062597
 GameObject:
   m_ObjectHideFlags: 0
@@ -36049,9 +36012,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
-  upgradManager: {fileID: 0}
-  index: 
-  canOpenGroupId: 0
+  tooltipDataType: 0
+  id: 
+  tooltipPivot: {x: 1, y: 0}
 --- !u!1 &2109944959
 GameObject:
   m_ObjectHideFlags: 0
@@ -36391,8 +36354,9 @@ GameObject:
   - component: {fileID: 2143170871}
   - component: {fileID: 2143170873}
   - component: {fileID: 2143170872}
+  - component: {fileID: 2143170874}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36412,10 +36376,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1723751609}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0010576, y: -1}
-  m_SizeDelta: {x: 445.06, y: 52.2935}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2143170872
 MonoBehaviour:
@@ -36431,7 +36395,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -36473,7 +36437,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
@@ -36482,7 +36446,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -36518,6 +36482,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2143170870}
   m_CullTransparentMesh: 1
+--- !u!114 &2143170874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143170870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: 1
+  m_FlexibleHeight: 1
+  m_LayoutPriority: 1
 --- !u!1 &3181922413856349245
 GameObject:
   m_ObjectHideFlags: 0
@@ -36871,5 +36855,6 @@ SceneRoots:
   - {fileID: 145284796}
   - {fileID: 2060068297}
   - {fileID: 1511410120}
+  - {fileID: 1316846439}
   - {fileID: 4272807104771113919}
   - {fileID: 1610518119}

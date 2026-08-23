@@ -42,6 +42,12 @@ DGN_TITLE_06,우주,Space
 DGN_TITLE_07,지옥,Hell
 DGN_DESC_REWARD_SUCCESS,던전 클리어!, Dungeon Clear!
 DGN_DESC_REWARD_FAILED,던전 실패!, Dungeon Failed!
-DGN_DESC_REWARD_CLICK,던전 돌파 기본 보상 : {0} \n = {1},Dungeon Clear Basic Reward : {0} * Click Multply {1}\n = {2}
-DGN_DESC_REWARD_COIN,던전 돌파 기본 보상 : {0} + 몬스터 격파 {1}\n = {2},Dungeon Clear Basic Reward : {0} + Monster Defeat {1}\n = {2}
+DGN_DESC_REWARD_CLICK,클릭 획득 : {0} \n = {1},Click Reward : {0}
+DGN_DESC_REWARD_COIN,코인 획득 : {0},Coin Reward : {0}
 DGN_DESC_REWARD_RELIC,유물 획득 : {0},Relic Getten : {0}
+DGN_DESC_TOOLTIP_CLICK,클리어 보상 {0}\n + \n 클릭 배수 {1} * 환생 보너스 * 이로운 효과 : {2}   
+DGN_DESC_TOOLTIP_COIN,클리어 보상 {0}\n + \n 몬스터 격퇴 {1} * 환생 보너스 * 이로운 효과 : {2}
+DGN_DESC_TOOLTIP_RELIC,획득 확률 {0} * 환생 보너스 {1},
+DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상
+DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상
+DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상

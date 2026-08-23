@@ -46,9 +46,7 @@ public class UpgradManager : MonoBehaviour
     public List<GameObject> upgradGroupObjects = new();
     public RectTransform contantTransform;
     public ScrollRect scrollRect;
-    public GameObject upgradExplainObject;
-    public RectTransform upgradExplainRectTransform;
-    public TextMeshProUGUI[] upgradExplainTexts;
+
 
     [Header("Settings")]
     // 업그레이드 설명창이 마우스를 따라다니도록 하기 위한 오프셋입니다. 필요에 따라 조정하세요.
@@ -81,13 +79,26 @@ public class UpgradManager : MonoBehaviour
         UpdateContentSize();
     }
     //By button
-    public void OpenUpgradGroup(string nodeID , int index)
+    public void OpenUpgradGroup(string ID)
     {
-        if(upgradNodeInfoDictionary[nodeID].isUnLock && upgradGroupObjects[index].activeInHierarchy == false)
+        try
         {
-            upgradGroupObjects[index].SetActive(true);
-            upradeSaveData.upgradGroupUnlockStatus[index] = true; // 세이브 데이터에도 잠금 해제 상태 저장
-            UpdateContentSize(); 
+            // 문자열 분할 및 형변환 시도
+            string[] idParts = ID.Split('/');
+            string nodeID = idParts[0];
+            int index = int.Parse(idParts[1]);
+
+            if(upgradNodeInfoDictionary[nodeID].isUnLock && upgradGroupObjects[index].activeInHierarchy == false)
+            {
+                upgradGroupObjects[index].SetActive(true);
+                upradeSaveData.upgradGroupUnlockStatus[index] = true; // 세이브 데이터에도 잠금 해제 상태 저장
+                UpdateContentSize(); 
+            }
+        }
+        catch (Exception e)
+        {
+            // 잡고 싶지 않더라도 최소한 로그는 찍어두는 것이 정신건강에 좋습니다.
+            Debug.LogWarning($"[ID 변환/잠금해제 실패] ID: {ID} | 에러 내용: {e.Message}");
         }
     }
     public void UpdateContentSize()
@@ -123,7 +134,7 @@ public class UpgradManager : MonoBehaviour
         contantTransform.sizeDelta = new Vector2(maxX + padding, maxY - minY + padding);
     }
 
-    public void UpgradNodeExplain(string index, bool isEnter)
+    public string[] UpgradNodeExplain(string index)
     {
         upgradNodeInfoDictionary.TryGetValue(index, out NodeInfo nodeInfo);
         int level = nodeInfo.level;
@@ -137,27 +148,17 @@ public class UpgradManager : MonoBehaviour
             nodePath = "DESC_END_UPGRADE"; // 업그레이드 데이터가 없는 경우
             level = 0; // 설명이 없는 경우 레벨은 0으로 초기화
         }
-        
-        upgradExplainTexts[0].text = LanguageManager.Instance.GetText(nodePath + "_TITLE");
-        upgradExplainTexts[1].text = string.Format(LanguageManager.Instance.GetText(nodePath), upgradExplainDictionary[index][level].values.ToString());
-        upgradExplainTexts[2].text = LanguageManager.Instance.GetText("DESC_COST") + upgradExplainDictionary[index][level].needGoods.ToString();
+
+        string title = LanguageManager.Instance.GetText(nodePath + "_TITLE");
+        string content = string.Format(LanguageManager.Instance.GetText(nodePath), upgradExplainDictionary[index][level].values.ToString());
+        string costTxt;
+        costTxt = LanguageManager.Instance.GetText("DESC_COST") + upgradExplainDictionary[index][level].needGoods.ToString();
         if(nodePath == "DESC_END_UPGRADE")
-            upgradExplainTexts[2].text = "!^ o ^!"; // 업그레이드 데이터가 없는 경우 비용 텍스트 숨기기
+            costTxt = "!^ o ^!"; // 업그레이드 데이터가 없는 경우 비용 텍스트 숨기기
         
-        // 위치
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        // 2. 스크린 좌표를 캔버스 상의 로컬 좌표로 변환합니다.
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform,
-            mousePos,
-            canvas.worldCamera, // Overlay 모드라면 null을 넣어도 됩니다.
-            out Vector2 localPoint
-        );
-    
-        upgradExplainRectTransform.anchoredPosition = localPoint + new Vector2(expainOffsetX, expainOffsetY);
-        if(upgradExplainRectTransform.anchoredPosition.x > canvasRectTransform.sizeDelta.x)
-            upgradExplainRectTransform.anchoredPosition = localPoint + new Vector2(-expainOffsetX, expainOffsetY);
-        upgradExplainObject.SetActive(isEnter);
+        string totalContent = $"{content}\n{costTxt}";
+
+        return new string[] { title, totalContent };
     }
     public void UpgradeNode(string index) // index = 노드 ID
     {

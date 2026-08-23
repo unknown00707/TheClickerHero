@@ -44,6 +44,7 @@ public class DungeonManager : MonoBehaviour
     private readonly string DUNGEON_REWARD_CLICK = "DGN_DESC_REWARD_CLICK";
     private readonly string DUNGEON_REWARD_COIN = "DGN_DESC_REWARD_COIN";
     private readonly string DUNGEON_REWARD_RELIC = "DGN_DESC_REWARD_RELIC";
+    private readonly string DGN_DESC_TOOLTIP = "DGN_DESC_TOOLTIP_";
     private readonly string dungeonDataFileName = "DungeonData.json"; // JSON 파일 이름
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -112,10 +113,22 @@ public class DungeonManager : MonoBehaviour
         string rewardText = isSuccessful ? LanguageManager.Instance.GetText(DUNGEON_REWARD_SUCCESS) 
                                          : LanguageManager.Instance.GetText(DUNGEON_REWARD_FAILED);
         dungeonClearRewardTxt.text = rewardText;     
-        dungeonClearClickRewardTxt.text = string.Format(LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK), gettenClick, playerStatsManager.playerStats.benfitEffect); // 클릭 보상 텍스트 업데이트
+        dungeonClearClickRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK);
         dungeonClearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN);
         dungeonClearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC);
     }   
+    public string[] ToTooltipByGetID(string id)
+    {
+        string titleId = LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id + "_TITLE");
+        string content = id switch
+        {
+            "CLICK" => LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id),
+            "COIN" => LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id),
+            "RELIC" => LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id),
+            _ => null
+        };
+        return new string[] {LanguageManager.Instance.GetText(titleId), content};
+    }
     public void AddCoinByEnemy(int coinAmount)
     {
         gettenCoin += coinAmount;

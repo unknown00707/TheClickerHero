@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public class Stat
 {
-    public float baseValue;
+    public readonly float baseValue;
     public float flatUpgrade;
     public float multiplier = 1.0f;
 
@@ -54,7 +54,7 @@ public class PlayerStasData
     public float CoinByClick => coinByClick.GetFinalValue(benfitEffect, reincarnationBonus);
     public float Speed => speed.GetFinalValue(benfitEffect, reincarnationBonus);
     public float RareGoodsProbability => rareGoodsProbability.GetFinalValue(benfitEffect, reincarnationBonus);
-
+    public float ToTalbenfit => 1f + (benfitEffect * reincarnationBonus);
     public void ResetStatsForReincarnation(bool keepBonus)
     {
         // 1. 초기값으로 되돌릴 스탯들
@@ -80,7 +80,7 @@ public class PlayerStatsManager : MonoBehaviour
 {
     public PlayerStasData playerStats = new();
     public TextMeshProUGUI[] playerStatsText;
-    private readonly String SAVE_FILE_NAME = "SavePlayerStatsData.json";
+    private readonly string SAVE_FILE_NAME = "SavePlayerStatsData.json";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
