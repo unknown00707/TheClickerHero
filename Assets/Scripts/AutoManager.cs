@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 [Serializable]
 public class PlayerTime
@@ -19,7 +20,10 @@ public class TimeLog
 public class AutoManager : MonoBehaviour
 {
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
-    public int totalClickReward; // 오프라인 보상으로 지급할 총 클릭 수
+    public GameObject offlineRewardObj;
+    public TextMeshProUGUI offlineRewardTitle;
+    public TextMeshProUGUI offlineRewardContent;
+    private int totalClickReward; // 오프라인 보상으로 지급할 총 클릭 수
     private readonly TimeLog timeLog = new();
     private DateTime loginTime; // 게임 시작 시간
     private string todayDate; // 오늘 날짜
@@ -33,6 +37,7 @@ public class AutoManager : MonoBehaviour
         todayDate = loginTime.ToString("yyyy-MM-dd");
         LoadTimeLog(); // 게임 시작 시 시간 로그 로드
         Debug.Log("게임 시작 시간: " + todayDate + " : " + loginTime);
+        offlineRewardObj.SetActive(false); // 혹시 모르니.
         OfflineReward(); // 오프라인 보상 지급
     }
 
@@ -96,11 +101,21 @@ public class AutoManager : MonoBehaviour
 
         // 4. 최종 합산 후 딱 한 번만 int로 변환 (소수점 버그 방지)
         totalClickReward = (int)(defaultReward + playerBonusReward);
+
+        //ui set
+        offlineRewardTitle.text = $"{ColorPalette.Rare}{LanguageManager.Instance.GetText("AUTO_OFFLINE_TITLE")}{ColorPalette.End}";
+       
+        string coloredValue = $"{ColorPalette.Yellow}{totalClickReward}{ColorPalette.End}";
+        string rawText = LanguageManager.Instance.GetText("AUTO_OFFLINE_CONTENT");
+        offlineRewardContent.text = string.Format(rawText, coloredValue);
+        
+        offlineRewardObj.SetActive(true);
     }
 
     public void GetOfflineReward()
     {
         playerStatsManager.playerStats.coinByClick.Upgrade(false, totalClickReward);
+        offlineRewardObj.SetActive(false);
         Debug.Log($"오프라인 보상 지급 완료! 총 클릭 수: {totalClickReward}");
     }
     public void SaveTimeLog()

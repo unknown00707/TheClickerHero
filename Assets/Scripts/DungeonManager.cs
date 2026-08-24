@@ -25,7 +25,7 @@ public class DungeonManager : MonoBehaviour
     public EnemyManager enemyManager;
     public PlayerStatsManager playerStatsManager;
     private readonly Dictionary<string, Dictionary<string, DungeonDataFromCSV>> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
-    private readonly DungeonDataToJson dungeonDataToJson; // JSON으로 저장할 던전
+    private readonly DungeonDataToJson dungeonDataToJson = new(); // JSON으로 저장할 던전
     private string currentDungeonMainFloor = "0"; 
     private string currentDungeonSubFloor = "0";
     [Header("던전 UI 설정")]
@@ -201,7 +201,10 @@ public class DungeonManager : MonoBehaviour
     public void LoadDungeonDataFromJson()
     {
         if (!File.Exists(Path.Combine(Application.persistentDataPath, dungeonDataFileName)))
+        {
             dungeonDataToJson.isCleared = new(); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
+            SaveDungeonDataToJson();
+        }
         
         GameManger.instance.LoadData(dungeonDataToJson, dungeonDataFileName);
     }

@@ -10,7 +10,7 @@ public class PlayerHealth : Entity
     [SerializeField] private ActivablePlayer activablePlayer;
     [SerializeField] private Sprite diedSprite;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    private readonly float deadTime = 1.5f; // 사망 후 딜레이 시간
+    private readonly float deadTime = 1f; // 사망 후 딜레이 시간
     private void Start()
     {
         PlayerHealthInit();
@@ -38,9 +38,12 @@ public class PlayerHealth : Entity
         activablePlayer.SetSkinAnimeOverride().enabled = !isDead;
         playerBoxCollider.enabled = !isDead;
     }
-
-    public void ChangePlayerActiveState(bool isActive)
+    /// <summary>
+    /// "true -> false, false -> true"
+    /// </summary>
+    /// <param name="isDead"></param>
+    public void ChangePlayerActiveState(bool isDead)
     {
-        playerObj.SetActive(isActive);
+        playerObj.SetActive(!isDead);
     }
 }

@@ -45,9 +45,12 @@ DGN_DESC_REWARD_FAILED,던전 실패!, Dungeon Failed!
 DGN_DESC_REWARD_CLICK,클릭 획득 : {0} \n = {1},Click Reward : {0}
 DGN_DESC_REWARD_COIN,코인 획득 : {0},Coin Reward : {0}
 DGN_DESC_REWARD_RELIC,유물 획득 : {0},Relic Getten : {0}
-DGN_DESC_TOOLTIP_CLICK,클리어 보상 {0}\n + \n 클릭 배수 {1} * 환생 보너스 * 이로운 효과 : {2}   
-DGN_DESC_TOOLTIP_COIN,클리어 보상 {0}\n + \n 몬스터 격퇴 {1} * 환생 보너스 * 이로운 효과 : {2}
-DGN_DESC_TOOLTIP_RELIC,획득 확률 {0} * 환생 보너스 {1},
-DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상
-DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상
-DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상
+DGN_DESC_TOOLTIP_CLICK,클리어 보상 {0}\n + \n 클릭 배수 * 환생 보너스 * 이로운 효과,Clear Reward {0}\n + \n Click Multiplier * ReincarnationBonus * BenfitEffect   
+DGN_DESC_TOOLTIP_COIN,클리어 보상 {0}\n + \n 몬스터 격퇴 * 환생 보너스 * 이로운 효과,Clear Reward {0}\n + \n Defeat Monsters * ReincarnationBonus * BenfitEffect
+DGN_DESC_TOOLTIP_RELIC,획득 확률 * 환생 보너스,Drop Rate * Rebirth Bonus
+DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상,Click Reward
+DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상,Coin Reward
+DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상,Relic Reward
+AUTO_OFFLINE_TITLE,오프라인 보상,Offline Reward
+AUTO_OFFLINE_CONTENT,얻은 클릭 : {0},Clicks Obtained : {0}
+AUTO_OFFLINE_GET,보상 받기,Get Reward

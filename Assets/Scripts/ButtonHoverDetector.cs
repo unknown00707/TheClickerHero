@@ -14,7 +14,7 @@ public class ButtonHoverDetector : MonoBehaviour, IPointerEnterHandler, IPointer
     public string id;
     [SerializeField] private Vector2 tooltipPivot = new(0.5f, 0.5f);
 
-    private readonly float holdTime = 0.5f;
+    private readonly float holdTime = 0.3f;
     private Coroutine holdCoroutine;
     private bool isHolding = false;
     // 마우스가 버튼 위로 들어올 때 호출

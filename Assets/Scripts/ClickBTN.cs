@@ -88,14 +88,14 @@ public class ClickBTN : MonoBehaviour
         {
             mainSenceUIManager.OpenMainUI(false); // 메인 UI 닫기
             playerHealth.PlayerHealthInit(); // 플레이어 체력 초기화
-            playerHealth.ChangePlayerActiveState(!playerHealth.isDead); // 플레이어 오브젝트 활성화
+            playerHealth.ChangePlayerActiveState(playerHealth.isDead); // 플레이어 오브젝트 활성화
             dungeonManager.LoadDungeon(currentDungeonID);
         }
     }
 
     public void RetrunToMainSence()
     {
-        playerHealth.ChangePlayerActiveState(false); // 플레이어 오브젝트 비활성화
+        playerHealth.ChangePlayerActiveState(true); // 플레이어 오브젝트 비활성화
         dungeonManager.DungeonUIInit(); // 던전 UI 초기화
         mainSenceUIManager.OpenMainUI(true); // 메인 UI 열기
     }
