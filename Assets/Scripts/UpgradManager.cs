@@ -150,9 +150,8 @@ public class UpgradManager : MonoBehaviour
         }
 
         string title = LanguageManager.Instance.GetText(nodePath + "_TITLE");
-        string content = string.Format(LanguageManager.Instance.GetText(nodePath), upgradExplainDictionary[index][level].values.ToString());
-        string costTxt;
-        costTxt = LanguageManager.Instance.GetText("DESC_COST") + upgradExplainDictionary[index][level].needGoods.ToString();
+        string content = LanguageManager.Instance.GetText(nodePath).ReplaceTags("UpValue", upgradExplainDictionary[index][level].values.ToString());
+        string costTxt = LanguageManager.Instance.GetText("DESC_COST") + upgradExplainDictionary[index][level].needGoods.ToString();
         if(nodePath == "DESC_END_UPGRADE")
             costTxt = "!^ o ^!"; // 업그레이드 데이터가 없는 경우 비용 텍스트 숨기기
         

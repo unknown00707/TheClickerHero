@@ -107,8 +107,7 @@ public class AutoManager : MonoBehaviour
        
         string coloredValue = $"{ColorPalette.Yellow}{totalClickReward}{ColorPalette.End}";
         string rawText = LanguageManager.Instance.GetText("AUTO_OFFLINE_CONTENT");
-        offlineRewardContent.text = string.Format(rawText, coloredValue);
-        
+        offlineRewardContent.text = rawText.ReplaceTags("GettenCoin", coloredValue);
         offlineRewardObj.SetActive(true);
     }
 

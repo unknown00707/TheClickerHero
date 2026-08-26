@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
@@ -80,14 +81,44 @@ public class PlayerStatsManager : MonoBehaviour
 {
     public PlayerStasData playerStats = new();
     public TextMeshProUGUI[] playerStatsText;
+    private Dictionary<string, Func<float>> statGetters = new();
     private readonly string SAVE_FILE_NAME = "SavePlayerStatsData.json";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         LoadPlayerStats();
         UpDatePlayerStatsText();
+        InitStatGettersDict();
     }
+    private void InitStatGettersDict()
+    {
+        // 딕셔너리 초기화 (대소문자 무시 설정 추가)
+        statGetters = new Dictionary<string, Func<float>>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "공격력", () => playerStats.AttackPower },
+            { "체력", () => playerStats.Health },
+            { "방어력", () => playerStats.Defense },
+            { "크리티컬 확률", () => playerStats.CriticalChance },
+            { "크리티컬 데미지", () => playerStats.CriticalDamage },
+            { "클릭당 코인", () => playerStats.CoinByClick },
+            { "클릭 배수", () => playerStats.coinByClick.multiplier },
+            { "이동 속도", () => playerStats.Speed },
+            { "희귀 확률", () => playerStats.RareGoodsProbability },
+            { "이로운 효과", () => playerStats.benfitEffect },
+            { "환생 보너스", () => playerStats.reincarnationBonus },
+            { "총 혜택", () => playerStats.ToTalbenfit }
+        };
+    }
+    public float GetStatValueInDict(string statName)
+    {
+        if (statGetters.TryGetValue(statName, out var getter))
+        {
+            return getter(); // 연결된 프로퍼티 값 바로 반환
+        }
 
+        Debug.LogWarning($"[StatsManager] '{statName}'에 해당하는 스탯을 찾을 수 없습니다.");
+        return 0f;
+    }
     public void UpDatePlayerStatsText()
     {
         playerStatsText[0].text = playerStats.AttackPower.ToString("F0") + " + " + "무기 데미지 들어갈 예정";

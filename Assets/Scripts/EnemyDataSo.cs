@@ -11,6 +11,7 @@ public class EnemyDataSo : ScriptableObject
     public float attackPower;       // 공격력
     public float moveSpeed;         // 이동 속도
     public int coinDrop;            // 처치 시 드롭하는 코인 양
+    public int clickDrop;           // 처치 시 드롭하는 클릭 양
     [Header("Behavior Settings")]
     public float attackRange;       // 공격 범위
     public float attackCooldown;    // 공격 간격

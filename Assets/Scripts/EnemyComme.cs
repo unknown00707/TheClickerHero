@@ -205,7 +205,8 @@ public class EnemyComme : Entity
         spriteRenderer.sortingOrder = -10;
         spriteRenderer.sprite = enemyData.deadSprite;
 
-        dungeonManager.AddCoinByEnemy(enemyData.coinDrop); // 적 처치 시 코인 획득
+        dungeonManager.AddCoinAndClickByEnemy(enemyData.coinDrop, true); // 적 처치 시 코인 획득
+        dungeonManager.AddCoinAndClickByEnemy(enemyData.clickDrop, false); // 적 처시 시 클릭 획득
         enemyManager.ReturnEnemyToPool(this, isDead); // 사망 시 풀에 반환
 
         Invoke(nameof(DisableSelf), deadTime);

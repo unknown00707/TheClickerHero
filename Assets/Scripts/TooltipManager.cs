@@ -45,6 +45,7 @@ public class TooltipManager : MonoBehaviour
         {
             TooltipDataType.UpragedManager => instance.upgradManager.UpgradNodeExplain(id),
             TooltipDataType.DungeonManager => instance.dungeonManager.ToTooltipByGetID(id),
+            TooltipDataType.PlayerStatsManager => new string[] {""},
             _ => null // default를 의미합니다.
         };
 

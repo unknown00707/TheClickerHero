@@ -8,13 +8,13 @@ DESC_END_UPGRADE_TITLE,끝!,End!
 DESC_COST,비용 : ,Cost : ,
 DESC_FIRST,시작을 축하합니다!,Congratulations on the start!
 DESC_FIRST_TITLE,최초!,Welcome!
-DESC_ATK_01,공격력을 {0} 증가시킵니다.,Up {0} your Attack Stats
+DESC_ATK_01,공격력을 {UpValue} 증가시킵니다.,Up {UpValue} your Attack Stats
 DESC_ATK_01_TITLE,공격력 증가,Up Attack
-DESC_ATK_02,공격력을 {0}배 증가시킵니다.,Up {0} times your Attack Stats
+DESC_ATK_02,공격력을 {UpValue}배 증가시킵니다.,Up {UpValue} times your Attack Stats
 DESC_ATK_02_TITLE,공격력 배수 증가,Up Attack Multply
-DESC_DEF_01,방어력을 {0} 증가시킵니다.,Up {0} your Defence Stats
+DESC_DEF_01,방어력을 {UpValue} 증가시킵니다.,Up {UpValue} your Defence Stats
 DESC_DEF_01_TITLE,방어력 증가,Up Defence
-DESC_CLICK_01,클릭당 코인을 {0} 증가시킵니다.,Up {0} your Coin By Click
+DESC_CLICK_01,클릭당 코인을 {UpValue} 증가시킵니다.,Up {UpValue} your Coin By Click
 DESC_CLICK_01_TITLE,클릭당 코인 증가,Up Coin By Click
 TXT_CLICK_WINDOW,클릭!,Click!
 TXT_STATS_WINDOW,능력치,Stats
@@ -42,15 +42,15 @@ DGN_TITLE_06,우주,Space
 DGN_TITLE_07,지옥,Hell
 DGN_DESC_REWARD_SUCCESS,던전 클리어!, Dungeon Clear!
 DGN_DESC_REWARD_FAILED,던전 실패!, Dungeon Failed!
-DGN_DESC_REWARD_CLICK,클릭 획득 : {0} \n = {1},Click Reward : {0}
-DGN_DESC_REWARD_COIN,코인 획득 : {0},Coin Reward : {0}
-DGN_DESC_REWARD_RELIC,유물 획득 : {0},Relic Getten : {0}
-DGN_DESC_TOOLTIP_CLICK,클리어 보상 {0}\n + \n 클릭 배수 * 환생 보너스 * 이로운 효과,Clear Reward {0}\n + \n Click Multiplier * ReincarnationBonus * BenfitEffect   
-DGN_DESC_TOOLTIP_COIN,클리어 보상 {0}\n + \n 몬스터 격퇴 * 환생 보너스 * 이로운 효과,Clear Reward {0}\n + \n Defeat Monsters * ReincarnationBonus * BenfitEffect
-DGN_DESC_TOOLTIP_RELIC,획득 확률 * 환생 보너스,Drop Rate * Rebirth Bonus
+DGN_DESC_REWARD_CLICK,클릭 획득 : {GettenClick},Click Reward : {GettenClick}
+DGN_DESC_REWARD_COIN,코인 획득 : {GettenCoin},Coin Reward : {GettenCoin}
+DGN_DESC_REWARD_RELIC,유물 획득 : {GettenReic},Relic Getten : {GettenReic}
+DGN_DESC_TOOLTIP_CLICK,클리어 보상 {GettenClick}\n + \n 클릭 배수 {ClickMultiply} * 환생 보너스 * 이로운 효과 {TotalBenefit},Clear Reward {0}\n + \n Click Multiplier {ClickMultiply} * ReincarnationBonus * BenfitEffect {TotalBenefit}   
+DGN_DESC_TOOLTIP_COIN,클리어 보상 {GettenCoin}\n + \n 몬스터 격퇴 {DefeatMonsters} * 환생 보너스 * 이로운 효과 {TotalBenefit},Clear Reward {GettenCoin}\n + \n Defeat Monsters {DefeatMonsters} * ReincarnationBonus * BenfitEffect {TotalBenefit}
+DGN_DESC_TOOLTIP_RELIC,획득 확률 {GettenReic} * 환생 보너스 {ReincarnationBonus},Drop Rate {GettenReic} * ReincarnationBonus {ReincarnationBonus}
 DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상,Click Reward
 DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상,Coin Reward
 DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상,Relic Reward
 AUTO_OFFLINE_TITLE,오프라인 보상,Offline Reward
-AUTO_OFFLINE_CONTENT,얻은 클릭 : {0},Clicks Obtained : {0}
+AUTO_OFFLINE_CONTENT,얻은 클릭 : {GettenCoin},Clicks Obtained : {GettenCoin}
 AUTO_OFFLINE_GET,보상 받기,Get Reward
