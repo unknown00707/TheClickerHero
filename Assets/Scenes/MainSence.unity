@@ -578,7 +578,6 @@ RectTransform:
   - {fileID: 102345708}
   - {fileID: 777302216}
   - {fileID: 948806656}
-  - {fileID: 1723751609}
   - {fileID: 955327965}
   m_Father: {fileID: 368779182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1725,11 +1724,11 @@ RectTransform:
   - {fileID: 1672224826}
   m_Father: {fileID: 519105673}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &66633777
 GameObject:
   m_ObjectHideFlags: 0
@@ -2511,16 +2510,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0465e9fbddb10d84cbefdeeca365f85b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonManager
-  playerTransform: {fileID: 1610518119}
   enemyManager: {fileID: 598883086}
   playerStatsManager: {fileID: 1866507182}
-  dungeonClearUIObj: {fileID: 98540069}
-  dungeonClearRewardTxt: {fileID: 822224357}
-  dungeonClearClickRewardTxt: {fileID: 1145292855}
-  dungeonClearCoinRewardTxt: {fileID: 435053506}
-  dungeonClearRelicRewardTxt: {fileID: 941498450}
-  dungeonGettenRelicRewardTxt: {fileID: 1742607177}
-  dungeonGettenCoinByEnemyTxt: {fileID: 1672224827}
+  clickBTN: {fileID: 1616189651}
+  playerTransform: {fileID: 1610518119}
+  clearUIObj: {fileID: 98540069}
+  clearRewardTxt: {fileID: 822224357}
+  clearClickRewardTxt: {fileID: 1145292855}
+  clearCoinRewardTxt: {fileID: 435053506}
+  clearRelicRewardTxt: {fileID: 941498450}
+  gettenClickRewardTxt: {fileID: 1742607177}
+  gettenCoinByEnemyTxt: {fileID: 1672224827}
 --- !u!1 &167853314
 GameObject:
   m_ObjectHideFlags: 0
@@ -3712,7 +3712,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -4548,6 +4548,7 @@ RectTransform:
   m_Children:
   - {fileID: 15195171}
   - {fileID: 2063062598}
+  - {fileID: 1723751609}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5365,6 +5366,8 @@ GameObject:
   - component: {fileID: 435053505}
   - component: {fileID: 435053507}
   - component: {fileID: 435053506}
+  - component: {fileID: 435053508}
+  - component: {fileID: 435053509}
   m_Layer: 5
   m_Name: CoinRewardTxt
   m_TagString: Untagged
@@ -5389,7 +5392,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -7}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 175.17, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &435053506
 MonoBehaviour:
@@ -5491,6 +5494,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 435053504}
   m_CullTransparentMesh: 1
+--- !u!114 &435053508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435053504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
+  tooltipDataType: 1
+  id: COIN
+  tooltipPivot: {x: 0.5, y: 0.5}
+--- !u!114 &435053509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435053504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
 --- !u!1 &447175544
 GameObject:
   m_ObjectHideFlags: 0
@@ -5537,7 +5569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 458291159}
   m_Layer: 5
-  m_Name: GetRareItem
+  m_Name: GetClicks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5558,11 +5590,11 @@ RectTransform:
   - {fileID: 1742607176}
   m_Father: {fileID: 519105673}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &461788553
 GameObject:
   m_ObjectHideFlags: 0
@@ -6295,8 +6327,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1857962914}
-  - {fileID: 61493776}
   - {fileID: 458291159}
+  - {fileID: 61493776}
   m_Father: {fileID: 1688056924}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6994,6 +7026,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 36125c82b88696d4ea4d5d92893b18fb, type: 2}
   emptyEnemyPrefab: {fileID: 3181922414714076711, guid: 3eaf3bef85fefb240a131b7190a8fde5, type: 3}
   playerTransform: {fileID: 1610518119}
+  playerHealth: {fileID: 40167127}
   MAX_ENEMY_INSTANCES: 100
   leftEnemyText: {fileID: 1766782039}
 --- !u!1 &623408039
@@ -23787,6 +23820,8 @@ GameObject:
   - component: {fileID: 941498449}
   - component: {fileID: 941498451}
   - component: {fileID: 941498450}
+  - component: {fileID: 941498452}
+  - component: {fileID: 941498453}
   m_Layer: 5
   m_Name: RelicREwardTxt
   m_TagString: Untagged
@@ -23811,7 +23846,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -113}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 175.17, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &941498450
 MonoBehaviour:
@@ -23913,6 +23948,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 941498448}
   m_CullTransparentMesh: 1
+--- !u!114 &941498452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941498448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
+  tooltipDataType: 1
+  id: RELIC
+  tooltipPivot: {x: 0.5, y: 0.5}
+--- !u!114 &941498453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941498448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
 --- !u!1 &948806655
 GameObject:
   m_ObjectHideFlags: 0
@@ -25712,6 +25776,8 @@ GameObject:
   - component: {fileID: 1145292854}
   - component: {fileID: 1145292856}
   - component: {fileID: 1145292855}
+  - component: {fileID: 1145292857}
+  - component: {fileID: 1145292858}
   m_Layer: 5
   m_Name: ClickRewardTxt
   m_TagString: Untagged
@@ -25736,7 +25802,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 99}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 175.17, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1145292855
 MonoBehaviour:
@@ -25838,6 +25904,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145292853}
   m_CullTransparentMesh: 1
+--- !u!114 &1145292857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145292853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab72b3fac942e3e499e706d02d0905ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverDetector
+  tooltipDataType: 1
+  id: CLICK
+  tooltipPivot: {x: 0.5, y: 0.5}
+--- !u!114 &1145292858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145292853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
 --- !u!1 &1152177040
 GameObject:
   m_ObjectHideFlags: 0
@@ -31746,6 +31841,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ddf84dfb5aad4646ba6b26a946c3c4a, type: 2}
   - {fileID: 11400000, guid: a39c6281a7c13dd47b177f0bde7f550b, type: 2}
   - {fileID: 11400000, guid: 991b06a704ce091409ed5bc8b36285e4, type: 2}
+  dungeonSelectBTN: {fileID: 647453898}
   dungeonInfoIMG: {fileID: 1132249273}
   dungeonInfoTxt: {fileID: 9068077}
 --- !u!1 &1619223501
@@ -32868,7 +32964,7 @@ RectTransform:
   m_Children:
   - {fileID: 212794237}
   - {fileID: 2143170871}
-  m_Father: {fileID: 15195171}
+  m_Father: {fileID: 368779182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -33050,7 +33146,7 @@ GameObject:
   - component: {fileID: 1742607178}
   - component: {fileID: 1742607177}
   m_Layer: 5
-  m_Name: GetItemsTxT
+  m_Name: GetIClickTxT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37355,6 +37451,7 @@ MonoBehaviour:
   enemyTransform: {fileID: 4272807104771113919}
   enemyRigidbody: {fileID: 8497953346032181901}
   playerTransform: {fileID: 1610518119}
+  playerHealth: {fileID: 0}
   spriteRenderer: {fileID: 7142464961901502975}
   animator: {fileID: 4210919165332441498}
   groundCol2D: {fileID: 7267437000867995871}

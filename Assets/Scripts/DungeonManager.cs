@@ -9,6 +9,16 @@ using UnityEngine;
 public class DungeonDataToJson
 {
     public List<bool> isCleared = new(); // 던전 클리어 여부
+
+    // 생성자에서 초기 던전 개수(7개)만큼 기본 데이터(false)를 채워줍니다.
+    public DungeonDataToJson()
+    {
+        int initialDungeonCount = 7;
+        for (int i = 0; i < initialDungeonCount; i++)
+        {
+            isCleared.Add(false); 
+        }
+    }
 }
 public class DungeonDataFromCSV
 {
@@ -20,24 +30,31 @@ public class DungeonDataFromCSV
 }
 public class DungeonManager : MonoBehaviour
 {
-    [Header("던전 관련 설정")]
-    public Transform playerTransform;
+    [Header("Manager 참조")]
     public EnemyManager enemyManager;
     public PlayerStatsManager playerStatsManager;
-    private readonly Dictionary<string, Dictionary<string, DungeonDataFromCSV>> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
-    private readonly DungeonDataToJson dungeonDataToJson = new(); // JSON으로 저장할 던전
-    private string currentDungeonMainFloor = "0"; 
-    private string currentDungeonSubFloor = "0";
+    public ClickBTN clickBTN;
+    [Header("던전 관련 설정")]
+    public Transform playerTransform;
+    private readonly Dictionary<int, Dictionary<int, DungeonDataFromCSV>> dungeonDataList = new(); // CSV에서 읽어온 던전 데이터 리스트
+    private DungeonDataToJson dungeonDataToJson = new(); // JSON으로 저장할 던전
+    private int currentDungeonMainFloor = 0; 
+    private int currentDungeonSubFloor = 0;
+    private readonly int START_SUB_FLOOR = 0;
     [Header("던전 UI 설정")]
-    public GameObject dungeonClearUIObj;
-    public TextMeshProUGUI dungeonClearRewardTxt;
-    public TextMeshProUGUI dungeonClearClickRewardTxt;
-    public TextMeshProUGUI dungeonClearCoinRewardTxt;
-    public TextMeshProUGUI dungeonClearRelicRewardTxt;
-    public TextMeshProUGUI dungeonGettenRelicRewardTxt;
-    public TextMeshProUGUI dungeonGettenCoinByEnemyTxt;
-    private int gettenCoin = 0; // 적 처치 및 던전 클리어 시 획득한 코인
-    private int gettenClick = 0; 
+    public GameObject clearUIObj;
+    public TextMeshProUGUI clearRewardTxt;
+    public TextMeshProUGUI clearClickRewardTxt;
+    public TextMeshProUGUI clearCoinRewardTxt;
+    public TextMeshProUGUI clearRelicRewardTxt;
+    public TextMeshProUGUI gettenClickByEnemyTxt;
+    public TextMeshProUGUI gettenCoinByEnemyTxt;
+    private int gettenCoinByEnemy = 0; // 적 처치 및 던전 클리어 시 획득한 코인
+    private int gettenClickByEnemy = 0; 
+    private int gettenCoinByStage = 0;
+    private int gettenClickByStage = 0;
+    private int totalGettenClick = 0;
+    private int totalGettenCoin = 0;
     private int defeatMonsters = 0;
     [Header("Language Key")]
     private readonly string DUNGEON_REWARD_SUCCESS = "DGN_DESC_REWARD_SUCCESS";
@@ -58,33 +75,32 @@ public class DungeonManager : MonoBehaviour
     public void LoadDungeon(int mainStageID)
     {
         // 던전 순회 
-        string startDungeonIndex = "0"; // 각 스테이지의 첫 번째 던전만 로드
-        LoadDungeonLogic(mainStageID.ToString(), startDungeonIndex);
+        int startDungeonIndex = START_SUB_FLOOR; // 각 스테이지의 첫 번째 던전만 로드
+        DungeonUIInit();
+        LoadDungeonLogic(mainStageID, startDungeonIndex);
     }
 
     public void NextStageDungeonLoad()
     {
-        string nextSubStageID = (int.Parse(currentDungeonSubFloor) + 1).ToString();
+        int nextSubStageID = currentDungeonSubFloor + 1;
         if(dungeonDataList[currentDungeonMainFloor].ContainsKey(nextSubStageID))
         {
-            // 죽인 적의 수 계산 
-            defeatMonsters += dungeonDataList[currentDungeonMainFloor][currentDungeonSubFloor].enemyCount;
             // 계산 후 로드
             LoadDungeonLogic(currentDungeonMainFloor, nextSubStageID);
         }
         else
         {
             Debug.Log($"모든 던전을 클리어했습니다! 현재 메인 스테이지: {currentDungeonMainFloor}");
-            defeatMonsters += dungeonDataList[currentDungeonMainFloor][currentDungeonSubFloor].enemyCount;
             AddDungeonClearAward();
+            dungeonDataToJson.isCleared[currentDungeonMainFloor] = true;
             SetRewardUI(true, true);
         }
     }
 
-    private void LoadDungeonLogic(string mainID, string subID)
+    private void LoadDungeonLogic(int mainID, int subID)
     {
         // 던전 클리어 보상 - 처음 빼고
-        if (subID != "0")
+        if (subID != START_SUB_FLOOR)
             AddDungeonClearAward();
            
         DungeonDataFromCSV selectedDungeonData = dungeonDataList[mainID][subID];
@@ -104,42 +120,56 @@ public class DungeonManager : MonoBehaviour
     }
     public void DungeonUIInit()
     {
-        dungeonClearUIObj.SetActive(false);
-        gettenCoin = 0;
-        gettenClick = 0;
+        clearUIObj.SetActive(false);
+        gettenCoinByEnemy = 0; 
+        gettenClickByEnemy = 0; 
+        gettenCoinByStage = 0;
+        gettenClickByStage = 0;
+        ReFreshGettenTextByEnemy();
     }
     public void SetRewardUI(bool isOpen, bool isSuccessful = false)
     {
-       // float totalCoinReward = 
+        CalculateTotalGettenValue();
 
         enemyManager.ClearAllActiveEnemies(); // 모든 적 제거
 
-        dungeonClearUIObj.SetActive(isOpen);
         string clearText = isSuccessful ? LanguageManager.Instance.GetText(DUNGEON_REWARD_SUCCESS) 
                                          : LanguageManager.Instance.GetText(DUNGEON_REWARD_FAILED);
-        dungeonClearRewardTxt.text = clearText;     
-        dungeonClearClickRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK).ReplaceTagsParams("GettenClick", gettenClick);
-        dungeonClearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN).ReplaceTagsParams("GettenCoin", gettenCoin);
-        dungeonClearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC).ReplaceTagsParams("GettenReic", $"{ColorPalette.Legend}Null{ColorPalette.End}");
+        clearRewardTxt.text = clearText;     
+        clearClickRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK).ReplaceTagsParams("GettenClick", totalGettenClick);
+        clearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN).ReplaceTagsParams("GettenCoin", totalGettenCoin);
+        clearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC).ReplaceTagsParams("GettenReic", $"{ColorPalette.Legend}Null{ColorPalette.End}");
+        clearUIObj.SetActive(isOpen);
     }   
     public string[] ToTooltipByGetID(string id)
     {
-        string titleId = LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id + "_TITLE");
-        string content = id switch
+        // 1. 타이틀과 기본 컨텐츠의 '키(Key)'를 먼저 조합합니다.
+        string titleKey = DGN_DESC_TOOLTIP + id + "_TITLE";
+        string contentKey = DGN_DESC_TOOLTIP + id;
+
+        // 2. 키를 이용해 기본 번역 텍스트를 가져옵니다.
+        string title = LanguageManager.Instance.GetText(titleKey);
+        string baseContent = LanguageManager.Instance.GetText(contentKey);
+
+        // 3. 가져온 기본 컨텐츠 텍스트를 id에 맞게 치환합니다.
+        string finalContent = id switch
         {
-            "CLICK" => GetClickContent(LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id)),
-            "COIN" => GetCoinContent(LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id)),
-            "RELIC" => GetRelicContent(LanguageManager.Instance.GetText(DGN_DESC_TOOLTIP + id)),
-            _ => null
+            "CLICK" => GetClickContent(baseContent),
+            "COIN"  => GetCoinContent(baseContent) + $"\n{ColorPalette.Yellow}{LanguageManager.Instance.GetText(contentKey+"_EXTRA")}{ColorPalette.End}",
+            "RELIC" => GetRelicContent(baseContent),
+            _       => null
         };
-        return new string[] {LanguageManager.Instance.GetText(titleId), content};
+
+        // 4. 이미 번역 및 치환이 완료된 텍스트 배열을 그대로 리턴합니다.
+        return new string[] { title, finalContent };
     }
     private string GetClickContent(string content)
     {
-        // 2. 치환할 태그 목록 정의하고 바로 텍스트 리턴하기
         return content.ReplaceTagsDict(new()
         {
-            { "GettenClick",    gettenClick },
+            { "StageClick",    gettenClickByStage },
+            { "GettenClick",    gettenClickByEnemy },
+            { "DefeatMonsters", defeatMonsters},
             { "ClickMultiply",  playerStatsManager.GetStatValueInDict("클릭 배수") },
             { "TotalBenefit",   playerStatsManager.GetStatValueInDict("총 혜택") }
         });
@@ -148,39 +178,74 @@ public class DungeonManager : MonoBehaviour
     {
         return content.ReplaceTagsDict(new()
         {
-            { "GettenCoin",    gettenCoin },
-            { "DefeatMonsters", defeatMonsters },
+            { "StageCoin",     gettenCoinByStage },
+            { "GettenCoin",     gettenCoinByEnemy },
+            { "DropRate",       playerStatsManager.GetStatValueInDict("희귀 확률") },
             { "TotalBenefit",   playerStatsManager.GetStatValueInDict("총 혜택") }
         });
     }
     private string GetRelicContent(string content)
     {
-        return content.ReplaceTagsDict(new()
-        {
-            { "GettenReic",    playerStatsManager.GetStatValueInDict("희귀 확률") },
-            { "ReincarnationBonus", playerStatsManager.GetStatValueInDict("환생 보너스") },
-        });
+        return content;
     }
     public void AddCoinAndClickByEnemy(int amount, bool isCoin)
     {
         if(isCoin)
-        {
-            gettenCoin += amount;
-            dungeonGettenCoinByEnemyTxt.text = gettenCoin.ToString();
-        }
+            gettenCoinByEnemy += amount;
         else
-        {
-            gettenClick += amount;
-            dungeonClearClickRewardTxt.text = gettenClick.ToString();
-        }
+            gettenClickByEnemy += amount;
+        
+        ReFreshGettenTextByEnemy();
+    }
+    private void ReFreshGettenTextByEnemy()
+    {
+        gettenCoinByEnemyTxt.text = gettenCoinByEnemy.ToString();
+        gettenClickByEnemyTxt.text = gettenClickByEnemy.ToString();
     }
     private void AddDungeonClearAward()
     {
         DungeonDataFromCSV clearDungeonData = dungeonDataList[currentDungeonMainFloor][currentDungeonSubFloor];
         
-        AddCoinAndClickByEnemy(clearDungeonData.clearCoin, true);
-        AddCoinAndClickByEnemy(clearDungeonData.clearClick, false);
+        gettenClickByStage += clearDungeonData.clearClick;
+        gettenCoinByStage += clearDungeonData.clearCoin;
         
+    }
+    private void CalculateTotalGettenValue()
+    {
+        totalGettenClick = (int)((gettenClickByStage + gettenClickByEnemy) * 
+            (1.0f + (playerStatsManager.playerStats.ClickMultiplier + playerStatsManager.playerStats.ToTalbenefit)));
+    
+        totalGettenCoin = gettenCoinByEnemy + gettenCoinByStage;
+    }
+    public void AddEnemyDieCount()
+    {
+        defeatMonsters++;
+    }
+    public bool RollRareResourceDrop()
+    {
+        float finalChance = 
+                playerStatsManager.playerStats.RareGoodsProbability 
+                * playerStatsManager.playerStats.ToTalbenefit;
+
+        float randomRoll = UnityEngine.Random.value;
+
+        if (randomRoll <= finalChance)
+            return true;
+        else
+            return false;
+    }
+    public bool IsCanPlayDungeon(int id)
+    {
+        if (id == 0) // 가장 처음 던전
+            return true;
+        if (dungeonDataToJson.isCleared.Count < id) 
+        // 반환값이 id 전 던전이 클리어 여부이기 때문에 반드시 Count >= id 여야함. 
+        {
+            Debug.Log($"{ColorPalette.Red}던전 클리어 리스트가 비어있음!{ColorPalette.End}");
+            return false;
+        }
+
+        return dungeonDataToJson.isCleared[--id];
     }
 // ----------- CSV 데이터 로드 및 JSON 저장/로드 메서드 -----------
     void LoadDungeonDataFromCSV()
@@ -211,13 +276,13 @@ public class DungeonManager : MonoBehaviour
                 clearCoin = int.Parse(part[3]),
                 clearClick = int.Parse(part[4])
             };
-            string mainStageID = part[0].Split('-')[0];
-            string subStageID = part[0].Split('-')[1];
+            int mainStageID = int.Parse(part[0].Split('-')[0]);
+            int subStageID = int.Parse(part[0].Split('-')[1]);
 
             // 리스트에 순서대로 추가 (인덱스 관리가 필요 없음)
             if (!dungeonDataList.ContainsKey(mainStageID))
             {
-                dungeonDataList[mainStageID] = new Dictionary<string, DungeonDataFromCSV>();
+                dungeonDataList[mainStageID] = new Dictionary<int, DungeonDataFromCSV>();
             }
             dungeonDataList[mainStageID][subStageID] = data;
         }
@@ -240,10 +305,24 @@ public class DungeonManager : MonoBehaviour
     {
         if (!File.Exists(Path.Combine(Application.persistentDataPath, dungeonDataFileName)))
         {
-            dungeonDataToJson.isCleared = new(); // 기본적으로 모든 던전 클리어 여부를 false로 초기화
+            Debug.Log($"{ColorPalette.Rare}던전 클리어 데이터 초기화{ColorPalette.End}");
+            dungeonDataToJson = new DungeonDataToJson();  // 기본적으로 모든 던전 클리어 여부를 false로 초기화
             SaveDungeonDataToJson();
         }
         
         GameManger.instance.LoadData(dungeonDataToJson, dungeonDataFileName);
+
+        // 업데이트로 던전이 늘어났을 때를 위한 세이브 파일 보정 코드
+        // 세이브 파일에 기록된 개수가 현재 게임 던전 수보다 적다면? -- 업데이트에 따른 차이 발생 보정
+        if(dungeonDataToJson.isCleared.Count < clickBTN.dungeonDataSos.Length)
+        {
+            while (dungeonDataToJson.isCleared.Count >= clickBTN.dungeonDataSos.Length)
+            {
+                dungeonDataToJson.isCleared.Add(false); // 부족한 칸만큼 false를 뒤에 붙여줌
+            }
+            Debug.Log($"새로운 던전 데이터 추가됨! 현재 총 개수: {dungeonDataToJson.isCleared.Count}");
+            SaveDungeonDataToJson();
+            LoadDungeonDataFromJson();
+        }
     }
 }

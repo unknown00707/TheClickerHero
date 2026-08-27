@@ -11,6 +11,7 @@ public class EnemyComme : Entity
     public Transform enemyTransform;
     public Rigidbody2D enemyRigidbody;
     public Transform playerTransform;
+    public PlayerHealth playerHealth;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public BoxCollider2D groundCol2D;
@@ -103,7 +104,6 @@ public class EnemyComme : Entity
 
         if (hit.collider != null)
         {
-            PlayerHealth playerHealth = hit.collider.GetComponent<PlayerHealth>();
             DamageInfo damageInfo = new()
             {
                 damage = enemyData.attackPower,
@@ -204,9 +204,14 @@ public class EnemyComme : Entity
         animator.enabled = false; 
         spriteRenderer.sortingOrder = -10;
         spriteRenderer.sprite = enemyData.deadSprite;
+        dungeonManager.AddCoinAndClickByEnemy(enemyData.clickDrop, false);
+        if(dungeonManager.RollRareResourceDrop()) // 가챠 성공 시
+        {
+            Debug.Log($"{ColorPalette.Legend}가챠 성공!{ColorPalette.End} 대상 : {enemyTransform.gameObject.name} 드롭 양 : {enemyData.coinDrop}");
+            dungeonManager.AddCoinAndClickByEnemy(enemyData.coinDrop, true);
+        }
+        dungeonManager.AddEnemyDieCount();
 
-        dungeonManager.AddCoinAndClickByEnemy(enemyData.coinDrop, true); // 적 처치 시 코인 획득
-        dungeonManager.AddCoinAndClickByEnemy(enemyData.clickDrop, false); // 적 처시 시 클릭 획득
         enemyManager.ReturnEnemyToPool(this, isDead); // 사망 시 풀에 반환
 
         Invoke(nameof(DisableSelf), deadTime);

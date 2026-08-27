@@ -202,7 +202,7 @@ public class UpgradManager : MonoBehaviour
                         break;
                     case StatType.CLICK_COUNT:
                         var (isPercentage_CLICK_COUNT, amount_CLICK_COUNT) = CalculateStatType(explainData.calcTypes, explainData.values);
-                        playerStatsManager.playerStats.coinByClick.Upgrade(isPercentage_CLICK_COUNT, (int)amount_CLICK_COUNT);
+                        playerStatsManager.playerStats.click.Upgrade(isPercentage_CLICK_COUNT, (int)amount_CLICK_COUNT);
                         break;
                 }
 

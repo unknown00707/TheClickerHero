@@ -4,10 +4,11 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Animator))]
 public class ActivablePlayer : MonoBehaviour
 {
+    private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
     private static readonly int NormalAttackHash = Animator.StringToHash("normalAttack");
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
-    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int SpeedHash = Animator.StringToHash("moveSpeed");
     private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
     
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조  
@@ -83,10 +84,17 @@ public class ActivablePlayer : MonoBehaviour
     {
         SetSameAnimeOverride(weaponManager.GetCurrentWeaponData());
         SetWeaponRanderFalse(true);
-        
+        SetSameAttackSpeed(playerStatsManager.playerStats.AttackSpeed);
         playerAnim.SetTrigger(SwordAttackHash);
         weaponAnim.SetTrigger(SwordAttackHash);
         weaponEffectAnim.SetTrigger(SwordAttackHash);
+    }
+
+    void SetSameAttackSpeed(float speed)
+    {
+        playerAnim.SetFloat(AttackSpeedHash, speed);
+        weaponAnim.SetFloat(AttackSpeedHash, speed);
+        weaponEffectAnim.SetFloat(AttackSpeedHash, speed);
     }
     // ----------------------- 애니메이션 관련 메서드 -----------------------
     public void SetSameAnimeOverride(WeaponDataSo currentWeapon)

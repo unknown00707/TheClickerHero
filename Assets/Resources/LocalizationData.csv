@@ -44,10 +44,11 @@ DGN_DESC_REWARD_SUCCESS,던전 클리어!, Dungeon Clear!
 DGN_DESC_REWARD_FAILED,던전 실패!, Dungeon Failed!
 DGN_DESC_REWARD_CLICK,클릭 획득 : {GettenClick},Click Reward : {GettenClick}
 DGN_DESC_REWARD_COIN,코인 획득 : {GettenCoin},Coin Reward : {GettenCoin}
-DGN_DESC_REWARD_RELIC,유물 획득 : {GettenReic},Relic Getten : {GettenReic}
-DGN_DESC_TOOLTIP_CLICK,클리어 보상 {GettenClick}\n + \n 클릭 배수 {ClickMultiply} * 환생 보너스 * 이로운 효과 {TotalBenefit},Clear Reward {0}\n + \n Click Multiplier {ClickMultiply} * ReincarnationBonus * BenfitEffect {TotalBenefit}   
-DGN_DESC_TOOLTIP_COIN,클리어 보상 {GettenCoin}\n + \n 몬스터 격퇴 {DefeatMonsters} * 환생 보너스 * 이로운 효과 {TotalBenefit},Clear Reward {GettenCoin}\n + \n Defeat Monsters {DefeatMonsters} * ReincarnationBonus * BenfitEffect {TotalBenefit}
-DGN_DESC_TOOLTIP_RELIC,획득 확률 {GettenReic} * 환생 보너스 {ReincarnationBonus},Drop Rate {GettenReic} * ReincarnationBonus {ReincarnationBonus}
+DGN_DESC_REWARD_RELIC,유물 획득 : {GettenRelic},Relic Getten : {GettenRelic}
+DGN_DESC_TOOLTIP_CLICK,던전 클리어 보상 {StageClick} + 몬스터 격퇴 {GettenClick} \n * \n 1 + (클릭 배수 {ClickMultiply} * 환생 보너스 * 이로운 효과 {TotalBenefit}),Clear Reward {GettenClick}\n + \n Click Multiplier {ClickMultiply} * ReincarnationBonus * BenfitEffect {TotalBenefit}   
+DGN_DESC_TOOLTIP_COIN,던전 클리어 보상 {StageCoin} + 확률 획득 {GettenCoin}\n 획득 확률 {DropRate} * 환생 보너스 * 이로운 효과 {TotalBenefit},Clear Reward {GettenCoin}\n + \n Drop Rate {DropRate} * ReincarnationBonus * BenfitEffect {TotalBenefit}
+DGN_DESC_TOOLTIP_COIN_EXTRA,1 Coin = 3 Click,1 Coin = 3 Click
+DGN_DESC_TOOLTIP_RELIC,유물,RELIC
 DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상,Click Reward
 DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상,Coin Reward
 DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상,Relic Reward

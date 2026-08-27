@@ -86,7 +86,7 @@ public class AuraManager : MonoBehaviour
         }
 
         IObjectPool<GameObject> newPool = new ObjectPool<GameObject>(
-            createFunc: () => Instantiate(prefab), 
+            createFunc: () => Instantiate(prefab, transform), 
             actionOnGet: go => go.SetActive(true),
             actionOnRelease: go => go.SetActive(false),
             actionOnDestroy: go => Destroy(go),

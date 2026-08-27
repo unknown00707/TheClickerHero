@@ -19,6 +19,7 @@ MonoBehaviour:
   attackPower: 5
   moveSpeed: 1
   coinDrop: 1
+  clickDrop: 1
   attackRange: 0.72
   attackCooldown: 5
   attackBoxSize: {x: 0.53, y: 0.8}

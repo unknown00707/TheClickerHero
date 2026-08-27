@@ -20,9 +20,13 @@ public class TimeLog
 public class AutoManager : MonoBehaviour
 {
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
+    [Header("Offline")]
     public GameObject offlineRewardObj;
     public TextMeshProUGUI offlineRewardTitle;
     public TextMeshProUGUI offlineRewardContent;
+    [Header("Auto")]
+    private int gettenCoin = 0;
+    private int gettenClick = 0;
     private int totalClickReward; // 오프라인 보상으로 지급할 총 클릭 수
     private readonly TimeLog timeLog = new();
     private DateTime loginTime; // 게임 시작 시간
@@ -96,7 +100,7 @@ public class AutoManager : MonoBehaviour
         float effortRewardPerHour = 100f; // 플레이어 노력 보상의 '기준 시간당 비용' (예시)
         float playerBonusReward = offlineHours 
                                 * effortRewardPerHour
-                                * playerStatsManager.playerStats.benfitEffect 
+                                * playerStatsManager.playerStats.benefitEffect 
                                 * playerStatsManager.playerStats.reincarnationBonus;
 
         // 4. 최종 합산 후 딱 한 번만 int로 변환 (소수점 버그 방지)
@@ -110,10 +114,9 @@ public class AutoManager : MonoBehaviour
         offlineRewardContent.text = rawText.ReplaceTags("GettenCoin", coloredValue);
         offlineRewardObj.SetActive(true);
     }
-
     public void GetOfflineReward()
     {
-        playerStatsManager.playerStats.coinByClick.Upgrade(false, totalClickReward);
+        playerStatsManager.playerStats.click.Upgrade(false, totalClickReward);
         offlineRewardObj.SetActive(false);
         Debug.Log($"오프라인 보상 지급 완료! 총 클릭 수: {totalClickReward}");
     }
@@ -137,7 +140,6 @@ public class AutoManager : MonoBehaviour
         // 6. JSON 파일로 변환 및 저장
         GameManger.instance.SaveData(timeLog, SAVE_FILE_NAME);
     }
-
     public void LoadTimeLog()
     {
         if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME)))
@@ -146,4 +148,9 @@ public class AutoManager : MonoBehaviour
     }
 
     // --------------------- 플레이어와 몬스터의 자동 사냥 ----------------------//
+    public void OnKillEnemyByAutoPlayer()
+    {
+        gettenCoin++;
+        gettenClick++;
+    }
 }

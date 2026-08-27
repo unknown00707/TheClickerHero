@@ -12,6 +12,7 @@ public class ClickBTN : MonoBehaviour
     public GameObject[] tapObjects;
     public GameObject[] tapLeftObjects;
     public DungeonDataSo[] dungeonDataSos;
+    public GameObject dungeonSelectBTN;
 
     
     [SerializeField] private UnityEngine.UI.Image dungeonInfoIMG;
@@ -71,6 +72,8 @@ public class ClickBTN : MonoBehaviour
         {
             currentDungeonID = 0;
         }
+        // IsDungeonClear(currentDungeonID) => true == clear
+        dungeonSelectBTN.SetActive(dungeonManager.IsCanPlayDungeon(currentDungeonID));
         OpenTapByIndexDungeonSelect();
     }
 
@@ -96,7 +99,7 @@ public class ClickBTN : MonoBehaviour
     public void RetrunToMainSence()
     {
         playerHealth.ChangePlayerActiveState(true); // 플레이어 오브젝트 비활성화
-        dungeonManager.DungeonUIInit(); // 던전 UI 초기화
+        dungeonManager.DungeonUIInit(); // 던전 UI 초기화 - 혹시 모르는 보험
         mainSenceUIManager.OpenMainUI(true); // 메인 UI 열기
     }
 }

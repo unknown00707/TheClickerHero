@@ -9,6 +9,7 @@ public class EnemyManager : MonoBehaviour
     public List<EnemyDataSo> enemyDataList; // 다양한 적 데이터를 리스트로 관리
     public GameObject emptyEnemyPrefab; // 적 프리팹 (공통된 기본 형태)
     public Transform playerTransform; // 플레이어 위치 참조 (적 스폰 시 플레이어를 기준으로 위치 설정)
+    public PlayerHealth playerHealth;
     public int MAX_ENEMY_INSTANCES = 100; // 최대 적 인스턴스 수 (풀링 시스템에서 활용)
     [Header("적 던전 UI관련")]
     public TextMeshProUGUI leftEnemyText; // 남은 적 수 표시용 텍스트
@@ -23,6 +24,7 @@ public class EnemyManager : MonoBehaviour
             // 적 인스턴스에 EnemyComme 컴포넌트를 참조하고 초기 설정 (예: 체력, 애니메이션 등)
             EnemyComme enemyComme = enemyInstance.GetComponentInChildren<EnemyComme>();
             enemyComme.playerTransform = playerTransform; // 플레이어 위치 참조 설정
+            enemyComme.playerHealth = playerHealth; // 플레이어 헬스 참조 설정 -> 매번 getcommponet 실행 방지
             enemyComme.enemyManager = this; // 적 매니저 참조 설정
             enemyComme.dungeonManager = dungeonManager; // 던전 매니저 참조 설정
             // 초기 설정은 나중에 활성화 시점에 해당 적 데이터로 적용할 예정
