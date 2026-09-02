@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class Stat
 {
-    public readonly float baseValue;
+    public float baseValue;
     public float flatUpgrade;
     public float multiplier = 0.0f;
 

@@ -28,8 +28,8 @@ public class PlayerHealth : Entity
     IEnumerator ExecuteRewardUIAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        dungeonManager.SetRewardUI(!isDead);
         ChangePlayerActiveState(isDead);
+        dungeonManager.SetRewardUI(!isDead);
     }
     public void PlayerHealthInit()
     {

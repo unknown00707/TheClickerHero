@@ -1,18 +1,19 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator))]
 public class ActivablePlayer : MonoBehaviour
 {
+    [Header("References")]
     private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
     private static readonly int NormalAttackHash = Animator.StringToHash("normalAttack");
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     private static readonly int SpeedHash = Animator.StringToHash("moveSpeed");
     private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
-    
+    [Header("Manager References")]
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조  
     public WeaponManager weaponManager; // 무기 매니저 참조
+    public PlayerInput playerInput; // 플레이어 입력 참조
     public Rigidbody2D playerRigidbody;
     private Vector2 inputVector;
     private Vector2 dirPlayerVector;
@@ -29,9 +30,23 @@ public class ActivablePlayer : MonoBehaviour
     {
         SetWeaponRanderFalse(false);
     }
-    void OnMove(InputValue value)
+    void OnEnable()
     {
-        Vector2 rawInput = value.Get<Vector2>();
+        playerInput.OnMoveAction += Move;
+        playerInput.OnUltimateAction += Ultimate;
+        playerInput.OnNormalAttackAction += NormalAttack;
+        playerInput.OnSwordAttackAction += SwordAttack;
+    }
+    void OnDisable()
+    {
+        playerInput.OnMoveAction -= Move;
+        playerInput.OnUltimateAction -= Ultimate;
+        playerInput.OnNormalAttackAction -= NormalAttack;
+        playerInput.OnSwordAttackAction -= SwordAttack;
+    }
+    void Move(Vector2 direction)
+    {
+        Vector2 rawInput = direction;
 
         // 대각선 입력 방지 로직 (그대로 유지!)
         if (Mathf.Abs(rawInput.x) > Mathf.Abs(rawInput.y))
@@ -70,17 +85,17 @@ public class ActivablePlayer : MonoBehaviour
         playerRigidbody.MovePosition(newPosition);
     }
     // ----------------------- 공격 입력 메서드 -----------------------
-    void OnUltimate()
+    void Ultimate()
     {
             
     }
 
-    void OnNormalAttack()
+    void NormalAttack()
     {
         playerAnim.SetTrigger(NormalAttackHash);
     }
 
-    void OnSwordAttack()
+    void SwordAttack()
     {
         SetSameAnimeOverride(weaponManager.GetCurrentWeaponData());
         SetWeaponRanderFalse(true);
