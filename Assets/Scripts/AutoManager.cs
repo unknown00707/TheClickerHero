@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+[Serializable]
+public class UnlockAutoOnlineUprade
+{
+    public int unlockedMaxID; // 현재까지 해금된 AutoOnlineUpradeSo의 최대 ID --> 이 값을 강제 적용
+}
 [Serializable]
 public class PlayerTime
 {
@@ -24,15 +30,23 @@ public class AutoManager : MonoBehaviour
     public GameObject offlineRewardObj;
     public TextMeshProUGUI offlineRewardTitle;
     public TextMeshProUGUI offlineRewardContent;
-    [Header("Auto")]
-    private int gettenCoin = 0;
-    private int gettenClick = 0;
+    [Header("Offline Reward")]
     private int totalClickReward; // 오프라인 보상으로 지급할 총 클릭 수
     private readonly TimeLog timeLog = new();
     private DateTime loginTime; // 게임 시작 시간
     private string todayDate; // 오늘 날짜
     private readonly int MAX_OFFLINE_HOURS = 3; // 최대 오프라인 시간 제한 (24시간)
-    private readonly string SAVE_FILE_NAME = "TimeLog.json"; // 저장 파일 이름
+    private readonly string SAVE_TIME_LOG_FILE_NAME = "TimeLog.json"; // 저장 파일 이름
+    [Header("Auto Battle")]
+    public AutoOnlineUpradeSo[] autoOnlineUpradeSo;
+    public Image autoOnlineUpgradeIMG;
+    public TextMeshProUGUI autoOnlineUpgradeTxt;
+    public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
+    public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
+    UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
+    private int gettenCoin = 0;
+    private int gettenClick = 0;
+    private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
 
     void Awake()
     {
@@ -138,13 +152,13 @@ public class AutoManager : MonoBehaviour
         timeLog.times.Add(newSession);
 
         // 6. JSON 파일로 변환 및 저장
-        GameManger.instance.SaveData(timeLog, SAVE_FILE_NAME);
+        GameManger.instance.SaveData(timeLog, SAVE_TIME_LOG_FILE_NAME);
     }
     public void LoadTimeLog()
     {
-        if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME)))
-            GameManger.instance.SaveData(timeLog, SAVE_FILE_NAME); // 파일이 없으면 새로 저장
-        GameManger.instance.LoadData(timeLog, SAVE_FILE_NAME);
+        if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_TIME_LOG_FILE_NAME)))
+            GameManger.instance.SaveData(timeLog, SAVE_TIME_LOG_FILE_NAME); // 파일이 없으면 새로 저장
+        GameManger.instance.LoadData(timeLog, SAVE_TIME_LOG_FILE_NAME);
     }
 
     // --------------------- 플레이어와 몬스터의 자동 사냥 ----------------------//
@@ -152,5 +166,53 @@ public class AutoManager : MonoBehaviour
     {
         gettenCoin++;
         gettenClick++;
+    }
+
+    public void UpdateAutoOnlineUpgradeUI(int currentSoID)
+    {
+        // 현재 적 ID에 따라 적용 가능한 업그레이드 찾기
+        AutoOnlineUpradeSo applyUISo = autoOnlineUpradeSo[currentSoID];
+
+        if (unlockAutoOnlineUprade.unlockedMaxID >= currentSoID) // 현재 해금된 업그레이드 ID와 비교
+        {
+            autoOnlineUpgradeIMG.sprite = applyUISo.upgradeSprite;
+            autoOnlineUpgradeTxt.text = $"업그레이드 필요 클릭: {applyUISo.needClick}\n" +
+                                        $"업그레이드 속도: {applyUISo.upgradeSpeedAmount}\n" +
+                                        $"희귀 확률: {applyUISo.rareProbabilityOfEnemy * 100}%";
+            autoOnlineApplyBTN.SetActive(true);
+            autoOnlineUpgradeLockBTN.SetActive(false);
+        }
+        else
+        {
+            autoOnlineUpgradeIMG.sprite = null; // 또는 기본 이미지로 설정
+            autoOnlineUpgradeTxt.text = "적용 가능한 업그레이드 없음";
+            autoOnlineApplyBTN.SetActive(false);
+            autoOnlineUpgradeLockBTN.SetActive(true);
+        }
+    }
+
+    public void UnlockAutoOnlineUpgrade(int currentSoID)
+    {
+        if (currentSoID > unlockAutoOnlineUprade.unlockedMaxID)
+        {
+            unlockAutoOnlineUprade.unlockedMaxID = currentSoID;
+            SaveUnlockAutoOnlineUpgrade(); // 변경 사항 저장
+            UpdateAutoOnlineUpgradeUI(currentSoID); // UI 업데이트
+            Debug.Log($"AutoOnlineUprade ID {currentSoID} 해금 완료!");
+        }
+        else
+        {
+            Debug.Log($"AutoOnlineUprade ID {currentSoID}는 이미 해금되어 있습니다.");
+        }
+    }
+    public void SaveUnlockAutoOnlineUpgrade()
+    {
+        GameManger.instance.SaveData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME);
+    }
+    public void LoadUnlockAutoOnlineUpgrade()
+    {
+        if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME)))
+            GameManger.instance.SaveData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME); // 파일이 없으면 새로 저장
+        GameManger.instance.LoadData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class Stat
 {
-    public float baseValue;
+    public readonly float baseValue;
     public float flatUpgrade;
     public float multiplier = 0.0f;
 
@@ -48,7 +48,7 @@ public class PlayerStasData
     public Stat criticalChance = new(0.0f);   // 크확은 0%부터 시작하는 게 자연스럽습니다.
     public Stat criticalDamage = new(0.5f);   // 크뎀 기본 보너스 +50% (기본 대미지의 150%)
     public Stat click = new(1.0f);      // 변수 타입을 float으로 통일하여 계산 에러 방지
-    public Stat speed = new(1.0f);
+    public Stat speed = new(0.5f);
     public Stat rareGoodsProbability = new(0.01f);
     
     // 순수 버프 수치 (20%면 0.2f 상태로 저장됨)
@@ -77,7 +77,7 @@ public class PlayerStasData
         criticalDamage = new Stat(1.0f);
         click = new Stat(1);
 
-        speed = new Stat(1.0f);
+        speed = new Stat(0.5f);
         // 2. 환생 보너스나 특수 혜택은 유지하거나 누적
         if (!keepBonus)
         {
