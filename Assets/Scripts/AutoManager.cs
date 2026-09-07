@@ -43,7 +43,7 @@ public class AutoManager : MonoBehaviour
     public TextMeshProUGUI autoOnlineUpgradeTxt;
     public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
     public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
-    UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
+    readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
     private int gettenCoin = 0;
     private int gettenClick = 0;
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
@@ -175,7 +175,7 @@ public class AutoManager : MonoBehaviour
 
         if (unlockAutoOnlineUprade.unlockedMaxID >= currentSoID) // 현재 해금된 업그레이드 ID와 비교
         {
-            autoOnlineUpgradeIMG.sprite = applyUISo.upgradeSprite;
+            autoOnlineUpgradeIMG.sprite = applyUISo.unlockSprite;
             autoOnlineUpgradeTxt.text = $"업그레이드 필요 클릭: {applyUISo.needClick}\n" +
                                         $"업그레이드 속도: {applyUISo.upgradeSpeedAmount}\n" +
                                         $"희귀 확률: {applyUISo.rareProbabilityOfEnemy * 100}%";
@@ -184,7 +184,7 @@ public class AutoManager : MonoBehaviour
         }
         else
         {
-            autoOnlineUpgradeIMG.sprite = null; // 또는 기본 이미지로 설정
+            autoOnlineUpgradeIMG.sprite = applyUISo.lockedSprite; // 또는 기본 이미지로 설정
             autoOnlineUpgradeTxt.text = "적용 가능한 업그레이드 없음";
             autoOnlineApplyBTN.SetActive(false);
             autoOnlineUpgradeLockBTN.SetActive(true);

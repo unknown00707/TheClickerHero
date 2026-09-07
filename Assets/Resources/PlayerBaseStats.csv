@@ -1,0 +1,10 @@
+StatName,BaseValue
+Health,100.0
+AttackPower,10.0
+AttackSpeed,1.0
+Defense,5.0
+CriticalChance,0.0
+CriticalDamage,0.5
+Click,1.0
+Speed,0.5
+RareGoodsProbability,0.01

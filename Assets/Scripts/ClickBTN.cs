@@ -22,16 +22,16 @@ public class ClickBTN : MonoBehaviour
     public GameObject dungeonSelectBTN;
     [SerializeField] private UnityEngine.UI.Image dungeonInfoIMG;
     [SerializeField] private TextMeshProUGUI dungeonInfoTxt;
-    [SerializeField] private LocalizedText localizedText;
+    [SerializeField] private LocalizedText dungeonInfoTxtLocalizedText;
     private int currentDungeonID = 0;
 
     [Header("Auto Online Upgrade")]
     private int currentAutoOnlineIndex = 0;
     void Awake()
     {
-        if (localizedText == null)
+        if (dungeonInfoTxtLocalizedText == null)
         {
-            localizedText = dungeonInfoTxt.GetComponent<LocalizedText>();
+            dungeonInfoTxtLocalizedText = dungeonInfoTxt.GetComponent<LocalizedText>();
         }
         OpenTapByIndexDungeonSelect();
     }
@@ -91,8 +91,8 @@ public class ClickBTN : MonoBehaviour
     void OpenTapByIndexDungeonSelect()
     {
         dungeonInfoIMG.sprite = dungeonDataSos[currentDungeonID].dungeonSprite;
-        localizedText.textID = dungeonDataSos[currentDungeonID].dungeonName;
-        localizedText.Refresh();
+        dungeonInfoTxtLocalizedText.textID = dungeonDataSos[currentDungeonID].dungeonName;
+        dungeonInfoTxtLocalizedText.Refresh();
     }
 
     public void SelectDungeon()

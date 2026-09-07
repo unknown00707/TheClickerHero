@@ -41,15 +41,15 @@ public class Stat
 public class PlayerStasData
 {
     // 스탯 생성 (기본값 설정)
-    public Stat health = new(100.0f);
-    public Stat attackPower = new(10.0f);
-    public Stat attackSpeed = new(1.0f);
-    public Stat defense = new(5.0f);
-    public Stat criticalChance = new(0.0f);   // 크확은 0%부터 시작하는 게 자연스럽습니다.
-    public Stat criticalDamage = new(0.5f);   // 크뎀 기본 보너스 +50% (기본 대미지의 150%)
-    public Stat click = new(1.0f);      // 변수 타입을 float으로 통일하여 계산 에러 방지
-    public Stat speed = new(0.5f);
-    public Stat rareGoodsProbability = new(0.01f);
+    public Stat health;
+    public Stat attackPower;
+    public Stat attackSpeed;
+    public Stat defense;
+    public Stat criticalChance;   // 크확은 0%부터 시작하는 게 자연스럽습니다.
+    public Stat criticalDamage;   // 크뎀 기본 보너스 +50% (기본 대미지의 150%)
+    public Stat click;      // 변수 타입을 float으로 통일하여 계산 에러 방지
+    public Stat speed;
+    public Stat rareGoodsProbability;
     
     // 순수 버프 수치 (20%면 0.2f 상태로 저장됨)
     public float benefitEffect = 0.0f;
@@ -66,22 +66,29 @@ public class PlayerStasData
     public float Speed => speed.GetFinalValue(benefitEffect, reincarnationBonus);
     public float RareGoodsProbability => rareGoodsProbability.GetFinalValue(benefitEffect, reincarnationBonus);
     public float ToTalbenefit => benefitEffect + reincarnationBonus;
-    public void ResetStatsForReincarnation(bool keepBonus)
+    public PlayerStasData(Dictionary<string, float> baseStats)
     {
-        // 1. 초기값으로 되돌릴 스탯들
-        health = new Stat(100.0f);
-        attackPower = new Stat(10.0f);
-        defense = new Stat(5.0f);
-    
-        criticalChance = new Stat(0.0f);
-        criticalDamage = new Stat(1.0f);
-        click = new Stat(1);
+        InitializeStats(baseStats);
+    }
+    private void InitializeStats(Dictionary<string, float> baseStats)
+    {
+        // 딕셔너리에서 값을 찾고, 없으면 예외 방지를 위해 기본 디폴트값을 제공합니다.
+        health               = new Stat(baseStats.GetValueOrDefault("Health", 100f));
+        attackPower          = new Stat(baseStats.GetValueOrDefault("AttackPower", 10f));
+        attackSpeed          = new Stat(baseStats.GetValueOrDefault("AttackSpeed", 1f));
+        defense              = new Stat(baseStats.GetValueOrDefault("Defense", 5f));
+        criticalChance       = new Stat(baseStats.GetValueOrDefault("CriticalChance", 0f));
+        criticalDamage       = new Stat(baseStats.GetValueOrDefault("CriticalDamage", 0.5f));
+        click                = new Stat(baseStats.GetValueOrDefault("Click", 1f));
+        speed                = new Stat(baseStats.GetValueOrDefault("Speed", 0.5f));
+        rareGoodsProbability = new Stat(baseStats.GetValueOrDefault("RareGoodsProbability", 0.01f));
+    }
+    public void ResetStatsForReincarnation(Dictionary<string, float> baseStats, bool keepBonus)
+    {
+        InitializeStats(baseStats);
 
-        speed = new Stat(0.5f);
-        // 2. 환생 보너스나 특수 혜택은 유지하거나 누적
         if (!keepBonus)
         {
-            rareGoodsProbability = new Stat(0.01f);
             benefitEffect = 0.0f;
             reincarnationBonus = 0.0f;
         }
@@ -89,16 +96,23 @@ public class PlayerStasData
 }
 public class PlayerStatsManager : MonoBehaviour
 {
-    public PlayerStasData playerStats = new();
+    public PlayerStasData playerStats;
     public TextMeshProUGUI[] playerStatsText;
     private Dictionary<string, Func<float>> statGetters = new();
+    private readonly Dictionary<string, float> baseStatsContainer = new(StringComparer.OrdinalIgnoreCase);
     private readonly string SAVE_FILE_NAME = "SavePlayerStatsData.json";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        LoadBaseStatsFromCSV();
+        playerStats = new PlayerStasData(baseStatsContainer);
+
         LoadPlayerStats();
-        UpDatePlayerStatsText();
+
         InitStatGettersDict();
+        
+        CheckInspectorErrors();
+        UpDatePlayerStatsText();
     }
     private void InitStatGettersDict()
     {
@@ -131,18 +145,82 @@ public class PlayerStatsManager : MonoBehaviour
     }
     public void UpDatePlayerStatsText()
     {
-        playerStatsText[0].text = playerStats.AttackPower.ToString("F0") + " + " + "무기 데미지 들어갈 예정";
-        playerStatsText[1].text = playerStats.Defense.ToString("F0");
-        playerStatsText[2].text = playerStats.Health.ToString("F0");
-        playerStatsText[3].text = (playerStats.CriticalChance * 100).ToString("F1") + " + " + "무기 보정" +"%";
-        playerStatsText[4].text = (playerStats.CriticalDamage * 100).ToString("F1") + " + " + "무기 보정" +"%";
-        playerStatsText[5].text = playerStats.Click.ToString();
-        playerStatsText[6].text = (playerStats.benefitEffect * 100).ToString("F1") + "%";
-        playerStatsText[7].text = playerStats.Speed.ToString("F1");
-        playerStatsText[8].text = (playerStats.RareGoodsProbability * 100).ToString("F1") + "%";
-        playerStatsText[9].text = (playerStats.reincarnationBonus * 100).ToString("F1") + "%";
+        foreach (var startTxt in playerStatsText)
+        {
+            if (startTxt == null) continue;
+
+            string statKey = startTxt.gameObject.name;
+            float rawValue = GetStatValueInDict(statKey);
+
+            // switch문은 내부적으로 == 연산자처럼 해시값 비교를 수행하여 초고속으로 작동합니다.
+            startTxt.text = statKey switch
+            {
+                // 1. 퍼센트(%)로 표시할 스탯들만 묶어서 관리
+                "크리티컬 확률" or "희귀 확률" or "이로운 효과" or "환생 보너스" or "총 혜택" => $"{rawValue * 100f:F1}%",
+                // 2. 소수점 한 자리만 보여줄 특정 스탯
+                "이동 속도" => rawValue.ToString("F1"),
+                // 3. 예외 처리가 필요한 특수 스탯
+                "공격력" => $"{rawValue:F0} + 무기 데미지 들어갈 예정",
+                // 4. 그 외 나머지 모든 스탯 (체력, 방어력, 클릭 등)은 정수로 처리
+                _ => rawValue.ToString("F0"),
+            };
+        }
+    }
+    private void CheckInspectorErrors()
+    {
+        if (playerStatsText == null) return;
+
+        foreach (var startTxt in playerStatsText)
+        {
+            if (startTxt == null) continue;
+
+            string objName = startTxt.gameObject.name;
+
+            // 딕셔너리에 등록되지 않은 이름이 인스펙터에 있다면 에러 출력!
+            if (!statGetters.ContainsKey(objName))
+            {
+                Debug.LogError($"❌ [StatsManager 비상!] UI 오브젝트 이름 '{objName}'이(가) 스탯 딕셔너리에 존재하지 않습니다! 인스펙터 이름을 확인하세요.", startTxt.gameObject);
+            }
+        }
+    }
+    public void ReincarnatePlayer(bool keepBonus)
+    {
+        playerStats.ResetStatsForReincarnation(baseStatsContainer, keepBonus);
+        UpDatePlayerStatsText();
+        SavePlayerStats();
     }
 
+
+//------Save & Load Player Stats------//
+    private void LoadBaseStatsFromCSV()
+    {
+        // 확장자(.csv)를 떼고 파일 이름만 적습니다. (Assets/Resources/PlayerBaseStats.csv)
+        TextAsset csvFile = Resources.Load<TextAsset>("PlayerBaseStats");
+
+        if (csvFile == null)
+        {
+            Debug.LogError("[StatsManager] CSV 파일을 Resources 폴더에서 찾을 수 없습니다!");
+            return;
+        }
+
+        // 줄바꿈 기준으로 데이터를 쪼갭니다. (\r\n 및 \n 대응)
+        string[] lines = csvFile.text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        // i = 1 부터 시작하여 첫 줄(헤더: StatName,BaseValue)은 건너뜁니다.
+        for (int i = 1; i < lines.Length; i++)
+            {
+            string[] columns = lines[i].Split(',');
+
+            if (columns.Length >= 2)
+            {
+                string statName = columns[0].Trim();
+                if (float.TryParse(columns[1].Trim(), out float baseValue))
+                {
+                    baseStatsContainer[statName] = baseValue;
+                }
+            }
+        }
+    }
     public void SavePlayerStats() => GameManger.instance.SaveData(playerStats, SAVE_FILE_NAME);
     public void LoadPlayerStats()
     {
