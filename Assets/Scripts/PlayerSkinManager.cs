@@ -63,6 +63,7 @@ public class PlayerSkinManager : MonoBehaviour
             goodsManager.GoodTXTUpdate();
 
             saveData.unlockedSkins.Add(currentSkinIndex);
+            saveData.unlockedSkins.Sort(); 
             SetupSkinUI(currentSkinIndex); // UI 업데이트
             GameManger.instance.SaveGame(); // 게임 저장
         }
@@ -96,6 +97,16 @@ public class PlayerSkinManager : MonoBehaviour
     {
         activablePlayer.SetSkinAnimeOverride().runtimeAnimatorController 
         = allSkins[saveData.equippedSkin].skinOverrideController;
+    }
+
+    public AnimatorOverrideController GetAnimatorOverrideCurrentEquipped()
+    {
+        if (saveData.unlockedSkins == null || saveData.unlockedSkins.Count == 0)
+        {
+            return allSkins[0].skinOverrideController; 
+        }
+
+        return allSkins[saveData.equippedSkin].skinOverrideController;
     }
 
     public void SaveSkins() => GameManger.instance.SaveData(saveData, SAVE_FILE_NAME);

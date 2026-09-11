@@ -10,7 +10,10 @@ public class PlayerSkinDataSo : ScriptableObject
     public Sprite skinSprite;        // 스킨 장착 시 보여줄 스프라이트
     public AnimatorOverrideController skinOverrideController; 
     [Header("스킨 장착 시 플레이어 스텟 강화")]
-    public bool isAttackMultiplier; // 공격력 배수 적용 여부
-    public bool isDefenseMultiplier; // 방어력 배수 적용 여부
-    public bool isHealthMultiplier; // 체력 배수 적용 여부
+    public float attackUpgradeAmount; // 공격력 배수 적용 여부
+    public float defenseUpgradeAmount; // 방어력 배수 적용 여부
+    public float healthUpgradeAmount; // 체력 배수 적용 여부
+    public float speedUpgradeAmount; // 공격 속도 배수 적용 여부
+    public float criticalChanceUpgradeAmount; // 치명타 확률 배수 적용 여부
+    public float criticalDamageUpgradeAmount; // 치명타 피해 배수 적용 여부
 }

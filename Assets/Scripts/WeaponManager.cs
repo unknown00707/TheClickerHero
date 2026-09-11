@@ -20,6 +20,7 @@ public class WeaponManager : MonoBehaviour
     [Header("Managers")]
     public GoodsManager goodsManager; // 재화 매니저 참조
     public ActivablePlayer activablePlayer; // 플레이어 참조
+    public AutoManager autoManager; // 오토 매니저 참조
     [Header("Weapon Data")]
     public WeaponDataSo[] weaponDataArray; // 모든 무기 데이터 배열 (인덱스 0부터 순서대로)
     public UnlockWeaponData unlockWeaponData = new(); // 무기 잠금 해제 상태 및 현재
@@ -77,6 +78,7 @@ public class WeaponManager : MonoBehaviour
         {
             unlockWeaponData.equippedWeaponIndex = currentWeaponIndex;
             activablePlayer.SetSameAnimeOverride(GetCurrentWeaponData()); // 무기 장착 시 애니메이션 오버라이드 설정
+            autoManager.SetSameAnimeOverride(GetCurrentWeaponData()); // 무기 장착 시 오토 플레이어 애니메이션 오버라이드 설정
             UpdateWeaponUI(); // UI 업데이트
             SaveWeaponData(); // 무기 장착 후 저장
         }

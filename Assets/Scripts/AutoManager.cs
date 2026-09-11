@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Pool;
+
 [Serializable]
 public class UnlockAutoOnlineUprade
 {
@@ -26,10 +29,13 @@ public class TimeLog
 public class AutoManager : MonoBehaviour
 {
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
+    public PlayerSkinManager playerSkinManager; // 플레이어 스킨 매니저 참조
+
     [Header("Offline")]
     public GameObject offlineRewardObj;
     public TextMeshProUGUI offlineRewardTitle;
     public TextMeshProUGUI offlineRewardContent;
+
     [Header("Offline Reward")]
     private int totalClickReward; // 오프라인 보상으로 지급할 총 클릭 수
     private readonly TimeLog timeLog = new();
@@ -37,16 +43,32 @@ public class AutoManager : MonoBehaviour
     private string todayDate; // 오늘 날짜
     private readonly int MAX_OFFLINE_HOURS = 3; // 최대 오프라인 시간 제한 (24시간)
     private readonly string SAVE_TIME_LOG_FILE_NAME = "TimeLog.json"; // 저장 파일 이름
-    [Header("Auto Battle")]
+
+    [Header("Auto Battle Data")]
     public AutoOnlineUpradeSo[] autoOnlineUpradeSo;
     public Image autoOnlineUpgradeIMG;
     public TextMeshProUGUI autoOnlineUpgradeTxt;
     public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
     public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
-    readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
+    private readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
+    private float autoOnlineRewardCycle = 300f; // == attackSpeed --> 공격 속도에 따라 보상 주기 달라짐. 
+    private float rareProbabilityOfEnemy = 0; // 적의 희귀 확률 --> 이 값이 높을 수록 ID 큰 적이 나타남 -> 보상 증가
     private int gettenCoin = 0;
     private int gettenClick = 0;
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
+
+    [Header("Auto Player Animator")]
+    public Animator autoPlayerAnimator;
+    public Animator autoPlayerWeaponAnimator;
+    public Animator autoPlayerWeaponEffectAnimator;
+    private static readonly int YHash = Animator.StringToHash("y");
+    private static readonly int XHash = Animator.StringToHash("x");
+    private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
+    private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
+
+    [Header("Auto Battle Objects Manager")]
+    private IObjectPool<GameObject> _pool; // 적 인스턴스 풀링을 위한 Object Pool
+
 
     void Awake()
     {
@@ -57,6 +79,21 @@ public class AutoManager : MonoBehaviour
         Debug.Log("게임 시작 시간: " + todayDate + " : " + loginTime);
         offlineRewardObj.SetActive(false); // 혹시 모르니.
         OfflineReward(); // 오프라인 보상 지급
+
+        // Online
+        LoadUnlockAutoOnlineUpgrade(); // 게임 시작 시 해금된 업그레이드 로드
+        ApplyAutoOnlineUpgradeStat(); // 해금된 업그레이드 스탯 적용
+        UpdateAutoOnlineUpgradeUI(unlockAutoOnlineUprade.unlockedMaxID); // UI 업데이트
+
+        // Pooling
+        PoolInit(); // 적 인스턴스 풀링 초기화
+    }
+
+    void Start()
+    {
+        // 게임 시작 시 현재 장착된 스킨의 AnimatorOverrideController 적용
+        ApplyAutoPlayerAnimatorOverride();
+        AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
     }
 
     // --------------------- 오프라인 자동 보상 로직 ---------------------//
@@ -197,6 +234,7 @@ public class AutoManager : MonoBehaviour
         {
             unlockAutoOnlineUprade.unlockedMaxID = currentSoID;
             SaveUnlockAutoOnlineUpgrade(); // 변경 사항 저장
+            ApplyAutoOnlineUpgradeStat(); // 스탯 적용
             UpdateAutoOnlineUpgradeUI(currentSoID); // UI 업데이트
             Debug.Log($"AutoOnlineUprade ID {currentSoID} 해금 완료!");
         }
@@ -204,6 +242,48 @@ public class AutoManager : MonoBehaviour
         {
             Debug.Log($"AutoOnlineUprade ID {currentSoID}는 이미 해금되어 있습니다.");
         }
+    }
+    private void AutoAnimationInit()
+    {
+        autoOnlineRewardCycle = autoOnlineUpradeSo
+                                .Take(unlockAutoOnlineUprade.unlockedMaxID + 1)
+                                .Sum(so => so.upgradeSpeedAmount);
+        rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
+    
+        autoPlayerAnimator.SetFloat(XHash, -1); // 왼쪽
+        autoPlayerAnimator.SetFloat(YHash, 0); // 기본
+        autoPlayerWeaponAnimator.SetFloat(MoveSpeedHash, 1); // 항상 움직여야되서 !=0 만 만족하면 됌.
+        
+        autoPlayerAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+    }
+    private void PoolInit()
+    {
+        _pool = new ObjectPool<GameObject>(
+            CreateAutoEnemy,          // 생성
+            OnGetAutoEnemy,           // 꺼냄
+            OnReleaseAutoEnemy,       // 반환
+            OnDestroyAutoEnemy,       // 파괴
+            collectionCheck: true, // 중복 반환 체크 활성화 (버그 방지)
+            defaultCapacity: 10, 
+            maxSize: 50
+        );
+    }
+    public void SetSameAnimeOverride(WeaponDataSo currentWeapon)
+    {
+        // 플레이어는 나중에
+        autoPlayerWeaponAnimator.runtimeAnimatorController = currentWeapon.weaponOverrideController;
+        autoPlayerWeaponEffectAnimator.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
+    }
+    public void ApplyAutoPlayerAnimatorOverride() // playerSkin Equipped 버튼에 적용
+    {
+        autoPlayerAnimator.runtimeAnimatorController = playerSkinManager.GetAnimatorOverrideCurrentEquipped();
+    }
+    private void ApplyAutoOnlineUpgradeStat()
+    {
+        autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
+        rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     }
     public void SaveUnlockAutoOnlineUpgrade()
     {
@@ -215,4 +295,23 @@ public class AutoManager : MonoBehaviour
             GameManger.instance.SaveData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME); // 파일이 없으면 새로 저장
         GameManger.instance.LoadData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME);
     }
+
+// --------------------- 오토 배틀 적 인스턴스 풀링 ---------------------//
+    private GameObject CreateAutoEnemy()
+    {
+        return null;
+    }
+    private void OnGetAutoEnemy(GameObject enemy)
+    {
+        
+    }
+    private void OnReleaseAutoEnemy(GameObject enemy)
+    {
+        
+    }
+    private void OnDestroyAutoEnemy(GameObject enemy)
+    {
+        
+    }
+
 }

@@ -39,8 +39,6 @@ public class WeaponScript : MonoBehaviour
                 monster.TakeDamage(info);
             }
         }
-
-        
     }
 
     int FindOffsetIndex()
@@ -86,7 +84,7 @@ public class WeaponScript : MonoBehaviour
         if (weapon == null) return;
 
         // 플레이어의 최종 데미지 계산
-        float totalDamage = (activablePlayer.playerStatsManager.playerStats.AttackPower + weapon.baseDamage) * weapon.auraDamageMultiplier;
+        float totalDamage = (playerStatsManager.playerStats.AttackPower + weapon.baseDamage) * weapon.auraDamageMultiplier;
 
         Vector2 lookDirection = activablePlayer.ReturnDirPlayerVec; 
 
