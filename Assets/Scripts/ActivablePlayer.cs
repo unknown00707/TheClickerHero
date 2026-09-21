@@ -100,9 +100,16 @@ public class ActivablePlayer : MonoBehaviour
         SetSameAnimeOverride(weaponManager.GetCurrentWeaponData());
         SetWeaponRanderFalse(true);
         SetSameAttackSpeed(playerStatsManager.playerStats.AttackSpeed);
+
         playerAnim.SetTrigger(SwordAttackHash);
         weaponAnim.SetTrigger(SwordAttackHash);
         weaponEffectAnim.SetTrigger(SwordAttackHash);
+
+        // float actualTimeUntilHit = originalEventTime / attackSpeedMultiplier;
+
+        // // 3. 큐 풀에서 몬스터를 꺼내와서 정확한 속도로 출발시킴
+        // Monster enemy = monsterPool.Get();
+        // enemy.SetTrajectory(spawnPoint.position, hitPoint.position, actualTimeUntilHit);
     }
 
     void SetSameAttackSpeed(float speed)
@@ -111,6 +118,51 @@ public class ActivablePlayer : MonoBehaviour
         weaponAnim.SetFloat(AttackSpeedHash, speed);
         weaponEffectAnim.SetFloat(AttackSpeedHash, speed);
     }
+    // private IEnumerator Co_SpawnMonsterWithSync()
+    // {
+    //     // ⚠️ [중요] 트리거가 실행된 후, 애니메이터가 다음 애니메이션 정보로 
+    //     // 갱신될 때까지 딱 1프레임 대기합니다.
+    //     yield return null; 
+
+    //     // 3. 현재 레이어(0번 베이스 레이어)에서 재생 중인 애니메이션 클립 정보 획득
+    //     AnimatorClipInfo[] clipInfo = playerAnimator.GetCurrentAnimatorClipInfo(0);
+        
+    //     if (clipInfo.Length > 0)
+    //     {
+    //         AnimationClip currentClip = clipInfo[0].clip; // 현재 재생중인 클립
+    //         float originalEventTime = 0f;
+    //         bool eventFound = false;
+
+    //         // 4. 해당 애니메이션 파일에 들어있는 모든 이벤트를 검색
+    //         foreach (AnimationEvent animEvent in currentClip.events)
+    //         {
+    //             // 우리가 연출 타이밍으로 잡고 싶은 애니메이션 이벤트 함수 이름
+    //             if (animEvent.functionName == "OnPlayerHitEvent") 
+    //             {
+    //                 originalEventTime = animEvent.time; // 원본 세팅 시간(초) 추출
+    //                 eventFound = true;
+    //                 break;
+    //             }
+    //         }
+
+    //         // 5. 이벤트를 정상적으로 찾았다면 역산 공식 적용 후 몬스터 출발!
+    //         if (eventFound)
+    //         {
+    //             // 실제 걸릴 시간 = 원본 시간 / 현재 공격 속도 배속
+    //             float actualTimeUntilHit = originalEventTime / attackSpeedMultiplier;
+
+    //             // 큐 풀에서 꺼내어 출발시키기
+    //             Monster enemy = monsterPool.Get();
+    //             enemy.SetTrajectory(spawnPoint.position, hitPoint.position, actualTimeUntilHit);
+                
+    //             Debug.Log($"🎬 [{currentClip.name}] 발견! 원본이벤트:{originalEventTime}초 -> 공속반영실제시간:{actualTimeUntilHit:F2}초로 몬스터 속도 자동 제어");
+    //         }
+    //         else
+    //         {
+    //             Debug.LogWarning($"⚠️ 현재 애니메이션 [{currentClip.name}]에 'OnPlayerHitEvent' 이벤트가 찍혀있지 않습니다!");
+    //         }
+    //     }
+    // }
     // ----------------------- 애니메이션 관련 메서드 -----------------------
     public void SetSameAnimeOverride(WeaponDataSo currentWeapon)
     {

@@ -5,7 +5,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Pool;
 
 [Serializable]
 public class UnlockAutoOnlineUprade
@@ -67,7 +66,9 @@ public class AutoManager : MonoBehaviour
     private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
 
     [Header("Auto Battle Objects Manager")]
-    private IObjectPool<GameObject> _pool; // 적 인스턴스 풀링을 위한 Object Pool
+    public EnemyComme autoEnemyPrefab;
+    private Queue<EnemyComme> _pool; // 적 인스턴스 풀링을 위한 Object Pool
+
 
 
     void Awake()
@@ -204,7 +205,7 @@ public class AutoManager : MonoBehaviour
         gettenCoin++;
         gettenClick++;
     }
-
+//------------------- 오토 UI 관련 ---------------------------------//
     public void UpdateAutoOnlineUpgradeUI(int currentSoID)
     {
         // 현재 적 ID에 따라 적용 가능한 업그레이드 찾기
@@ -227,7 +228,6 @@ public class AutoManager : MonoBehaviour
             autoOnlineUpgradeLockBTN.SetActive(true);
         }
     }
-
     public void UnlockAutoOnlineUpgrade(int currentSoID)
     {
         if (currentSoID > unlockAutoOnlineUprade.unlockedMaxID)
@@ -243,6 +243,7 @@ public class AutoManager : MonoBehaviour
             Debug.Log($"AutoOnlineUprade ID {currentSoID}는 이미 해금되어 있습니다.");
         }
     }
+//-------------------- 오토 애니메이션 --------------------------------//
     private void AutoAnimationInit()
     {
         autoOnlineRewardCycle = autoOnlineUpradeSo
@@ -257,18 +258,6 @@ public class AutoManager : MonoBehaviour
         autoPlayerAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-    }
-    private void PoolInit()
-    {
-        _pool = new ObjectPool<GameObject>(
-            CreateAutoEnemy,          // 생성
-            OnGetAutoEnemy,           // 꺼냄
-            OnReleaseAutoEnemy,       // 반환
-            OnDestroyAutoEnemy,       // 파괴
-            collectionCheck: true, // 중복 반환 체크 활성화 (버그 방지)
-            defaultCapacity: 10, 
-            maxSize: 50
-        );
     }
     public void SetSameAnimeOverride(WeaponDataSo currentWeapon)
     {
@@ -285,6 +274,7 @@ public class AutoManager : MonoBehaviour
         autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     }
+//---------------------- 오토 세이브 -----------------------------------//
     public void SaveUnlockAutoOnlineUpgrade()
     {
         GameManger.instance.SaveData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME);
@@ -294,24 +284,40 @@ public class AutoManager : MonoBehaviour
         if(!File.Exists(Path.Combine(Application.persistentDataPath, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME)))
             GameManger.instance.SaveData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME); // 파일이 없으면 새로 저장
         GameManger.instance.LoadData(unlockAutoOnlineUprade, SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME);
+    
     }
 
 // --------------------- 오토 배틀 적 인스턴스 풀링 ---------------------//
-    private GameObject CreateAutoEnemy()
+    private void PoolInit(int initialCapacity = 10)
     {
-        return null;
+        for (int i = 0; i < initialCapacity; i++)
+        {
+            EnemyComme obj = Instantiate(autoEnemyPrefab, transform);
+            obj.enemyTransform.gameObject.SetActive(false);
+            _pool.Enqueue(obj); 
+        }
     }
-    private void OnGetAutoEnemy(GameObject enemy)
+    public EnemyComme GetEnemy()
     {
-        
-    }
-    private void OnReleaseAutoEnemy(GameObject enemy)
-    {
-        
-    }
-    private void OnDestroyAutoEnemy(GameObject enemy)
-    {
-        
-    }
+        EnemyComme obj;
 
+        if (_pool.Count > 0)
+        {
+            obj = _pool.Dequeue();
+        }
+        else
+        {
+            obj = Instantiate(autoEnemyPrefab, transform);
+        }
+
+        obj.enemyTransform.gameObject.SetActive(true);
+        return obj;
+    }
+    public void ReleaseEnemy(EnemyComme obj)
+    {
+        if (_pool.Contains(obj)) return;
+
+        obj.enemyTransform.gameObject.SetActive(false);
+        _pool.Enqueue(obj);
+    }
 }

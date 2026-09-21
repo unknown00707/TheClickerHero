@@ -16,7 +16,7 @@ public class EnemyComme : Entity
     public Animator animator;
     public BoxCollider2D groundCol2D;
     public Transform auraSpwanTransform;
-    private BoxCollider2D hitboxCollider;
+    public BoxCollider2D hitboxCollider;
     [SerializeField] private EnemyDataSo enemyData;
     [Header("Attack")]
     [SerializeField] private bool isAttacking = false;
@@ -31,17 +31,45 @@ public class EnemyComme : Entity
     private static readonly WaitForSeconds _waitForSeconds0_1 = new(0.1f);
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
+    [Header("Auto Set")]
+    public bool isAutoEnemy = false;
+    private Vector3 _targetPosition;
+    private float _moveSpeed;
+    private bool _isMoving = false;
 
     void Awake()
     {
-        hitboxCollider = GetComponent<BoxCollider2D>();
 
     }
+    public void SetTrajectory(Vector3 spawnPos, Vector3 targetPos, float requiredTime)
+    {
+        transform.position = spawnPos;
+        _targetPosition = targetPos;
+        
+        // 속도 = 거리 / 시간
+        float distance = Vector3.Distance(spawnPos, targetPos);
+        _moveSpeed = distance / requiredTime; 
+        
+        _isMoving = true;
+    }
 
+    private void Update()
+    {
+        if (!_isMoving) return;
+
+        // 매 프레임 플레이어 앞 타격 지점을 향해 이동
+        transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _moveSpeed * Time.deltaTime);
+
+        // 도착하면 이동 중지 (이후 플레이어 애니메이션 함수에 의해 처치 연출)
+        if (transform.position == _targetPosition)
+        {
+            _isMoving = false;
+        }
+    }
 
     void FixedUpdate()
     {
-        if (enemyData == null || isDead || isAttacking) return;
+        if (enemyData == null || isDead || isAttacking || isAutoEnemy) return;
         
         // 쿨타임 중이거나 사정거리 밖에 있으면 플레이어를 추적하여 이동합니다.
         if (vectorToPlayer.magnitude > enemyData.attackRange || Time.time < attackCoolTime)
@@ -114,7 +142,7 @@ public class EnemyComme : Entity
     }
     public void OnRangedAttack()
     {
-        if (isDead) return;
+        if (isDead || isAutoEnemy) return;
         
         float totalDamage = enemyData.attackPower * enemyData.auraDamageToAttackMultipule;
         AuraManager.Instance.FireSpreadAura(
