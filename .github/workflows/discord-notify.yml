@@ -12,4 +12,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          args: '🔨 **[${{ github.repository }}]** 저장소에 새 커밋이 푸시되었습니다! \n- 작성자: ${{ github.actor }} \n- 메시지: ${{ github.event.head_commit.message }}'
+          args: |
+            🔨 **[${{ github.repository }}]** 저장소에 새 커밋이 푸시되었습니다!
+            - **작성자:** ${{ github.actor }}
+            - **메시지:** ${{ github.event.head_commit.message }}
