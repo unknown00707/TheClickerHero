@@ -1,43 +1,19 @@
 name: Discord Forum Notification
 on:
   push:
-    branches: [ "main" ] # 본인의 메인 브랜치 이름 (기본은 main)
+    branches: [ "main" ]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
-        env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          THREAD_ID: ${{ secrets.DISCORD_THREAD_ID }}
-        run: |
-          TARGET_URL="${WEBHOOK_URL}?thread_id=${THREAD_ID}"
-          PAYLOAD=$(cat <<EOF
-          {
-            "username": "GitHub Bot",
-            "embeds": [
-              {
-                "title": "🔨 새 커밋 알림 - ${{ github.repository }}",
-                "url": "${{ github.event.head_commit.url }}",
-                "color": 3447003,
-                "fields": [
-                  { "name": "작성자", "value": "${{ github.actor }}", "inline": true },
-                  { "name": "브랜치", "value": "${{ github.ref_name }}", "inline": true },
-                  { "name": "커밋 메시지", "value": "${{ github.event.head_commit.message }}" }
-                ],
-                "footer": { "text": "Commit SHA: ${{ github.sha }}" }
-              }
-            ]
-          }
-          EOF
-          )
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Content-Type: application/json" \
-            -X POST \
-            -d "$PAYLOAD" \
-            "$TARGET_URL")
-          if [ "$HTTP_STATUS" -ne 200 ] && [ "$HTTP_STATUS" -ne 204 ]; then
-            echo "Discord 전송 실패 (HTTP Status: $HTTP_STATUS)"
-            exit 1
-          fi
+      - name: Discord Webhook Notify
+        uses: rjstone/discord-webhook-notify@v1
+        with:
+          severity: info
+          username: GitHub Bot
+          color: '#34a853'
+          avatarUrl: https://githubassets.com
+          details: '🔨 새 커밋이 푸시되었습니다!'
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          threadId: ${{ secrets.DISCORD_THREAD_ID }}
