@@ -60,7 +60,8 @@ public class EnemyComme : Entity
         // 매 프레임 플레이어 앞 타격 지점을 향해 이동
         transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _moveSpeed * Time.deltaTime);
 
-        // // 도착하면 이동 중지 (이후 플레이어 애니메이션 함수에 의해 처치 연출)
+        // // 죽으면 이미지만 바꾸고 계속 이동하다가 3초후 pool에 반환하는 걸로
+        // 
         // if (transform.position == _targetPosition)
         // {
         //     _isMoving = false;
