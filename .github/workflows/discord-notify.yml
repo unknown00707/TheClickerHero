@@ -8,12 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Discord Webhook Notify
-        uses: rjstone/discord-webhook-notify@v1
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_THREAD_ID: 여기다가정우님이준숫자ID입력
         with:
-          severity: info
-          username: GitHub Bot
-          color: '#34a853'
-          avatarUrl: https://githubassets.com
-          details: '🔨 새 커밋이 푸시되었습니다!'
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          threadId: ${{ secrets.DISCORD_THREAD_ID }}
+          args: '🔨 [${{ github.repository }}] 새 커밋이 푸시되었습니다! (작성자: ${{ github.actor }})'
