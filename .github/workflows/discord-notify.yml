@@ -1,4 +1,4 @@
-name: Discord Forum Notification
+name: Discord Notification
 on:
   push:
     branches: [ "main" ]
@@ -9,19 +9,9 @@ jobs:
     steps:
       - name: Send Discord Notification
         run: |
-          # 1. 주소 맨 뒤에 /github 가 있다면 자동으로 지우고 순수 주소만 추출합니다.
-          CLEAN_URL=$(echo "${{ secrets.DISCORD_WEBHOOK_URL }}" | sed 's/\/github$//')
+          TARGET_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
           
-          # 2. 주소 뒤에 확실하게 ?thread_id=숫자ID 를 결합합니다.
-          TARGET_URL="${CLEAN_URL}?thread_id=${{ secrets.DISCORD_THREAD_ID }}"
+          # 일반 채팅방 전용 메시지 구조 (가장 안전하고 확실함)
+          PAYLOAD='{"content": "🔨 **${{ github.repository }}** 저장소에 새 커밋이 푸시되었습니다!\n- 작성자: ${{ github.actor }}\n- 브랜치: ${{ github.ref_name }}\n- 메시지: ${{ github.event.head_commit.message }}"}'
           
-          # 3. 디스코드 포럼 전용 규격(JSON)으로 메시지를 만듭니다.
-          PAYLOAD=$(cat <<EOF
-          {
-            "content": "🔨 **${{ github.repository }}** 저장소에 새 커밋이 푸시되었습니다!\n- 작성자: ${{ github.actor }}\n- 메시지: ${{ github.event.head_commit.message }}"
-          }
-          EOF
-          )
-          
-          # 4. 주소와 데이터를 디스코드로 정밀 타격하여 발송합니다.
           curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$TARGET_URL"
