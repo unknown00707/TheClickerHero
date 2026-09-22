@@ -9,9 +9,11 @@ jobs:
     steps:
       - name: Send Discord Notification
         run: |
+          # 전달해주신 새 웹후크 주소 금고에서 가져오기
           TARGET_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
           
-          # 일반 채팅방 전용 메시지 구조 (가장 안전하고 확실함)
+          # 가장 안전한 전송 데이터 구성
           PAYLOAD='{"content": "🔨 **${{ github.repository }}** 저장소에 새 커밋이 푸시되었습니다!\n- 작성자: ${{ github.actor }}\n- 브랜치: ${{ github.ref_name }}\n- 메시지: ${{ github.event.head_commit.message }}"}'
           
+          # 새 주소로 발송
           curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$TARGET_URL"
