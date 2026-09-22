@@ -5,6 +5,7 @@ on:
 
 jobs:
   notify:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord Notification
