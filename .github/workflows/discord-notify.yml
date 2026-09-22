@@ -11,6 +11,6 @@ jobs:
         uses: Ilshidur/action-discord@master
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          DISCORD_THREAD_ID: 여기다가정우님이준숫자ID입력
+          DISCORD_THREAD_ID: 1550821344344809482
         with:
           args: '🔨 [${{ github.repository }}] 새 커밋이 푸시되었습니다! (작성자: ${{ github.actor }})'
