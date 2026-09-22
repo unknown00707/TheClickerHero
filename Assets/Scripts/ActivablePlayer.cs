@@ -104,12 +104,6 @@ public class ActivablePlayer : MonoBehaviour
         playerAnim.SetTrigger(SwordAttackHash);
         weaponAnim.SetTrigger(SwordAttackHash);
         weaponEffectAnim.SetTrigger(SwordAttackHash);
-
-        // float actualTimeUntilHit = originalEventTime / attackSpeedMultiplier;
-
-        // // 3. 큐 풀에서 몬스터를 꺼내와서 정확한 속도로 출발시킴
-        // Monster enemy = monsterPool.Get();
-        // enemy.SetTrajectory(spawnPoint.position, hitPoint.position, actualTimeUntilHit);
     }
 
     void SetSameAttackSpeed(float speed)
