@@ -14,6 +14,7 @@ public class PlayerSkinManager : MonoBehaviour
 {
     public GoodsManager goodsManager; // 재화 매니저 참조
     public ActivablePlayer activablePlayer; // 플레이어 참조
+    public AutoManager autoManager;
     public List<PlayerSkinDataSo> allSkins; // 게임에 존재하는 모든 스킨 데이터
     [Header("스킨 UI")]
     public TextMeshProUGUI skinNameText; // 스킨 이름 텍스트
@@ -79,6 +80,7 @@ public class PlayerSkinManager : MonoBehaviour
         {
             saveData.equippedSkin = currentSkinIndex;
             UpPlayerSkin();
+            autoManager.ApplyAutoPlayerAnimatorOverride();
             GameManger.instance.SaveGame(); // 게임 저장
         }
     }

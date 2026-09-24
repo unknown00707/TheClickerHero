@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: AttackHandL
+  m_Name: Attack_Hand_R
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,15 +21,15 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 8581897214540664708, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
-    - time: 0.089999914
-      value: {fileID: 1866606486818679807, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
-    - time: 0.18000007
-      value: {fileID: -2138162659073696452, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
+      value: {fileID: 5821126323618091756, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
+    - time: 0.09000015
+      value: {fileID: 4235531591063973926, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
+    - time: 0.1800003
+      value: {fileID: 5787853762042573226, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
     - time: 0.2800002
-      value: {fileID: 4786510854055190139, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
+      value: {fileID: -6437391767935699314, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
     - time: 0.36000022
-      value: {fileID: 4786510854055190139, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
+      value: {fileID: -6437391767935699314, guid: 10d588d85d2249342ac3eefab863ac7b, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212

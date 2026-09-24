@@ -246,26 +246,62 @@ public class AutoManager : MonoBehaviour
 //-------------------- 오토 애니메이션 --------------------------------//
     private void AutoAnimationInit()
     {
-        autoOnlineRewardCycle = autoOnlineUpradeSo
-                                .Take(unlockAutoOnlineUprade.unlockedMaxID + 1)
-                                .Sum(so => so.upgradeSpeedAmount);
+        // 1. 가져올 업그레이드 개수 지정 (인덱스 보정 및 리스트 범위 초과 방지)
+        int takeCount = Mathf.Clamp(unlockAutoOnlineUprade.unlockedMaxID + 1, 0, autoOnlineUpradeSo.Length);
+        // 2. SO에 있는 차감 시간(-10, -20 등)을 모두 더합니다. 결과는 음수(예: -30)가 됩니다.
+        float totalTimeReduction = autoOnlineUpradeSo.Take(takeCount).Sum(so => so.upgradeSpeedAmount);
+        // 3. 기본 주기(300초)에서 차감 시간을 계산하여 '최종 보상 주기'를 구합니다.
+        float baseCycleTime = 300f; // 5분
+        float currentRewardCycleTime = baseCycleTime + totalTimeReduction; // 300 + (-30) = 270초
+        // ⚠️ 버그 방지 예외 처리: 주기가 0초 이하로 떨어져 무한 루프나 에러가 나는 것을 방지 (최소 1초 제한)
+        currentRewardCycleTime = Mathf.Max(currentRewardCycleTime, 1f); 
+        autoOnlineRewardCycle = baseCycleTime / currentRewardCycleTime;
+
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     
         autoPlayerAnimator.SetFloat(XHash, -1); // 왼쪽
         autoPlayerAnimator.SetFloat(YHash, 0); // 기본
         autoPlayerWeaponAnimator.SetFloat(MoveSpeedHash, 1); // 항상 움직여야되서 !=0 만 만족하면 됌.
         
-        autoPlayerAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        autoPlayerAnimator.speed =  autoOnlineRewardCycle;
+        // autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        // autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
     }
-    public void SetSameAnimeOverride(WeaponDataSo currentWeapon)
+
+    public float GetFinalDurationByName(string clipName)
+    {
+        if (autoPlayerAnimator == null || autoPlayerAnimator.runtimeAnimatorController == null) return 0f;
+
+        // 1. 런타임 컨트롤러에서 이름이 일치하는 원본 애니메이션 클립을 찾습니다.
+        AnimationClip[] clips = autoPlayerAnimator.runtimeAnimatorController.animationClips;
+        float originLength = 0f;
+
+        foreach (AnimationClip clip in clips)
+        {
+            if (clip.name == clipName)
+            {
+                originLength = clip.length; // 원본 순수 길이 (예: 5.0초)
+                break;
+            }
+        }
+
+        if (originLength == 0f) return 0f;
+
+        // 2. 원본 길이를 현재 전체 속도(배속)로 나누어 실제 걸릴 시간을 미리 구합니다.
+        float currentSpeed = autoPlayerAnimator.speed;
+        
+        // 혹시 모를 0 나누기 방지 예외 처리
+        if (currentSpeed <= 0) currentSpeed = 1f; 
+
+        return originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
+    }
+    public void SetSameAnimeOverride(WeaponDataSo currentWeapon) // weapon Manager 에 직접 연결
     {
         // 플레이어는 나중에
         autoPlayerWeaponAnimator.runtimeAnimatorController = currentWeapon.weaponOverrideController;
         autoPlayerWeaponEffectAnimator.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
     }
-    public void ApplyAutoPlayerAnimatorOverride() // playerSkin Equipped 버튼에 적용
+    public void ApplyAutoPlayerAnimatorOverride() // playerSkin Manager 에 직접 연결
     {
         autoPlayerAnimator.runtimeAnimatorController = playerSkinManager.GetAnimatorOverrideCurrentEquipped();
     }

@@ -41,32 +41,7 @@ public class EnemyComme : Entity
     {
 
     }
-    public void SetTrajectory(Vector3 spawnPos, Vector3 targetPos, float requiredTime)
-    {
-        transform.position = spawnPos;
-        _targetPosition = targetPos;
-        
-        // 속도 = 거리 / 시간
-        float distance = Vector3.Distance(spawnPos, targetPos);
-        _moveSpeed = distance / requiredTime; 
-        
-        _isMoving = true;
-    }
 
-    private void Update()
-    {
-        if (!_isMoving) return;
-
-        // 매 프레임 플레이어 앞 타격 지점을 향해 이동
-        transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _moveSpeed * Time.deltaTime);
-
-        // // 죽으면 이미지만 바꾸고 계속 이동하다가 3초후 pool에 반환하는 걸로
-        // 
-        // if (transform.position == _targetPosition)
-        // {
-        //     _isMoving = false;
-        // }
-    }
 
     void FixedUpdate()
     {
