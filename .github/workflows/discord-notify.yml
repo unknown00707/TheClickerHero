@@ -1,18 +1,14 @@
 name: Discord Notification
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ] # 본인의 기본 브랜치 이름 (main 또는 master)
 
 jobs:
-  notify:
+  discord-webhook:
     runs-on: ubuntu-latest
     steps:
-      - name: Discord Webhook Notify
-        uses: Ilshidur/action-discord@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Discord Webhook Action
+        uses: illo725/discord-webhook-action@v2.2.5
         with:
-          args: |
-            🔨 **[${{ github.repository }}]** 저장소에 새 커밋이 푸시되었습니다!
-            - **작성자:** ${{ github.actor }}
-            - **메시지:** ${{ github.event.head_commit.message }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
