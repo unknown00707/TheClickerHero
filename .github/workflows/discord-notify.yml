@@ -2,13 +2,15 @@ name: Discord Notification
 
 on:
   push:
-    branches: [ "main" ] # 본인의 기본 브랜치 이름 (main 또는 master)
+    branches: [ "main" ]
 
 jobs:
   discord-webhook:
     runs-on: ubuntu-latest
     steps:
-      - name: Discord Webhook Action
-        uses: illo725/discord-webhook-action@v2.2.5
-        with:
-          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Send GitHub Style Discord Notification
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          # 웹훅 URL 뒤에 /github를 붙이면 디스코드에서 자동으로 GitHub 공식 포맷(GitHub 앱 레이블)으로 변환해줍니다.
+          curl -X POST -H "Content-Type: application/json" "${WEBHOOK_URL}/github"
