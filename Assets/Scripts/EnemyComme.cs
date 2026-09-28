@@ -33,10 +33,6 @@ public class EnemyComme : Entity
     private static readonly int XHash = Animator.StringToHash("x");
     [Header("Auto Set")]
     public bool isAutoEnemy = false;
-    private Vector3 _targetPosition;
-    private float _moveSpeed;
-    private bool _isMoving = false;
-
     void Awake()
     {
 

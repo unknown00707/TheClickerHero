@@ -80,7 +80,8 @@ public class PlayerSkinManager : MonoBehaviour
         {
             saveData.equippedSkin = currentSkinIndex;
             UpPlayerSkin();
-            autoManager.ApplyAutoPlayerAnimatorOverride();
+            autoManager.ApplyAutoPlayerAnimatorOverride(); // 애니메이션 적용
+            autoManager.SetPlayerAttackAnimeCycle(); // 주기 계산
             GameManger.instance.SaveGame(); // 게임 저장
         }
     }

@@ -60,6 +60,8 @@ public class AutoManager : MonoBehaviour
     public Animator autoPlayerAnimator;
     public Animator autoPlayerWeaponAnimator;
     public Animator autoPlayerWeaponEffectAnimator;
+    public string playerLeftAttackAnimeClipName = "Attack_Hand_L";
+    private float playerAttackAnimeCycle = 0f;
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
@@ -92,9 +94,10 @@ public class AutoManager : MonoBehaviour
 
     void Start()
     {
-        // 게임 시작 시 현재 장착된 스킨의 AnimatorOverrideController 적용
-        ApplyAutoPlayerAnimatorOverride();
+        // Online Animation
         AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
+        ApplyAutoPlayerAnimatorOverride();
+        SetPlayerAttackAnimeCycle();
     }
 
     // --------------------- 오프라인 자동 보상 로직 ---------------------//
@@ -268,9 +271,10 @@ public class AutoManager : MonoBehaviour
         // autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
     }
 
-    public float GetFinalDurationByName(string clipName)
+    public void SetPlayerAttackAnimeCycle()
     {
-        if (autoPlayerAnimator == null || autoPlayerAnimator.runtimeAnimatorController == null) return 0f;
+        if (autoPlayerAnimator == null || autoPlayerAnimator.runtimeAnimatorController == null) 
+            playerAttackAnimeCycle = 0f;
 
         // 1. 런타임 컨트롤러에서 이름이 일치하는 원본 애니메이션 클립을 찾습니다.
         AnimationClip[] clips = autoPlayerAnimator.runtimeAnimatorController.animationClips;
@@ -278,14 +282,14 @@ public class AutoManager : MonoBehaviour
 
         foreach (AnimationClip clip in clips)
         {
-            if (clip.name == clipName)
+            if (clip.name == playerLeftAttackAnimeClipName)
             {
                 originLength = clip.length; // 원본 순수 길이 (예: 5.0초)
                 break;
             }
         }
 
-        if (originLength == 0f) return 0f;
+        if (originLength == 0f) playerAttackAnimeCycle = 0f;
 
         // 2. 원본 길이를 현재 전체 속도(배속)로 나누어 실제 걸릴 시간을 미리 구합니다.
         float currentSpeed = autoPlayerAnimator.speed;
@@ -293,7 +297,7 @@ public class AutoManager : MonoBehaviour
         // 혹시 모를 0 나누기 방지 예외 처리
         if (currentSpeed <= 0) currentSpeed = 1f; 
 
-        return originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
+        playerAttackAnimeCycle = originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
     }
     public void SetSameAnimeOverride(WeaponDataSo currentWeapon) // weapon Manager 에 직접 연결
     {
