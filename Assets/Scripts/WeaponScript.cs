@@ -3,14 +3,19 @@ public class WeaponScript : MonoBehaviour
 {
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
+    [Header("Manager")]
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
     public WeaponManager weaponManager; // 무기 매니저 참조
+
+    [Header("Reference")]
     public Transform plaerTransform; // 플레이어 위치 참조 (근접 공격 판정에 사용)
     public ActivablePlayer activablePlayer; // 무기 효과를 플레이어 애니메이션과 연동하기 위해 참조
-    public Animator Animation; // 무기 자체 애니메이션 (검 휘두르는 모션)
+    public Animator weaponAnimator; // 무기 자체 애니메이션 (검 휘두르는 모션)
     public LayerMask enemyLayerMask; // 적 레이어 마스크 (적 레이어 설정 필요)
+
+
     private readonly Collider2D[] hitResults = new Collider2D[200]; // 최대 10명까지 적을 감지할 수 있는 배열 (필요 시 크기 조절) 
-    ContactFilter2D filter = new();
+    ContactFilter2D filter = new(); // 혹시 모르니까
     void Awake()
     {
         filter.useLayerMask = true;
@@ -44,8 +49,8 @@ public class WeaponScript : MonoBehaviour
     int FindOffsetIndex()
     {
         int offsetIndex = 0;
-        float offsetX = Animation.GetFloat(XHash);
-        float offsetY = Animation.GetFloat(YHash);
+        float offsetX = weaponAnimator.GetFloat(XHash);
+        float offsetY = weaponAnimator.GetFloat(YHash);
         if (offsetX == 0 && offsetY == 0)
         {
             offsetIndex = 0;
@@ -53,16 +58,16 @@ public class WeaponScript : MonoBehaviour
         else if (offsetX != 0 && offsetY == 0)
         {
             if (offsetX > 0)
-                offsetIndex = 2; // 오른쪽 공격이면 1
+                offsetIndex = 2; // 오른쪽 공격
             else
-                offsetIndex = 3; // 왼쪽 공격이면 2
+                offsetIndex = 3; // 왼쪽 공격
         }
         else if (offsetX == 0 && offsetY != 0)
         {
             if (offsetY > 0)
-                offsetIndex = 1; // 위쪽 공격이면 3
+                offsetIndex = 1; // 위쪽 공격
             else
-                offsetIndex = 0; // 아래쪽 공격이면 4
+                offsetIndex = 0; // 아래쪽 공격
         }
         return offsetIndex;
     }

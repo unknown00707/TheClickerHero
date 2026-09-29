@@ -2779,7 +2779,7 @@ MonoBehaviour:
   weaponManager: {fileID: 975170235}
   plaerTransform: {fileID: 1610518119}
   activablePlayer: {fileID: 40167125}
-  Animation: {fileID: 152799553}
+  weaponAnimator: {fileID: 152799553}
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 320
@@ -3021,6 +3021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSkinManager
   goodsManager: {fileID: 140919187}
   activablePlayer: {fileID: 40167125}
+  autoManager: {fileID: 0}
   allSkins:
   - {fileID: 11400000, guid: c5c890e90e65a0640b93b9800d6508dd, type: 2}
   - {fileID: 11400000, guid: f655d789287ee0b459efa29c506e054d, type: 2}
@@ -10988,7 +10989,7 @@ MonoBehaviour:
   weaponManager: {fileID: 975170235}
   plaerTransform: {fileID: 438473185}
   activablePlayer: {fileID: 0}
-  Animation: {fileID: 901236979}
+  weaponAnimator: {fileID: 0}
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 320
@@ -25492,7 +25493,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   goodsManager: {fileID: 140919187}
   activablePlayer: {fileID: 40167125}
-  autoManager: {fileID: 0}
+  autoManager: {fileID: 1511410121}
   weaponDataArray:
   - {fileID: 11400000, guid: 62f84056a77bb3c41aeaab457afdab94, type: 2}
   unlockWeaponData:
@@ -32153,6 +32154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AutoManager
   playerStatsManager: {fileID: 1866507182}
   playerSkinManager: {fileID: 172727097}
+  weaponManager: {fileID: 975170235}
   offlineRewardObj: {fileID: 955327964}
   offlineRewardTitle: {fileID: 15560189}
   offlineRewardContent: {fileID: 718772498}
@@ -32164,6 +32166,10 @@ MonoBehaviour:
   autoPlayerAnimator: {fileID: 1329112747}
   autoPlayerWeaponAnimator: {fileID: 901236979}
   autoPlayerWeaponEffectAnimator: {fileID: 889484080}
+  playerLeftAttackAnimeClipName: Attack_Hand_L
+  autoEnemyPrefab: {fileID: 0}
+  autoEnemySpwanTrans: {fileID: 0}
+  autoPlayerStandTrans: {fileID: 0}
 --- !u!1 &1520312055
 GameObject:
   m_ObjectHideFlags: 0
@@ -39415,12 +39421,14 @@ MonoBehaviour:
   animator: {fileID: 4210919165332441498}
   groundCol2D: {fileID: 7267437000867995871}
   auraSpwanTransform: {fileID: 4534676704627161536}
+  hitboxCollider: {fileID: 0}
   enemyData: {fileID: 11400000, guid: 36125c82b88696d4ea4d5d92893b18fb, type: 2}
   isAttacking: 0
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
   deadTime: 3
+  isAutoEnemy: 0
 --- !u!1 &5788596331224472270
 GameObject:
   m_ObjectHideFlags: 0

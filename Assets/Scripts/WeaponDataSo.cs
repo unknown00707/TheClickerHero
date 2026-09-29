@@ -15,6 +15,8 @@ public class WeaponDataSo : ScriptableObject
     [Header("근접 타격 판정 (Melee)")]
     public float baseDamage;             // 무기 기본 데미지
     public float meleeAttackRadius;    // OverlapCircle의 반지름 (크기)
+    
+    [Header("순서대로 아래 / 위 / 오른쪽 / 왼쪽")]
     public Vector2[] meleeOffset;        // 플레이어 기준 타격 중심점
 
     [Header("검기 (Aura) 설정")]

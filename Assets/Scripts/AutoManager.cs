@@ -27,8 +27,10 @@ public class TimeLog
 
 public class AutoManager : MonoBehaviour
 {
+    [Header("Manager")]
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
     public PlayerSkinManager playerSkinManager; // 플레이어 스킨 매니저 참조
+    public WeaponManager weaponManager;
 
     [Header("Offline")]
     public GameObject offlineRewardObj;
@@ -50,18 +52,20 @@ public class AutoManager : MonoBehaviour
     public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
     public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
     private readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
-    private float autoOnlineRewardCycle = 300f; // == attackSpeed --> 공격 속도에 따라 보상 주기 달라짐. 
+    private float autoOnlineRewardCycle = 300f; 
+    private float xDiffBetweenPlayerAndEnemy = 0; // 절댓값으로 인해 양수만 나오게
     private float rareProbabilityOfEnemy = 0; // 적의 희귀 확률 --> 이 값이 높을 수록 ID 큰 적이 나타남 -> 보상 증가
     private int gettenCoin = 0;
     private int gettenClick = 0;
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
 
-    [Header("Auto Player Animator")]
+    [Header("Auto Animation")]
     public Animator autoPlayerAnimator;
     public Animator autoPlayerWeaponAnimator;
     public Animator autoPlayerWeaponEffectAnimator;
     public string playerLeftAttackAnimeClipName = "Attack_Hand_L";
     private float playerAttackAnimeCycle = 0f;
+    private float autoEnemyMoveSpeed = 0f;
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
@@ -69,6 +73,8 @@ public class AutoManager : MonoBehaviour
 
     [Header("Auto Battle Objects Manager")]
     public EnemyComme autoEnemyPrefab;
+    public Transform autoEnemySpwanTrans; // 몬스터가 소환될 위치
+    public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
     private Queue<EnemyComme> _pool; // 적 인스턴스 풀링을 위한 Object Pool
 
 
@@ -84,6 +90,7 @@ public class AutoManager : MonoBehaviour
         OfflineReward(); // 오프라인 보상 지급
 
         // Online
+        xDiffBetweenPlayerAndEnemy = Mathf.Abs(autoPlayerStandTrans.position.x - autoEnemySpwanTrans.position.x);
         LoadUnlockAutoOnlineUpgrade(); // 게임 시작 시 해금된 업그레이드 로드
         ApplyAutoOnlineUpgradeStat(); // 해금된 업그레이드 스탯 적용
         UpdateAutoOnlineUpgradeUI(unlockAutoOnlineUprade.unlockedMaxID); // UI 업데이트
@@ -96,10 +103,14 @@ public class AutoManager : MonoBehaviour
     {
         // Online Animation
         AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
+        SetSameWeaponAnimeOverride();
         ApplyAutoPlayerAnimatorOverride();
         SetPlayerAttackAnimeCycle();
     }
-
+    void Update()
+    {
+        transform.Translate(autoEnemyMoveSpeed * Time.deltaTime * Vector2.right);
+    }
     // --------------------- 오프라인 자동 보상 로직 ---------------------//
     float CalculateOfflineTime()
     {
@@ -270,7 +281,6 @@ public class AutoManager : MonoBehaviour
         // autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         // autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
     }
-
     public void SetPlayerAttackAnimeCycle()
     {
         if (autoPlayerAnimator == null || autoPlayerAnimator.runtimeAnimatorController == null) 
@@ -299,9 +309,9 @@ public class AutoManager : MonoBehaviour
 
         playerAttackAnimeCycle = originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
     }
-    public void SetSameAnimeOverride(WeaponDataSo currentWeapon) // weapon Manager 에 직접 연결
+    public void SetSameWeaponAnimeOverride() // weapon Manager 에 직접 연결
     {
-        // 플레이어는 나중에
+        WeaponDataSo currentWeapon = weaponManager.GetCurrentWeaponData();
         autoPlayerWeaponAnimator.runtimeAnimatorController = currentWeapon.weaponOverrideController;
         autoPlayerWeaponEffectAnimator.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
     }

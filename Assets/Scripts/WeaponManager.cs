@@ -78,7 +78,7 @@ public class WeaponManager : MonoBehaviour
         {
             unlockWeaponData.equippedWeaponIndex = currentWeaponIndex;
             activablePlayer.SetSameAnimeOverride(GetCurrentWeaponData()); // 무기 장착 시 애니메이션 오버라이드 설정
-            autoManager.SetSameAnimeOverride(GetCurrentWeaponData()); // 무기 장착 시 오토 플레이어 애니메이션 오버라이드 설정
+            autoManager.SetSameWeaponAnimeOverride(); // 무기 장착 시 오토 플레이어 애니메이션 오버라이드 설정
             UpdateWeaponUI(); // UI 업데이트
             SaveWeaponData(); // 무기 장착 후 저장
         }
