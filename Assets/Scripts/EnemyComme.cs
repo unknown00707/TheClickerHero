@@ -8,6 +8,7 @@ public class EnemyComme : Entity
     [Header("Basic Settings")]
     public EnemyManager enemyManager;
     public DungeonManager dungeonManager;
+    public AutoManager autoManager;
     public Transform enemyTransform;
     public Rigidbody2D enemyRigidbody;
     public Transform playerTransform;
@@ -31,8 +32,7 @@ public class EnemyComme : Entity
     private static readonly WaitForSeconds _waitForSeconds0_1 = new(0.1f);
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
-    [Header("Auto Set")]
-    public bool isAutoEnemy = false;
+
     void Awake()
     {
 
@@ -41,7 +41,7 @@ public class EnemyComme : Entity
 
     void FixedUpdate()
     {
-        if (enemyData == null || isDead || isAttacking || isAutoEnemy) return;
+        if (enemyData == null || isDead || isAttacking) return;
         
         // 쿨타임 중이거나 사정거리 밖에 있으면 플레이어를 추적하여 이동합니다.
         if (vectorToPlayer.magnitude > enemyData.attackRange || Time.time < attackCoolTime)
@@ -114,7 +114,7 @@ public class EnemyComme : Entity
     }
     public void OnRangedAttack()
     {
-        if (isDead || isAutoEnemy) return;
+        if (isDead) return;
         
         float totalDamage = enemyData.attackPower * enemyData.auraDamageToAttackMultipule;
         AuraManager.Instance.FireSpreadAura(

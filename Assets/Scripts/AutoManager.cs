@@ -65,6 +65,7 @@ public class AutoManager : MonoBehaviour
     public Animator autoPlayerWeaponEffectAnimator;
     public string playerLeftAttackAnimeClipName = "Attack_Hand_L";
     private float playerAttackAnimeCycle = 0f;
+    private float enemyDieDurationTime = 0f;
     private float autoEnemyMoveSpeed = 0f;
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
@@ -72,11 +73,11 @@ public class AutoManager : MonoBehaviour
     private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
 
     [Header("Auto Battle Objects Manager")]
-    public EnemyComme autoEnemyPrefab;
+    public EnemyAuto autoEnemyPrefab;
     public Transform autoEnemySpwanTrans; // 몬스터가 소환될 위치
     public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
-    private Queue<EnemyComme> _pool; // 적 인스턴스 풀링을 위한 Object Pool
-
+    private Queue<EnemyAuto> _pool; // 적 인스턴스 풀링을 위한 Object Pool
+    private Queue<EnemyAuto> _activeEnemies; // 현재 활성화된 적들을 추적하기 위한 큐
 
 
     void Awake()
@@ -90,7 +91,6 @@ public class AutoManager : MonoBehaviour
         OfflineReward(); // 오프라인 보상 지급
 
         // Online
-        xDiffBetweenPlayerAndEnemy = Mathf.Abs(autoPlayerStandTrans.position.x - autoEnemySpwanTrans.position.x);
         LoadUnlockAutoOnlineUpgrade(); // 게임 시작 시 해금된 업그레이드 로드
         ApplyAutoOnlineUpgradeStat(); // 해금된 업그레이드 스탯 적용
         UpdateAutoOnlineUpgradeUI(unlockAutoOnlineUprade.unlockedMaxID); // UI 업데이트
@@ -102,14 +102,15 @@ public class AutoManager : MonoBehaviour
     void Start()
     {
         // Online Animation
-        AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
         SetSameWeaponAnimeOverride();
         ApplyAutoPlayerAnimatorOverride();
+        AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
         SetPlayerAttackAnimeCycle();
+        CalculateAutoBattleStats(); // 오토 배틀 스탯 계산
     }
     void Update()
     {
-        transform.Translate(autoEnemyMoveSpeed * Time.deltaTime * Vector2.right);
+        
     }
     // --------------------- 오프라인 자동 보상 로직 ---------------------//
     float CalculateOfflineTime()
@@ -269,6 +270,7 @@ public class AutoManager : MonoBehaviour
         float currentRewardCycleTime = baseCycleTime + totalTimeReduction; // 300 + (-30) = 270초
         // ⚠️ 버그 방지 예외 처리: 주기가 0초 이하로 떨어져 무한 루프나 에러가 나는 것을 방지 (최소 1초 제한)
         currentRewardCycleTime = Mathf.Max(currentRewardCycleTime, 1f); 
+
         autoOnlineRewardCycle = baseCycleTime / currentRewardCycleTime;
 
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
@@ -276,10 +278,10 @@ public class AutoManager : MonoBehaviour
         autoPlayerAnimator.SetFloat(XHash, -1); // 왼쪽
         autoPlayerAnimator.SetFloat(YHash, 0); // 기본
         autoPlayerWeaponAnimator.SetFloat(MoveSpeedHash, 1); // 항상 움직여야되서 !=0 만 만족하면 됌.
-        
-        autoPlayerAnimator.speed =  autoOnlineRewardCycle;
-        // autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-        // autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+
+        autoPlayerAnimator.speed = 1f;
+        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, 1f);
+        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, 1f);
     }
     public void SetPlayerAttackAnimeCycle()
     {
@@ -308,6 +310,17 @@ public class AutoManager : MonoBehaviour
         if (currentSpeed <= 0) currentSpeed = 1f; 
 
         playerAttackAnimeCycle = originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
+
+        ApplyAutoAnimeSpeed(); // 애니메이션 속도 적용
+    }
+    public void CalculateAutoBattleStats()
+    {
+       xDiffBetweenPlayerAndEnemy = 
+            Mathf.Abs(autoPlayerStandTrans.position.x 
+            - (autoEnemySpwanTrans.position.x + weaponManager.GetCurrentWeaponData().meleeOffset[^1].x));
+        autoEnemyMoveSpeed = xDiffBetweenPlayerAndEnemy / autoOnlineRewardCycle;
+
+        enemyDieDurationTime = autoOnlineRewardCycle - (playerAttackAnimeCycle / 2);
     }
     public void SetSameWeaponAnimeOverride() // weapon Manager 에 직접 연결
     {
@@ -323,6 +336,18 @@ public class AutoManager : MonoBehaviour
     {
         autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
+    
+        ApplyAutoAnimeSpeed(); // 애니메이션 속도 적용
+    }
+    private void ApplyAutoAnimeSpeed()
+    {
+        if (autoOnlineRewardCycle >= playerAttackAnimeCycle) return;
+        
+        autoPlayerAnimator.speed =  autoOnlineRewardCycle;
+        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+        
+        
     }
 //---------------------- 오토 세이브 -----------------------------------//
     public void SaveUnlockAutoOnlineUpgrade()
@@ -342,14 +367,14 @@ public class AutoManager : MonoBehaviour
     {
         for (int i = 0; i < initialCapacity; i++)
         {
-            EnemyComme obj = Instantiate(autoEnemyPrefab, transform);
+            EnemyAuto obj = Instantiate(autoEnemyPrefab, transform);
             obj.enemyTransform.gameObject.SetActive(false);
             _pool.Enqueue(obj); 
         }
     }
-    public EnemyComme GetEnemy()
+    public EnemyAuto GetEnemy()
     {
-        EnemyComme obj;
+        EnemyAuto obj;
 
         if (_pool.Count > 0)
         {
@@ -361,13 +386,20 @@ public class AutoManager : MonoBehaviour
         }
 
         obj.enemyTransform.gameObject.SetActive(true);
+        _activeEnemies.Enqueue(obj); // 활성화된 적을 추적
         return obj;
     }
-    public void ReleaseEnemy(EnemyComme obj)
+    public void ReleaseEnemy(EnemyAuto obj)
     {
         if (_pool.Contains(obj)) return;
 
         obj.enemyTransform.gameObject.SetActive(false);
         _pool.Enqueue(obj);
+    }
+    public void ReleaseActiveEnemy()
+    {
+       
+         _activeEnemies.Dequeue(); // 활성화된 적 큐에 추가
+        
     }
 }
