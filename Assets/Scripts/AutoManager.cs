@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using UnityEngine.UI;
 public class UnlockAutoOnlineUprade
 {
     public int unlockedMaxID; // 현재까지 해금된 AutoOnlineUpradeSo의 최대 ID --> 이 값을 강제 적용
+    public int maxEnemyIndex; // 현재까지 나타날 수 있는 적의 최대 인덱스 --> EnemyManager에서 변경
 }
 [Serializable]
 public class PlayerTime
@@ -55,6 +57,7 @@ public class AutoManager : MonoBehaviour
     private float autoOnlineRewardCycle = 300f; 
     private float xDiffBetweenPlayerAndEnemy = 0; // 절댓값으로 인해 양수만 나오게
     private float rareProbabilityOfEnemy = 0; // 적의 희귀 확률 --> 이 값이 높을 수록 ID 큰 적이 나타남 -> 보상 증가
+    private int maxEnemyIndex = 0; // 현재 나타날 수 있는 적의 최대 인덱스
     private int gettenCoin = 0;
     private int gettenClick = 0;
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
@@ -220,6 +223,20 @@ public class AutoManager : MonoBehaviour
         gettenCoin++;
         gettenClick++;
     }
+    private IEnumerator UpdateAutoBattleRoutine()
+    {
+        while (true)
+        {
+            // 1. 적 생성
+            // EnemyAuto autoEnemy = GetEnemy();
+
+            // 2. 적이 죽을 때까지 대기
+            yield return new WaitForSeconds(enemyDieDurationTime);
+
+            // 3. 적 제거
+        
+        }
+    }
 //------------------- 오토 UI 관련 ---------------------------------//
     public void UpdateAutoOnlineUpgradeUI(int currentSoID)
     {
@@ -259,7 +276,7 @@ public class AutoManager : MonoBehaviour
         }
     }
 //-------------------- 오토 애니메이션 --------------------------------//
-    private void AutoAnimationInit()
+    private void AutoAnimationInit() // 보상 주기 & 희귀 확률
     {
         // 1. 가져올 업그레이드 개수 지정 (인덱스 보정 및 리스트 범위 초과 방지)
         int takeCount = Mathf.Clamp(unlockAutoOnlineUprade.unlockedMaxID + 1, 0, autoOnlineUpradeSo.Length);
@@ -283,7 +300,8 @@ public class AutoManager : MonoBehaviour
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, 1f);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, 1f);
     }
-    public void SetPlayerAttackAnimeCycle()
+    //-------------------- 오토 배틀 스탯 계산 --------------------------------//
+    public void SetPlayerAttackAnimeCycle() // 공격 애니메이션 길이 계산
     {
         if (autoPlayerAnimator == null || autoPlayerAnimator.runtimeAnimatorController == null) 
             playerAttackAnimeCycle = 0f;
@@ -313,7 +331,7 @@ public class AutoManager : MonoBehaviour
 
         ApplyAutoAnimeSpeed(); // 애니메이션 속도 적용
     }
-    public void CalculateAutoBattleStats()
+    public void CalculateAutoBattleStats() // 적과 플레이어의 위치 차이 계산 및 적 이동 속도 계산
     {
        xDiffBetweenPlayerAndEnemy = 
             Mathf.Abs(autoPlayerStandTrans.position.x 
@@ -322,6 +340,16 @@ public class AutoManager : MonoBehaviour
 
         enemyDieDurationTime = autoOnlineRewardCycle - (playerAttackAnimeCycle / 2);
     }
+    public void UpdateMaxEnemyIndex(int newMaxIndex)
+    {
+        if (newMaxIndex > unlockAutoOnlineUprade.maxEnemyIndex)
+        {
+            unlockAutoOnlineUprade.maxEnemyIndex = newMaxIndex;
+            SaveUnlockAutoOnlineUpgrade(); // 변경 사항 저장
+            Debug.Log($"최대 적 인덱스 {newMaxIndex}로 업데이트 완료!");
+        }
+    }
+    // -------------------- 오토 애니메이션 오버라이드 적용 --------------------------------//
     public void SetSameWeaponAnimeOverride() // weapon Manager 에 직접 연결
     {
         WeaponDataSo currentWeapon = weaponManager.GetCurrentWeaponData();
@@ -332,6 +360,7 @@ public class AutoManager : MonoBehaviour
     {
         autoPlayerAnimator.runtimeAnimatorController = playerSkinManager.GetAnimatorOverrideCurrentEquipped();
     }
+    // -------------------- 오토 업그레이드 스탯 적용 --------------------------------//
     private void ApplyAutoOnlineUpgradeStat()
     {
         autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
@@ -346,8 +375,6 @@ public class AutoManager : MonoBehaviour
         autoPlayerAnimator.speed =  autoOnlineRewardCycle;
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-        
-        
     }
 //---------------------- 오토 세이브 -----------------------------------//
     public void SaveUnlockAutoOnlineUpgrade()
@@ -363,7 +390,7 @@ public class AutoManager : MonoBehaviour
     }
 
 // --------------------- 오토 배틀 적 인스턴스 풀링 ---------------------//
-    private void PoolInit(int initialCapacity = 10)
+    private void PoolInit(int initialCapacity = 50)
     {
         for (int i = 0; i < initialCapacity; i++)
         {
@@ -372,7 +399,7 @@ public class AutoManager : MonoBehaviour
             _pool.Enqueue(obj); 
         }
     }
-    public EnemyAuto GetEnemy()
+    public EnemyAuto GetEnemy(EnemyDataSo enemyData)
     {
         EnemyAuto obj;
 
@@ -386,6 +413,7 @@ public class AutoManager : MonoBehaviour
         }
 
         obj.enemyTransform.gameObject.SetActive(true);
+        obj.SynchronizeBySo(enemyData); // 적 데이터 초기화
         _activeEnemies.Enqueue(obj); // 활성화된 적을 추적
         return obj;
     }
@@ -398,8 +426,7 @@ public class AutoManager : MonoBehaviour
     }
     public void ReleaseActiveEnemy()
     {
-       
-         _activeEnemies.Dequeue(); // 활성화된 적 큐에 추가
+        _activeEnemies.Dequeue(); // 활성화된 적 큐에 추가
         
     }
 }

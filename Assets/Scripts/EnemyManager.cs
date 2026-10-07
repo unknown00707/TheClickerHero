@@ -16,6 +16,9 @@ public class EnemyManager : MonoBehaviour
     private readonly Dictionary<int, List<EnemyDataSo>> enemyPoolDict = new(); // 스테이지 기반으로 적 데이터를 빠르게 조회할 수 있는 딕셔너리
     private readonly Stack<EnemyComme> emptyEnemyInstancePool = new(); // 적 인스턴스 풀링 리스트
     private readonly List<EnemyComme> activeEnemies = new(); // 현재 활성화된 적 인스턴스 리스트
+    [Header("AutoManager 관련")]
+    public AutoManager autoManager; // AutoManager 참조
+    private readonly Dictionary<int, int> maxEnemyIndexByStageLevelDict = new(); 
     void Awake()
     {
         for (int i = 0; i < MAX_ENEMY_INSTANCES; i++)
@@ -78,6 +81,9 @@ public class EnemyManager : MonoBehaviour
             }
         }
         UpdateLeftEnemyCountUI(); // 남은 적 수 UI 업데이트
+
+        // 스테이지 레벨에 따른 최대 적 인덱스 계산 및 AutoManager에 전달
+        CalcuateMaxEnemyIndexByStageLevel(stageLevel); 
     }
 
     // 등장 가능한 몬스터 수(N)를 받아, 가중치 확률에 따라 인덱스를 하나 뽑아주는 함수
@@ -140,7 +146,15 @@ public class EnemyManager : MonoBehaviour
         activeEnemies.Clear();
         UpdateLeftEnemyCountUI();
     }
-
+    private void CalcuateMaxEnemyIndexByStageLevel(int stageLevel)
+    {
+        int maxId = maxEnemyIndexByStageLevelDict
+                    .Where(pair => pair.Key <= stageLevel)
+                    .Select(pair => pair.Value)
+                    .DefaultIfEmpty(0)
+                    .Max();
+        autoManager.UpdateMaxEnemyIndex(maxId); // AutoManager에 최대 적 인덱스 업데이트
+    }
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
 
     public void LoadCSVDataToInitPoolDict()
@@ -181,7 +195,7 @@ public class EnemyManager : MonoBehaviour
             }
 
             List<EnemyDataSo> enemyDataForStage = new();
-
+            int maxId = 0;
             // 5. parts[1] 부터 끝까지는 전부 몬스터 ID
             for (int i = 1; i < parts.Length; i++)
             {
@@ -190,6 +204,7 @@ public class EnemyManager : MonoBehaviour
                     if (id >= 0 && id < enemyDataList.Count) // 안전 장치
                     {
                         enemyDataForStage.Add(enemyDataList[id]);
+                        if (id > maxId) maxId = id; // 스테이지별 최대 몬스터 ID 갱신
                     }
                     else
                     {
@@ -202,6 +217,7 @@ public class EnemyManager : MonoBehaviour
             if (enemyDataForStage.Count > 0)
             {
                 enemyPoolDict[stageLevel] = enemyDataForStage;
+                maxEnemyIndexByStageLevelDict[stageLevel] = maxId; // 스테이지별 최대 몬스터 ID 저장
             }
         }
         Debug.Log("스테이지 적 데이터 CSV 로드 완료!");
