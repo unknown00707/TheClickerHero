@@ -6,11 +6,11 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
     public DungeonManager dungeonManager;
-    public List<EnemyDataSo> enemyDataList; // 다양한 적 데이터를 리스트로 관리
     public GameObject emptyEnemyPrefab; // 적 프리팹 (공통된 기본 형태)
     public Transform playerTransform; // 플레이어 위치 참조 (적 스폰 시 플레이어를 기준으로 위치 설정)
     public PlayerHealth playerHealth;
     public int MAX_ENEMY_INSTANCES = 100; // 최대 적 인스턴스 수 (풀링 시스템에서 활용)
+    private readonly List<EnemyDataSo> enemyDataList; // 다양한 적 데이터를 리스트로 관리
     [Header("적 던전 UI관련")]
     public TextMeshProUGUI leftEnemyText; // 남은 적 수 표시용 텍스트
     private readonly Dictionary<int, List<EnemyDataSo>> enemyPoolDict = new(); // 스테이지 기반으로 적 데이터를 빠르게 조회할 수 있는 딕셔너리
@@ -121,6 +121,43 @@ public class EnemyManager : MonoBehaviour
         // 수학적으로 여기까지 올 일은 없지만, 안전장치로 마지막 인덱스 반환
         return possibleEnemyCount - 1; 
     }
+
+    // maxIndex의 확률을 고정(예: 50%)하고 나머지는 차등 분배하는 코드
+    public int GetRandomEnemyIndexWithFix(int maxIndex, float targetProbability)
+    {
+        if (maxIndex <= 0) return 0;
+        
+        if (targetProbability >= 1f) return maxIndex;
+
+        int count = maxIndex + 1;
+        float[] weights = new float[count];
+        float sumOfRest = 0;
+
+        for (int i = 0; i < maxIndex; i++) // 인덱스 커질 수록 가중치 커짐
+        {
+            weights[i] = Mathf.Pow(autoManager.rewardFunctionMultiplier, i);
+            sumOfRest += weights[i];
+        }
+
+        float fixWeight = sumOfRest * (targetProbability / (1f - targetProbability));
+        weights[maxIndex] = fixWeight;
+
+        float totalWeight = sumOfRest + fixWeight;
+
+        float randomValue = Random.Range(0f, totalWeight);
+        float currentWeight = 0;
+        for (int i = 0; i < count; i++)
+        {
+            currentWeight += weights[i];
+            if (randomValue < currentWeight)
+            {
+                return i;
+            }
+        }
+
+        return maxIndex;
+    }
+
     public void ReturnEnemyToPool(EnemyComme enemyComme, bool isDead = false)
     {
         // 적 인스턴스를 비활성화하고 풀에 반환
@@ -154,6 +191,15 @@ public class EnemyManager : MonoBehaviour
                     .DefaultIfEmpty(0)
                     .Max();
         autoManager.UpdateMaxEnemyIndex(maxId); // AutoManager에 최대 적 인덱스 업데이트
+    }
+    public EnemyDataSo GetEnemyDataSoByIndex(int index)
+    {
+        if (index >= 0 && index < enemyDataList.Count)
+        {
+            return enemyDataList[index];
+        }
+        Debug.LogWarning($"EnemyDataSo 인덱스 {index}가 범위를 벗어났습니다!");
+        return null;
     }
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
 

@@ -33,6 +33,7 @@ public class AutoManager : MonoBehaviour
     public PlayerStatsManager playerStatsManager; // 플레이어 스탯 매니저 참조
     public PlayerSkinManager playerSkinManager; // 플레이어 스킨 매니저 참조
     public WeaponManager weaponManager;
+    public EnemyManager enemyManager; // 적 매니저 참조
 
     [Header("Offline")]
     public GameObject offlineRewardObj;
@@ -47,6 +48,11 @@ public class AutoManager : MonoBehaviour
     private readonly int MAX_OFFLINE_HOURS = 3; // 최대 오프라인 시간 제한 (24시간)
     private readonly string SAVE_TIME_LOG_FILE_NAME = "TimeLog.json"; // 저장 파일 이름
 
+    [Header("Online Reward")]
+    public float rewardFunctionMultiplier = 2.0f;
+    private int gettenCoin = 0;
+    private int gettenClick = 0;
+
     [Header("Auto Battle Data")]
     public AutoOnlineUpradeSo[] autoOnlineUpradeSo;
     public Image autoOnlineUpgradeIMG;
@@ -54,12 +60,11 @@ public class AutoManager : MonoBehaviour
     public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
     public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
     private readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
+
     private float autoOnlineRewardCycle = 300f; 
     private float xDiffBetweenPlayerAndEnemy = 0; // 절댓값으로 인해 양수만 나오게
     private float rareProbabilityOfEnemy = 0; // 적의 희귀 확률 --> 이 값이 높을 수록 ID 큰 적이 나타남 -> 보상 증가
-    private int maxEnemyIndex = 0; // 현재 나타날 수 있는 적의 최대 인덱스
-    private int gettenCoin = 0;
-    private int gettenClick = 0;
+    
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
 
     [Header("Auto Animation")]
@@ -67,9 +72,12 @@ public class AutoManager : MonoBehaviour
     public Animator autoPlayerWeaponAnimator;
     public Animator autoPlayerWeaponEffectAnimator;
     public string playerLeftAttackAnimeClipName = "Attack_Hand_L";
+
     private float playerAttackAnimeCycle = 0f;
-    private float enemyDieDurationTime = 0f;
+    private float playerAttackTime = 0f;
+    private float enemyDieDurationTime = 0f; // 적이 죽어야할 시간
     private float autoEnemyMoveSpeed = 0f;
+
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
     private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
@@ -227,13 +235,12 @@ public class AutoManager : MonoBehaviour
     {
         while (true)
         {
-            // 1. 적 생성
-            // EnemyAuto autoEnemy = GetEnemy();
+            EnemyAuto enemy = GetEnemy(enemyManager.GetEnemyDataSoByIndex(unlockAutoOnlineUprade.maxEnemyIndex)); 
 
-            // 2. 적이 죽을 때까지 대기
-            yield return new WaitForSeconds(enemyDieDurationTime);
 
-            // 3. 적 제거
+            yield return new WaitForSeconds(autoOnlineRewardCycle);
+
+            
         
         }
     }
@@ -375,6 +382,8 @@ public class AutoManager : MonoBehaviour
         autoPlayerAnimator.speed =  autoOnlineRewardCycle;
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+
+        playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle ;
     }
 //---------------------- 오토 세이브 -----------------------------------//
     public void SaveUnlockAutoOnlineUpgrade()
@@ -395,7 +404,13 @@ public class AutoManager : MonoBehaviour
         for (int i = 0; i < initialCapacity; i++)
         {
             EnemyAuto obj = Instantiate(autoEnemyPrefab, transform);
+
             obj.enemyTransform.gameObject.SetActive(false);
+            obj.enemyTransform.SetParent(transform); // 풀링 오브젝트를 AutoManager의 자식으로 설정
+            obj.enemyTransform = autoEnemySpwanTrans; // 적이 소환될 위치로 초기화
+
+            obj.autoManager = this; // EnemyAuto에 AutoManager 참조 전달
+
             _pool.Enqueue(obj); 
         }
     }
@@ -413,7 +428,7 @@ public class AutoManager : MonoBehaviour
         }
 
         obj.enemyTransform.gameObject.SetActive(true);
-        obj.SynchronizeBySo(enemyData); // 적 데이터 초기화
+        obj.SynchronizeBySo(enemyData, autoEnemyMoveSpeed, enemyDieDurationTime); // 적 데이터 초기화
         _activeEnemies.Enqueue(obj); // 활성화된 적을 추적
         return obj;
     }

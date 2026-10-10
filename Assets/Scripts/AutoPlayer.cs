@@ -1,16 +1,29 @@
+using System.Collections;
 using UnityEngine;
 
 public class AutoPlayer : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Animator autoPlayerAnimator;
+    Coroutine myCoroutine;
+    private static readonly int SwordAttackHash = Animator.StringToHash("swordAttack");
+
+    public void StartAutoAttack(float time)
     {
-        
+        myCoroutine = StartCoroutine(AutoAttackCoroutine(time));
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator AutoAttackCoroutine(float time)
     {
-        
+        yield return new WaitForSeconds(time);
+        autoPlayerAnimator.SetTrigger(SwordAttackHash);
+    }
+
+    public void StopAutoAttack()
+    {
+        if (myCoroutine != null)
+        {
+            StopCoroutine(myCoroutine);
+            myCoroutine = null;
+        }
     }
 }
