@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyAuto : MonoBehaviour
@@ -10,13 +11,16 @@ public class EnemyAuto : MonoBehaviour
     public BoxCollider2D hitboxCollider;
     public Transform enemyTransform;
     [Header("Enemy Data")]
+    private Sprite deadSprite;
     private float moveSpeed = 0f;
     private float timeToDie = 0f;
+    Coroutine myCoroutine;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void SynchronizeBySo(EnemyDataSo data, float speed, float timeToDie)
     {
         EnemyDataSo enemyData = data;
         spriteRenderer.sprite = enemyData.enemySprite;
+        deadSprite = enemyData.deadSprite;
         animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; 
         hitboxCollider.size = enemyData.hitboxSize; 
         hitboxCollider.offset = enemyData.hitboxOffset; 
@@ -30,14 +34,37 @@ public class EnemyAuto : MonoBehaviour
     {
         enemyTransform.Translate(moveSpeed * Time.deltaTime * Vector3.right);
     }
+    public void StartAutoEnemyCoroutine()
+    {
+        myCoroutine = StartCoroutine(DieCoroutine(timeToDie));
+    }
+    IEnumerator DieCoroutine(float time)
+    {
+        yield return new WaitForSeconds(time);
 
-    public void Die()
+        Die();
+    }
+
+    private void Die()
     {
         autoManager.ReleaseActiveEnemy(); // 활성화된 적 큐에서 제거
+        animator.enabled = false; 
+        spriteRenderer.sprite = deadSprite;
+    }
+
+    public void StopAutoEnemyCoroutine()
+    {
+        if (myCoroutine != null)
+        {
+            StopCoroutine(myCoroutine);
+            myCoroutine = null;
+        }
     }
 
     void OnEnable()
     {
-        
+        myCoroutine = null;
+        animator.enabled = true; // 애니메이터 활성화
+        spriteRenderer.sprite = null; // 스프라이트 초기화
     }
 }

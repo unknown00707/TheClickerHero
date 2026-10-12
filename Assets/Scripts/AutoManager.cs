@@ -84,6 +84,7 @@ public class AutoManager : MonoBehaviour
     private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
 
     [Header("Auto Battle Objects Manager")]
+    public AutoPlayer autoPlayer;
     public EnemyAuto autoEnemyPrefab;
     public Transform autoEnemySpwanTrans; // 몬스터가 소환될 위치
     public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
@@ -236,8 +237,9 @@ public class AutoManager : MonoBehaviour
         while (true)
         {
             EnemyAuto enemy = GetEnemy(enemyManager.GetEnemyDataSoByIndex(unlockAutoOnlineUprade.maxEnemyIndex)); 
-
-
+            enemy.StartAutoEnemyCoroutine(); // 적이 죽는 시간 계산 후 자동으로 Die() 호출
+            autoPlayer.StartAutoAttack(playerAttackTime); // 플레이어 공격 시작
+            
             yield return new WaitForSeconds(autoOnlineRewardCycle);
 
             
