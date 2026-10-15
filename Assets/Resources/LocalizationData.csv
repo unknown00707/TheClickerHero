@@ -53,5 +53,5 @@ DGN_DESC_TOOLTIP_CLICK_TITLE,클릭 보상,Click Reward
 DGN_DESC_TOOLTIP_COIN_TITLE,코인 보상,Coin Reward
 DGN_DESC_TOOLTIP_RELIC_TITLE,유물 보상,Relic Reward
 AUTO_OFFLINE_TITLE,오프라인 보상,Offline Reward
-AUTO_OFFLINE_CONTENT,얻은 클릭 : {GettenCoin},Clicks Obtained : {GettenCoin}
+AUTO_OFFLINE_CONTENT,얻은 클릭 : {GettenClick},Clicks Obtained : {GettenClick}
 AUTO_OFFLINE_GET,보상 받기,Get Reward

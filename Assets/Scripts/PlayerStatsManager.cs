@@ -52,6 +52,7 @@ public class PlayerStasData
     public Stat rareGoodsProbability;
     
     // 순수 버프 수치 (20%면 0.2f 상태로 저장됨)
+    public int coinMulitplier = 1;
     public float benefitEffect = 0.0f;
     public float reincarnationBonus = 0.0f;
     
@@ -62,7 +63,6 @@ public class PlayerStasData
     public float CriticalChance => criticalChance.GetFinalValue(benefitEffect, reincarnationBonus);
     public float CriticalDamage => criticalDamage.GetFinalValue(benefitEffect, reincarnationBonus);
     public float Click => click.GetFinalValue(benefitEffect, reincarnationBonus);
-    public float ClickMultiplier => click.multiplier;
     public float Speed => speed.GetFinalValue(benefitEffect, reincarnationBonus);
     public float RareGoodsProbability => rareGoodsProbability.GetFinalValue(benefitEffect, reincarnationBonus);
     public float ToTalbenefit => benefitEffect + reincarnationBonus;
@@ -189,7 +189,14 @@ public class PlayerStatsManager : MonoBehaviour
         UpDatePlayerStatsText();
         SavePlayerStats();
     }
+//-----Add Value Player Stats -----//
+    public void AddClickAndCoin(int click, int coin)
+    {
+        int totalAddClick = click + coin * playerStats.coinMulitplier;
+        playerStats.click.Upgrade(false, totalAddClick);
 
+        GameManger.instance.SaveGame();
+    }
 
 //------Save & Load Player Stats------//
     private void LoadBaseStatsFromCSV()

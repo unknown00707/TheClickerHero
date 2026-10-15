@@ -14,7 +14,7 @@ public class AutoPlayer : MonoBehaviour
 
     IEnumerator AutoAttackCoroutine(float time)
     {
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSecondsRealtime(time);
         autoPlayerAnimator.SetTrigger(SwordAttackHash);
     }
 

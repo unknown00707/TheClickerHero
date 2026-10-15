@@ -34,6 +34,7 @@ public class AutoManager : MonoBehaviour
     public PlayerSkinManager playerSkinManager; // 플레이어 스킨 매니저 참조
     public WeaponManager weaponManager;
     public EnemyManager enemyManager; // 적 매니저 참조
+    public DungeonManager dungeonManager;
 
     [Header("Offline")]
     public GameObject offlineRewardObj;
@@ -50,8 +51,8 @@ public class AutoManager : MonoBehaviour
 
     [Header("Online Reward")]
     public float rewardFunctionMultiplier = 2.0f;
-    private int gettenCoin = 0;
-    private int gettenClick = 0;
+    private int gettenCoin = 0; // 누적
+    private int gettenClick = 0; // 누적
 
     [Header("Auto Battle Data")]
     public AutoOnlineUpradeSo[] autoOnlineUpradeSo;
@@ -90,6 +91,7 @@ public class AutoManager : MonoBehaviour
     public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
     private Queue<EnemyAuto> _pool; // 적 인스턴스 풀링을 위한 Object Pool
     private Queue<EnemyAuto> _activeEnemies; // 현재 활성화된 적들을 추적하기 위한 큐
+    private Coroutine autobattleCoroutine = null;
 
 
     void Awake()
@@ -104,7 +106,6 @@ public class AutoManager : MonoBehaviour
 
         // Online
         LoadUnlockAutoOnlineUpgrade(); // 게임 시작 시 해금된 업그레이드 로드
-        ApplyAutoOnlineUpgradeStat(); // 해금된 업그레이드 스탯 적용
         UpdateAutoOnlineUpgradeUI(unlockAutoOnlineUprade.unlockedMaxID); // UI 업데이트
 
         // Pooling
@@ -116,9 +117,9 @@ public class AutoManager : MonoBehaviour
         // Online Animation
         SetSameWeaponAnimeOverride();
         ApplyAutoPlayerAnimatorOverride();
-        AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화
-        SetPlayerAttackAnimeCycle();
-        CalculateAutoBattleStats(); // 오토 배틀 스탯 계산
+        AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화 및 autoOnlineRewardCycle 초기화
+        
+        TotalResetAutoBattleStats();
     }
     void Update()
     {
@@ -190,7 +191,7 @@ public class AutoManager : MonoBehaviour
        
         string coloredValue = $"{ColorPalette.Yellow}{totalClickReward}{ColorPalette.End}";
         string rawText = LanguageManager.Instance.GetText("AUTO_OFFLINE_CONTENT");
-        offlineRewardContent.text = rawText.ReplaceTags("GettenCoin", coloredValue);
+        offlineRewardContent.text = rawText.ReplaceTags("GettenClick", coloredValue);
         offlineRewardObj.SetActive(true);
     }
     public void GetOfflineReward()
@@ -227,23 +228,29 @@ public class AutoManager : MonoBehaviour
     }
 
     // --------------------- 플레이어와 몬스터의 자동 사냥 ----------------------//
-    public void OnKillEnemyByAutoPlayer()
+    public void OnKillEnemyByAutoPlayer(int amoutClick, int amoutCoin, bool isCoin)
     {
-        gettenCoin++;
-        gettenClick++;
+        gettenClick += amoutClick;
+        if(isCoin)
+        {
+            gettenCoin += amoutCoin;
+            playerStatsManager.AddClickAndCoin(amoutClick, amoutCoin);
+            // 코인 획득 애니메이션
+            return;
+        }
+        playerStatsManager.AddClickAndCoin(amoutClick, 0); // 코인 제외
+        // 클릭 획득 애니메이션
     }
     private IEnumerator UpdateAutoBattleRoutine()
     {
+
         while (true)
         {
             EnemyAuto enemy = GetEnemy(enemyManager.GetEnemyDataSoByIndex(unlockAutoOnlineUprade.maxEnemyIndex)); 
             enemy.StartAutoEnemyCoroutine(); // 적이 죽는 시간 계산 후 자동으로 Die() 호출
             autoPlayer.StartAutoAttack(playerAttackTime); // 플레이어 공격 시작
             
-            yield return new WaitForSeconds(autoOnlineRewardCycle);
-
-            
-        
+            yield return new WaitForSecondsRealtime(autoOnlineRewardCycle);
         }
     }
 //------------------- 오토 UI 관련 ---------------------------------//
@@ -338,11 +345,10 @@ public class AutoManager : MonoBehaviour
 
         playerAttackAnimeCycle = originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
 
-        ApplyAutoAnimeSpeed(); // 애니메이션 속도 적용
     }
     public void CalculateAutoBattleStats() // 적과 플레이어의 위치 차이 계산 및 적 이동 속도 계산
     {
-       xDiffBetweenPlayerAndEnemy = 
+        xDiffBetweenPlayerAndEnemy = 
             Mathf.Abs(autoPlayerStandTrans.position.x 
             - (autoEnemySpwanTrans.position.x + weaponManager.GetCurrentWeaponData().meleeOffset[^1].x));
         autoEnemyMoveSpeed = xDiffBetweenPlayerAndEnemy / autoOnlineRewardCycle;
@@ -364,10 +370,14 @@ public class AutoManager : MonoBehaviour
         WeaponDataSo currentWeapon = weaponManager.GetCurrentWeaponData();
         autoPlayerWeaponAnimator.runtimeAnimatorController = currentWeapon.weaponOverrideController;
         autoPlayerWeaponEffectAnimator.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
+    
+        TotalResetAutoBattleStats();
     }
     public void ApplyAutoPlayerAnimatorOverride() // playerSkin Manager 에 직접 연결
     {
         autoPlayerAnimator.runtimeAnimatorController = playerSkinManager.GetAnimatorOverrideCurrentEquipped();
+        
+        TotalResetAutoBattleStats();
     }
     // -------------------- 오토 업그레이드 스탯 적용 --------------------------------//
     private void ApplyAutoOnlineUpgradeStat()
@@ -375,7 +385,7 @@ public class AutoManager : MonoBehaviour
         autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     
-        ApplyAutoAnimeSpeed(); // 애니메이션 속도 적용
+        TotalResetAutoBattleStats();
     }
     private void ApplyAutoAnimeSpeed()
     {
@@ -385,7 +395,29 @@ public class AutoManager : MonoBehaviour
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
 
-        playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle ;
+        playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle;
+    }
+    private void TotalResetAutoBattleStats()
+    {
+        SetPlayerAttackAnimeCycle();    // - playerAttackAnimeCycle
+        CalculateAutoBattleStats();     // 오토 배틀 스탯 계산 - autoEnemyMoveSpeed - enemyDieDurationTime
+        ApplyAutoAnimeSpeed();
+
+        SaveUnlockAutoOnlineUpgrade();
+
+        if (autobattleCoroutine != null)
+        {
+            StopCoroutine(autobattleCoroutine);
+            autoPlayer.StopAutoAttack();
+            foreach(EnemyAuto enemyAuto in _activeEnemies) // 활성화 된 적 모두 되돌려 보내기
+            {
+                enemyAuto.StopAutoEnemyCoroutine();
+                ReleaseEnemy(enemyAuto);
+                ReleaseActiveEnemy();
+            }
+        }
+        
+        autobattleCoroutine = StartCoroutine(UpdateAutoBattleRoutine());
     }
 //---------------------- 오토 세이브 -----------------------------------//
     public void SaveUnlockAutoOnlineUpgrade()
@@ -412,6 +444,7 @@ public class AutoManager : MonoBehaviour
             obj.enemyTransform = autoEnemySpwanTrans; // 적이 소환될 위치로 초기화
 
             obj.autoManager = this; // EnemyAuto에 AutoManager 참조 전달
+            obj.dungeonManager = dungeonManager;
 
             _pool.Enqueue(obj); 
         }
@@ -443,7 +476,6 @@ public class AutoManager : MonoBehaviour
     }
     public void ReleaseActiveEnemy()
     {
-        _activeEnemies.Dequeue(); // 활성화된 적 큐에 추가
-        
+        _activeEnemies.Dequeue();
     }
 }

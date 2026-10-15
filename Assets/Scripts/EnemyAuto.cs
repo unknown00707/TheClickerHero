@@ -5,12 +5,14 @@ public class EnemyAuto : MonoBehaviour
 {
     [Header("Manager")]
     public AutoManager autoManager;
+    public DungeonManager dungeonManager;
     [Header("Components")]  
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public BoxCollider2D hitboxCollider;
     public Transform enemyTransform;
     [Header("Enemy Data")]
+    private EnemyDataSo enemyData;
     private Sprite deadSprite;
     private float moveSpeed = 0f;
     private float timeToDie = 0f;
@@ -18,7 +20,7 @@ public class EnemyAuto : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void SynchronizeBySo(EnemyDataSo data, float speed, float timeToDie)
     {
-        EnemyDataSo enemyData = data;
+        enemyData = data;
         spriteRenderer.sprite = enemyData.enemySprite;
         deadSprite = enemyData.deadSprite;
         animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; 
@@ -40,9 +42,16 @@ public class EnemyAuto : MonoBehaviour
     }
     IEnumerator DieCoroutine(float time)
     {
-        yield return new WaitForSeconds(time);
+        yield return new WaitForSecondsRealtime(time);
 
         Die();
+        autoManager.OnKillEnemyByAutoPlayer(
+            enemyData.clickDrop, enemyData.coinDrop, dungeonManager.RollRareResourceDrop());
+
+        float quarterTime = time / 4f;
+        yield return new WaitForSecondsRealtime(quarterTime);
+
+        autoManager.ReleaseEnemy(this);
     }
 
     private void Die()

@@ -6537,6 +6537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAuto
   autoManager: {fileID: 0}
+  dungeonManager: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   hitboxCollider: {fileID: 0}
@@ -10627,6 +10628,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 157230179}
+        m_TargetAssemblyTypeName: DungeonManager, Assembly-CSharp
+        m_MethodName: GetRewardEndDungeon
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1616189651}
         m_TargetAssemblyTypeName: ClickBTN, Assembly-CSharp
         m_MethodName: RetrunToMainSence
@@ -32334,11 +32347,14 @@ MonoBehaviour:
   playerSkinManager: {fileID: 172727097}
   weaponManager: {fileID: 975170235}
   enemyManager: {fileID: 598883086}
+  dungeonManager: {fileID: 157230179}
   offlineRewardObj: {fileID: 955327964}
   offlineRewardTitle: {fileID: 15560189}
   offlineRewardContent: {fileID: 718772498}
   rewardFunctionMultiplier: 2
-  autoOnlineUpradeSo: []
+  autoOnlineUpradeSo:
+  - {fileID: 11400000, guid: 7655fb5eeddc90544908b01cfedecf85, type: 2}
+  - {fileID: 11400000, guid: e5a8e419224e6524d8ab2cba554bd74f, type: 2}
   autoOnlineUpgradeIMG: {fileID: 22223055}
   autoOnlineUpgradeTxt: {fileID: 1953097100}
   autoOnlineUpgradeLockBTN: {fileID: 1536656634}
@@ -32347,6 +32363,7 @@ MonoBehaviour:
   autoPlayerWeaponAnimator: {fileID: 901236979}
   autoPlayerWeaponEffectAnimator: {fileID: 889484080}
   playerLeftAttackAnimeClipName: Attack_Hand_L
+  autoPlayer: {fileID: 1329112752}
   autoEnemyPrefab: {fileID: 0}
   autoEnemySpwanTrans: {fileID: 0}
   autoPlayerStandTrans: {fileID: 0}
@@ -36401,6 +36418,7 @@ MonoBehaviour:
     rareGoodsProbability:
       flatUpgrade: 0
       multiplier: 1
+    coinMulitplier: 0
     benefitEffect: 0
     reincarnationBonus: 0
   playerStatsText:

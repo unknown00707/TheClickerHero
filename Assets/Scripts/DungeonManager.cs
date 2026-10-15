@@ -71,7 +71,7 @@ public class DungeonManager : MonoBehaviour
         LoadDungeonDataFromJson();
         SetRewardUI(false); // 처음에는 던전 클리어 UI를 비활성화 상태로 시작
     }
-
+    // ----- 던전 실행 및 로직 ---- //
     public void LoadDungeon(int mainStageID)
     {
         // 던전 순회 
@@ -79,7 +79,6 @@ public class DungeonManager : MonoBehaviour
         DungeonUIInit();
         LoadDungeonLogic(mainStageID, startDungeonIndex);
     }
-
     public void NextStageDungeonLoad()
     {
         int nextSubStageID = currentDungeonSubFloor + 1;
@@ -96,7 +95,6 @@ public class DungeonManager : MonoBehaviour
             SetRewardUI(true, true);
         }
     }
-
     private void LoadDungeonLogic(int mainID, int subID)
     {
         // 던전 클리어 보상 - 처음 빼고
@@ -118,6 +116,7 @@ public class DungeonManager : MonoBehaviour
             Debug.LogError($"던전 로드 실패! mainStageID {mainID}, subStageID {subID}에 해당하는 던전을 찾을 수 없습니다.");
         }
     }
+    // ---- 던전 UI 관련 ---- //
     public void DungeonUIInit()
     {
         clearUIObj.SetActive(false);
@@ -141,6 +140,10 @@ public class DungeonManager : MonoBehaviour
         clearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC).ReplaceTagsParams("GettenReic", $"{ColorPalette.Legend}Null{ColorPalette.End}");
         clearUIObj.SetActive(isOpen);
     }   
+    public void GetRewardEndDungeon() // --> return 버튼에 연결
+    {
+        playerStatsManager.AddClickAndCoin(totalGettenClick, totalGettenCoin);
+    }
     public string[] ToTooltipByGetID(string id)
     {
         // 1. 타이틀과 기본 컨텐츠의 '키(Key)'를 먼저 조합합니다.
@@ -188,6 +191,12 @@ public class DungeonManager : MonoBehaviour
     {
         return content;
     }
+    private void ReFreshGettenTextByEnemy()
+    {
+        gettenCoinByEnemyTxt.text = gettenCoinByEnemy.ToString();
+        gettenClickByEnemyTxt.text = gettenClickByEnemy.ToString();
+    }
+    // ---- 던전 보상 및 스탯 연산 관련 ---- //
     public void AddCoinAndClickByEnemy(int amount, bool isCoin)
     {
         if(isCoin)
@@ -196,11 +205,6 @@ public class DungeonManager : MonoBehaviour
             gettenClickByEnemy += amount;
         
         ReFreshGettenTextByEnemy();
-    }
-    private void ReFreshGettenTextByEnemy()
-    {
-        gettenCoinByEnemyTxt.text = gettenCoinByEnemy.ToString();
-        gettenClickByEnemyTxt.text = gettenClickByEnemy.ToString();
     }
     private void AddDungeonClearAward()
     {
@@ -213,7 +217,7 @@ public class DungeonManager : MonoBehaviour
     private void CalculateTotalGettenValue()
     {
         totalGettenClick = (int)((gettenClickByStage + gettenClickByEnemy) * 
-            (1.0f + (playerStatsManager.playerStats.ClickMultiplier + playerStatsManager.playerStats.ToTalbenefit)));
+            (1.0f + (playerStatsManager.playerStats.click.multiplier + playerStatsManager.playerStats.ToTalbenefit)));
     
         totalGettenCoin = gettenCoinByEnemy + gettenCoinByStage;
     }
@@ -234,6 +238,7 @@ public class DungeonManager : MonoBehaviour
         else
             return false;
     }
+    // ---- 기타 함수 ---- //
     public bool IsCanPlayDungeon(int id)
     {
         if (id == 0) // 가장 처음 던전
