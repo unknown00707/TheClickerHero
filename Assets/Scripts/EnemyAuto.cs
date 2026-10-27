@@ -9,7 +9,6 @@ public class EnemyAuto : MonoBehaviour
     [Header("Components")]  
     public SpriteRenderer spriteRenderer;
     public Animator animator;
-    public BoxCollider2D hitboxCollider;
     public Transform enemyTransform;
     [Header("Enemy Data")]
     private EnemyDataSo enemyData;
@@ -24,8 +23,6 @@ public class EnemyAuto : MonoBehaviour
         spriteRenderer.sprite = enemyData.enemySprite;
         deadSprite = enemyData.deadSprite;
         animator.runtimeAnimatorController = enemyData.enemyAnimatorOverride; 
-        hitboxCollider.size = enemyData.hitboxSize; 
-        hitboxCollider.offset = enemyData.hitboxOffset; 
         transform.localPosition = new Vector3(0f, enemyData.transformOffset, 0f);
 
         moveSpeed = speed;

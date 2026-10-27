@@ -86,7 +86,7 @@ public class AutoManager : MonoBehaviour
 
     [Header("Auto Battle Objects Manager")]
     public AutoPlayer autoPlayer;
-    public EnemyAuto autoEnemyPrefab;
+    public GameObject autoEnemyPrefab;
     public Transform autoEnemySpwanTrans; // 몬스터가 소환될 위치
     public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
     private Queue<EnemyAuto> _pool; // 적 인스턴스 풀링을 위한 Object Pool
@@ -437,7 +437,8 @@ public class AutoManager : MonoBehaviour
     {
         for (int i = 0; i < initialCapacity; i++)
         {
-            EnemyAuto obj = Instantiate(autoEnemyPrefab, transform);
+            GameObject perfab = Instantiate(autoEnemyPrefab, transform);
+            EnemyAuto obj = perfab.GetComponentInChildren<EnemyAuto>();
 
             obj.enemyTransform.gameObject.SetActive(false);
             obj.enemyTransform.SetParent(transform); // 풀링 오브젝트를 AutoManager의 자식으로 설정
@@ -459,7 +460,8 @@ public class AutoManager : MonoBehaviour
         }
         else
         {
-            obj = Instantiate(autoEnemyPrefab, transform);
+            GameObject perfab = Instantiate(autoEnemyPrefab, transform);
+            obj = perfab.GetComponentInChildren<EnemyAuto>();
         }
 
         obj.enemyTransform.gameObject.SetActive(true);
