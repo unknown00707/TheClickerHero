@@ -52,7 +52,7 @@ public class TooltipManager : MonoBehaviour
         if (txt != null && txt.Length >= 2)
             instance.Show(txt[0], txt[1], customPivot);
         else
-            Debug.LogError($"툴팁 데이터 누락 또는 배열 크기 오류! Type: {tooltipDataType}");
+            TestLogger.LogError($"툴팁 데이터 누락 또는 배열 크기 오류! Type: {tooltipDataType}");
     }
     private void Show(string title, string content, Vector2 customPivot)
     {

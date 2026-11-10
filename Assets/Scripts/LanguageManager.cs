@@ -40,7 +40,7 @@ public class LanguageManager : MonoBehaviour
         TextAsset csvData = Resources.Load<TextAsset>("LocalizationData");
         if (csvData == null)
         {
-            Debug.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
+            TestLogger.LogError($"{ColorPalette.Red}[LanguageManager]{ColorPalette.End} CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
             return;
         }
 
@@ -63,7 +63,7 @@ public class LanguageManager : MonoBehaviour
             langTable[id][Language.KR] = row[1];
             langTable[id][Language.EN] = row[2];
         }
-        Debug.Log("다국어 데이터 로드 완료!");
+        TestLogger.Log($"{ColorPalette.Green}다국어 데이터 로드 완료!{ColorPalette.End}");
     }
 
     // 6. 외부(UI)에서 ID를 주면, 현재 언어에 맞는 텍스트를 꺼내주는 함수

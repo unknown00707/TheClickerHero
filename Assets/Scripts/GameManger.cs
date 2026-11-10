@@ -37,7 +37,7 @@ public class GameManger : MonoBehaviour
         string jsonData = JsonUtility.ToJson(data, true);
         string path = Path.Combine(Application.persistentDataPath, fileName);
         File.WriteAllText(path, jsonData);
-        Debug.Log($"저장 완료! 데이터: {data.GetType().Name} 경로: {path}");
+        TestLogger.Log($"{ColorPalette.Gray}[{name}]{ColorPalette.End} 저장 완료! 데이터: {data.GetType().Name} 경로: {path}");
     }
 
     public void LoadData<T>(T data, string fileName) 
@@ -50,11 +50,11 @@ public class GameManger : MonoBehaviour
         {
             string jsonData = File.ReadAllText(path);
             JsonUtility.FromJsonOverwrite(jsonData, data);
-            Debug.Log($"불러오기 완료! 데이터: {data.GetType().Name} 경로: {path}");
+            TestLogger.Log($"{ColorPalette.Gray}[{name}]{ColorPalette.End} 불러오기 완료! 데이터: {data.GetType().Name} 경로: {path}");
         }
         else
         {
-            Debug.LogWarning($"저장된 데이터/{data.GetType().Name}/가 없습니다. 경로: {path}");
+            TestLogger.LogError($"{ColorPalette.Gray}[{name}]{ColorPalette.End} 저장된 데이터/{data.GetType().Name}/가 없습니다. 경로: {path}");
         }
         
     }

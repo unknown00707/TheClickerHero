@@ -140,7 +140,7 @@ public class PlayerStatsManager : MonoBehaviour
             return getter(); // 연결된 프로퍼티 값 바로 반환
         }
 
-        Debug.LogWarning($"[StatsManager] '{statName}'에 해당하는 스탯을 찾을 수 없습니다.");
+        TestLogger.LogWarning($"[StatsManager] '{statName}'에 해당하는 스탯을 찾을 수 없습니다.");
         return 0f;
     }
     public void UpDatePlayerStatsText()
@@ -206,7 +206,7 @@ public class PlayerStatsManager : MonoBehaviour
 
         if (csvFile == null)
         {
-            Debug.LogError("[StatsManager] CSV 파일을 Resources 폴더에서 찾을 수 없습니다!");
+            TestLogger.LogError("[StatsManager] CSV 파일을 Resources 폴더에서 찾을 수 없습니다!");
             return;
         }
 

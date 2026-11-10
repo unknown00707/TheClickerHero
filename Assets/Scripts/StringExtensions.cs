@@ -45,24 +45,6 @@ public static class StringExtensions
         }
         return target;
     }
-    public static string ReplaceTagsParams(this string target, params object[] args)
-    {
-        if (string.IsNullOrEmpty(target) || args == null || args.Length % 2 != 0) 
-        {
-            UnityEngine.Debug.LogWarning("ReplaceTags의 인자 개수는 반드시 [태그 이름, 값] 짝수 쌍이어야 합니다.");
-            return target;
-        }
 
-        for (int i = 0; i < args.Length; i += 2)
-        {
-            string key = args[i]?.ToString();
-            string value = args[i + 1]?.ToString();
-            
-            if (!string.IsNullOrEmpty(key))
-            {
-                target = target.Replace($"{{{key}}}", value);
-            }
-        }
-        return target;
-    }
+
 }

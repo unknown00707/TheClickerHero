@@ -26,6 +26,8 @@ public class LocalizedText : MonoBehaviour
     {
         if (LanguageManager.Instance != null)
         {
+            TestLogger.Log(@$"{ColorPalette.Green}[LocalizedText]{ColorPalette.End} textID: {textID} - {LanguageManager.Instance.GetText(textID)}
+            TextMeshProUGUI: {textMesh.name} - {((textMesh == null) ? "null" : "not null")}");
             textMesh.text = LanguageManager.Instance.GetText(textID);
         }
     }

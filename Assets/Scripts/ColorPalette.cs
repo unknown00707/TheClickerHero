@@ -23,6 +23,8 @@ public static class ColorPalette
 
     /// <summary> 기본 청록색(시안) 태그 시작 신호 <br/>실제 색상: <color=#00FFFF>■■■</color></summary>
     public const string Cyan = "<color=#00FFFF>";
+
+    public const string Gray = "<color=#808080>";
     
     // ==========================================
     // 게임 아이템/등급별 색상 리스트

@@ -10,7 +10,7 @@ public class EnemyManager : MonoBehaviour
     public Transform playerTransform; // 플레이어 위치 참조 (적 스폰 시 플레이어를 기준으로 위치 설정)
     public PlayerHealth playerHealth;
     public int MAX_ENEMY_INSTANCES = 100; // 최대 적 인스턴스 수 (풀링 시스템에서 활용)
-    private readonly List<EnemyDataSo> enemyDataList; // 다양한 적 데이터를 리스트로 관리
+    public List<EnemyDataSo> enemyDataList = new(); // 다양한 적 데이터를 리스트로 관리
     [Header("적 던전 UI관련")]
     public TextMeshProUGUI leftEnemyText; // 남은 적 수 표시용 텍스트
     private readonly Dictionary<int, List<EnemyDataSo>> enemyPoolDict = new(); // 스테이지 기반으로 적 데이터를 빠르게 조회할 수 있는 딕셔너리
@@ -198,7 +198,7 @@ public class EnemyManager : MonoBehaviour
         {
             return enemyDataList[index];
         }
-        Debug.LogWarning($"EnemyDataSo 인덱스 {index}가 범위를 벗어났습니다!");
+        TestLogger.LogError($"{ColorPalette.Red}[EnemyManager]{ColorPalette.End} EnemyDataSo 인덱스 {index}가 범위를 벗어났습니다!");
         return null;
     }
     // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ Save & Load ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ //
@@ -208,7 +208,7 @@ public class EnemyManager : MonoBehaviour
         TextAsset csvData = Resources.Load<TextAsset>("EnemyIDByStageLevelData");
         if (csvData == null)
         {
-            Debug.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
+            TestLogger.LogError($"{ColorPalette.Red}[EnemyManager]{ColorPalette.End} CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
             return;
         }
 
@@ -236,7 +236,7 @@ public class EnemyManager : MonoBehaviour
             // 4. parts[0]은 스테이지 레벨
             if (!int.TryParse(parts[0], out int stageLevel))
             {
-                Debug.LogWarning($"스테이지 파싱 에러: {parts[0]}");
+                TestLogger.LogWarning($"{ColorPalette.Yellow}[EnemyManager]{ColorPalette.End} 스테이지 파싱 에러: {parts[0]}");
                 continue;
             }
 
@@ -254,7 +254,7 @@ public class EnemyManager : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogWarning($"EnemyID {id}가 리스트 범위를 벗어났습니다!");
+                        TestLogger.LogError($"{ColorPalette.Red}[EnemyManager]{ColorPalette.End} EnemyID {id}가 리스트 범위를 벗어났습니다!");
                     }
                 }
             }
@@ -266,6 +266,6 @@ public class EnemyManager : MonoBehaviour
                 maxEnemyIndexByStageLevelDict[stageLevel] = maxId; // 스테이지별 최대 몬스터 ID 저장
             }
         }
-        Debug.Log("스테이지 적 데이터 CSV 로드 완료!");
+        TestLogger.Log($"{ColorPalette.Green}[EnemyManager]{ColorPalette.End} 스테이지 적 데이터 CSV 로드 완료!");
     }
 }

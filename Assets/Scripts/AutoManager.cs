@@ -81,17 +81,18 @@ public class AutoManager : MonoBehaviour
 
     private static readonly int YHash = Animator.StringToHash("y");
     private static readonly int XHash = Animator.StringToHash("x");
-    private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
     private static readonly int AttackSpeedHash = Animator.StringToHash("attackSpeed");
+    private static readonly int MoveSpeedHash = Animator.StringToHash("moveSpeed");
 
     [Header("Auto Battle Objects Manager")]
     public AutoPlayer autoPlayer;
     public GameObject autoEnemyPrefab;
     public Transform autoEnemySpwanTrans; // 몬스터가 소환될 위치
     public Transform autoPlayerStandTrans; // 오토 플레이어의 서 있는 위치
-    private Queue<EnemyAuto> _pool; // 적 인스턴스 풀링을 위한 Object Pool
-    private Queue<EnemyAuto> _activeEnemies; // 현재 활성화된 적들을 추적하기 위한 큐
+    private readonly Queue<EnemyAuto> _pool = new(); // 적 인스턴스 풀링을 위한 Object Pool
+    private readonly Queue<EnemyAuto> _activeEnemies = new(); // 현재 활성화된 적들을 추적하기 위한 큐
     private Coroutine autobattleCoroutine = null;
+    private bool isCanHardResetAutoBattleCoroutine = false; // 코루틴을 강제로 재시작할 수 있는지 여부
 
 
     void Awake()
@@ -119,11 +120,12 @@ public class AutoManager : MonoBehaviour
         ApplyAutoPlayerAnimatorOverride();
         AutoAnimationInit(); // 오토 플레이어 애니메이션 초기화 및 autoOnlineRewardCycle 초기화
         
-        TotalResetAutoBattleStats();
+        isCanHardResetAutoBattleCoroutine = true;
+        TotalResetAutoBattleStats(nameof(Start)); // 오토 배틀 스탯 계산 및 적용
     }
     void Update()
     {
-        
+       
     }
     // --------------------- 오프라인 자동 보상 로직 ---------------------//
     float CalculateOfflineTime()
@@ -243,7 +245,7 @@ public class AutoManager : MonoBehaviour
     }
     private IEnumerator UpdateAutoBattleRoutine()
     {
-
+        Debug.Log($"{ColorPalette.Cyan}[AutoManager]{ColorPalette.End} UpdateAutoBattleRoutine started with reward cycle: {autoOnlineRewardCycle}, enemy move speed: {autoEnemyMoveSpeed}, enemy die duration: {enemyDieDurationTime}");
         while (true)
         {
             EnemyAuto enemy = GetEnemy(enemyManager.GetEnemyDataSoByIndex(unlockAutoOnlineUprade.maxEnemyIndex)); 
@@ -296,22 +298,25 @@ public class AutoManager : MonoBehaviour
     {
         // 1. 가져올 업그레이드 개수 지정 (인덱스 보정 및 리스트 범위 초과 방지)
         int takeCount = Mathf.Clamp(unlockAutoOnlineUprade.unlockedMaxID + 1, 0, autoOnlineUpradeSo.Length);
+        
         // 2. SO에 있는 차감 시간(-10, -20 등)을 모두 더합니다. 결과는 음수(예: -30)가 됩니다.
         float totalTimeReduction = autoOnlineUpradeSo.Take(takeCount).Sum(so => so.upgradeSpeedAmount);
+        
         // 3. 기본 주기(300초)에서 차감 시간을 계산하여 '최종 보상 주기'를 구합니다.
         float baseCycleTime = 300f; // 5분
         float currentRewardCycleTime = baseCycleTime + totalTimeReduction; // 300 + (-30) = 270초
-        // ⚠️ 버그 방지 예외 처리: 주기가 0초 이하로 떨어져 무한 루프나 에러가 나는 것을 방지 (최소 1초 제한)
-        currentRewardCycleTime = Mathf.Max(currentRewardCycleTime, 1f); 
+        // ⚠️ 버그 방지 예외 처리: 주기가 0초 이하로 떨어져 무한 루프나 에러가 나는 것을 방지
+        currentRewardCycleTime = Mathf.Max(currentRewardCycleTime, 0f); 
 
-        autoOnlineRewardCycle = baseCycleTime / currentRewardCycleTime;
+
+        const float MIN_CYCLE_TIME = 0f; // 시스템이 안전하게 돌아갈 최소 시간 (예: 1초)
+        autoOnlineRewardCycle = Mathf.Max(300f + totalTimeReduction, MIN_CYCLE_TIME);
 
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     
         autoPlayerAnimator.SetFloat(XHash, -1); // 왼쪽
         autoPlayerAnimator.SetFloat(YHash, 0); // 기본
-        autoPlayerWeaponAnimator.SetFloat(MoveSpeedHash, 1); // 항상 움직여야되서 !=0 만 만족하면 됌.
-
+        autoPlayerAnimator.SetFloat(MoveSpeedHash, 1f);
         autoPlayerAnimator.speed = 1f;
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, 1f);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, 1f);
@@ -371,13 +376,13 @@ public class AutoManager : MonoBehaviour
         autoPlayerWeaponAnimator.runtimeAnimatorController = currentWeapon.weaponOverrideController;
         autoPlayerWeaponEffectAnimator.runtimeAnimatorController = currentWeapon.weaponEffectOverrideController;
     
-        TotalResetAutoBattleStats();
+        TotalResetAutoBattleStats(nameof(SetSameWeaponAnimeOverride));
     }
     public void ApplyAutoPlayerAnimatorOverride() // playerSkin Manager 에 직접 연결
     {
         autoPlayerAnimator.runtimeAnimatorController = playerSkinManager.GetAnimatorOverrideCurrentEquipped();
         
-        TotalResetAutoBattleStats();
+        TotalResetAutoBattleStats(nameof(ApplyAutoPlayerAnimatorOverride));
     }
     // -------------------- 오토 업그레이드 스탯 적용 --------------------------------//
     private void ApplyAutoOnlineUpgradeStat()
@@ -385,38 +390,52 @@ public class AutoManager : MonoBehaviour
         autoOnlineRewardCycle += autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].upgradeSpeedAmount;
         rareProbabilityOfEnemy = autoOnlineUpradeSo[unlockAutoOnlineUprade.unlockedMaxID].rareProbabilityOfEnemy;
     
-        TotalResetAutoBattleStats();
+        TotalResetAutoBattleStats(nameof(ApplyAutoOnlineUpgradeStat));
     }
     private void ApplyAutoAnimeSpeed()
     {
         if (autoOnlineRewardCycle >= playerAttackAnimeCycle) return;
-        
-        autoPlayerAnimator.speed =  autoOnlineRewardCycle;
-        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
-        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, autoOnlineRewardCycle);
+
+        float speedMultiplier = playerAttackAnimeCycle / autoOnlineRewardCycle;
+        autoPlayerAnimator.speed =  speedMultiplier;
+        autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, speedMultiplier);
+        autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, speedMultiplier);
 
         playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle;
     }
-    private void TotalResetAutoBattleStats()
+    private void TotalResetAutoBattleStats(string where = "Unknown")
     {
+        if (!isCanHardResetAutoBattleCoroutine) return; // 코루틴 강제 재시작 가능 여부 확인
+
+        TestLogger.Log($"{ColorPalette.Legend}[AutoManager] HardRestAutoBattle{ColorPalette.End} In {where}()");
+
         SetPlayerAttackAnimeCycle();    // - playerAttackAnimeCycle
         CalculateAutoBattleStats();     // 오토 배틀 스탯 계산 - autoEnemyMoveSpeed - enemyDieDurationTime
         ApplyAutoAnimeSpeed();
 
         SaveUnlockAutoOnlineUpgrade();
 
+        HardResetAutoBattleCoroutine();
+    }
+
+    private void HardResetAutoBattleCoroutine()
+    {
         if (autobattleCoroutine != null)
         {
             StopCoroutine(autobattleCoroutine);
             autoPlayer.StopAutoAttack();
             foreach(EnemyAuto enemyAuto in _activeEnemies) // 활성화 된 적 모두 되돌려 보내기
             {
-                enemyAuto.StopAutoEnemyCoroutine();
+                enemyAuto.InitValues();
                 ReleaseEnemy(enemyAuto);
-                ReleaseActiveEnemy();
             }
+
+            int activeCount = _activeEnemies.Count;
+            for(int i = 0; i < activeCount; i++)
+                ReleaseActiveEnemy();
         }
-        
+        Debug.Log($"{ColorPalette.Legend}[AutoManager]{ColorPalette.End} Will start new UpdateAutoBattleRoutine coroutine.");
+        autobattleCoroutine = null;
         autobattleCoroutine = StartCoroutine(UpdateAutoBattleRoutine());
     }
 //---------------------- 오토 세이브 -----------------------------------//
@@ -435,25 +454,29 @@ public class AutoManager : MonoBehaviour
 // --------------------- 오토 배틀 적 인스턴스 풀링 ---------------------//
     private void PoolInit(int initialCapacity = 50)
     {
+        TestLogger.Log($"{ColorPalette.Legend}[AutoManager]{ColorPalette.End} PoolInit called with initial capacity: {initialCapacity}");
+     
         for (int i = 0; i < initialCapacity; i++)
         {
             GameObject perfab = Instantiate(autoEnemyPrefab, transform);
             EnemyAuto obj = perfab.GetComponentInChildren<EnemyAuto>();
-
-            obj.enemyTransform.gameObject.SetActive(false);
+            
             obj.enemyTransform.SetParent(transform); // 풀링 오브젝트를 AutoManager의 자식으로 설정
-            obj.enemyTransform = autoEnemySpwanTrans; // 적이 소환될 위치로 초기화
+            obj.enemyTransform.position = autoEnemySpwanTrans.position; // 적이 소환될 위치로 초기화
 
             obj.autoManager = this; // EnemyAuto에 AutoManager 참조 전달
             obj.dungeonManager = dungeonManager;
 
+            obj.enemyTransform.gameObject.name = $"Enemy_Pooled_{i + 1}"; // 이름 변경
+            obj.enemyTransform.gameObject.SetActive(false);
             _pool.Enqueue(obj); 
         }
+
+        TestLogger.Log($"{ColorPalette.Legend}[AutoManager]{ColorPalette.End} End of PoolInit. Pool size: {_pool.Count}");
     }
     public EnemyAuto GetEnemy(EnemyDataSo enemyData)
     {
         EnemyAuto obj;
-
         if (_pool.Count > 0)
         {
             obj = _pool.Dequeue();
@@ -462,18 +485,34 @@ public class AutoManager : MonoBehaviour
         {
             GameObject perfab = Instantiate(autoEnemyPrefab, transform);
             obj = perfab.GetComponentInChildren<EnemyAuto>();
+            obj.enemyTransform.SetParent(transform);
         }
 
-        obj.enemyTransform.gameObject.SetActive(true);
-        obj.SynchronizeBySo(enemyData, autoEnemyMoveSpeed, enemyDieDurationTime); // 적 데이터 초기화
+        Debug.Log($"{ColorPalette.Cyan}[AutoManager]{ColorPalette.End} GetEnemy called. Enemy {enemyData.name} activated");
+
+        float animeSpeed = 1f;
+        if (autoOnlineRewardCycle < playerAttackAnimeCycle)
+            animeSpeed = playerAttackAnimeCycle / autoOnlineRewardCycle;
+        
+        obj.SynchronizeBySo(enemyData, autoEnemyMoveSpeed, animeSpeed, enemyDieDurationTime); // 적 데이터 초기화
         _activeEnemies.Enqueue(obj); // 활성화된 적을 추적
+
+        obj.enemyTransform.gameObject.name = $"Enemy_{enemyData.name}_{_activeEnemies.Count}"; // 이름 변경
+
+        obj.enemyTransform.gameObject.SetActive(true);
+        obj.enemyTransform.position = autoEnemySpwanTrans.position;
+
         return obj;
     }
     public void ReleaseEnemy(EnemyAuto obj)
     {
         if (_pool.Contains(obj)) return;
 
+        obj.enemyTransform.gameObject.name = $"Enemy_Released_{_pool.Count + 1}"; // 이름 변경
+
         obj.enemyTransform.gameObject.SetActive(false);
+        obj.enemyTransform = autoEnemySpwanTrans;
+
         _pool.Enqueue(obj);
     }
     public void ReleaseActiveEnemy()

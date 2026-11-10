@@ -12,7 +12,7 @@ public class WeaponScript : MonoBehaviour
     public ActivablePlayer activablePlayer; // 무기 효과를 플레이어 애니메이션과 연동하기 위해 참조
     public Animator weaponAnimator; // 무기 자체 애니메이션 (검 휘두르는 모션)
     public LayerMask enemyLayerMask; // 적 레이어 마스크 (적 레이어 설정 필요)
-
+    public bool isAutoAttackEnabled = false; // 자동 공격 활성화 여부 (Inspector에서 설정 가능)
 
     private readonly Collider2D[] hitResults = new Collider2D[200]; // 최대 10명까지 적을 감지할 수 있는 배열 (필요 시 크기 조절) 
     ContactFilter2D filter = new(); // 혹시 모르니까
@@ -25,11 +25,16 @@ public class WeaponScript : MonoBehaviour
     // 애니메이션 이벤트에서 실행할 함수 (검을 휘두르는 타격 프레임에 실행!)
     public void OnMeleeAttackHit() 
     {
+        if (isAutoAttackEnabled)
+        {
+            TestLogger.Log($"{ColorPalette.Cyan}[WeaponScript]{ColorPalette.End} OnMeleeAttackHit called in AutoAttack mode.");
+            return; // 자동 공격 모드에서는 OnMeleeAttackHit를 무시하고, AutoPlayer에서 처리하도록 합니다.
+        }
+
         var currentWeapon = weaponManager.GetCurrentWeaponData();
         // 1. 근접 타격 판정 (SO에 저장된 크기와 위치 사용!)
         Vector2 hitCenter = (Vector2)plaerTransform.transform.position + currentWeapon.meleeOffset[FindOffsetIndex()];
         int hitCount = Physics2D.OverlapCircle(hitCenter, currentWeapon.meleeAttackRadius, filter, hitResults);
-        Collider2D[] hitEnemies = new Collider2D[hitCount];
         for (int i = 0; i < hitCount; i++) 
         {
             if (hitResults[i].TryGetComponent<EnemyComme>(out var monster)) 
@@ -74,6 +79,9 @@ public class WeaponScript : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (isAutoAttackEnabled)
+            return;
+        
         var currentWeapon = weaponManager.GetCurrentWeaponData();
         if (activablePlayer != null && currentWeapon != null)
         {

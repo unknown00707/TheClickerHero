@@ -241,13 +241,16 @@ MonoBehaviour:
   isDead: 0
   enemyManager: {fileID: 0}
   dungeonManager: {fileID: 0}
+  autoManager: {fileID: 0}
   enemyTransform: {fileID: 4272807103443607973}
   enemyRigidbody: {fileID: 8497953345816182935}
   playerTransform: {fileID: 0}
+  playerHealth: {fileID: 0}
   spriteRenderer: {fileID: 7142464961081525221}
   animator: {fileID: 4210919166089505664}
   groundCol2D: {fileID: 7267437001725706949}
   auraSpwanTransform: {fileID: 4534676703270280154}
+  hitboxCollider: {fileID: 6537327567138097717}
   enemyData: {fileID: 0}
   isAttacking: 0
   playerLayer:

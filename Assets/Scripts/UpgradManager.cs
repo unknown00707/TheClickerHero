@@ -214,11 +214,11 @@ public class UpgradManager : MonoBehaviour
                 {
                     nodeInfo.isMaxLevel = true;
                     // UI에서 최대 레벨 도달 표시 (예시에서는 Debug.Log로 대체)
-                    Debug.Log($"노드 {index}가 최대 레벨에 도달했습니다!");
+                    TestLogger.Log($"노드 {index}가 최대 레벨에 도달했습니다!");
                 }
                 else
                 {
-                    Debug.Log($"노드 {index}가 레벨 {level + 1}로 업그레이드되었습니다!");
+                    TestLogger.Log($"노드 {index}가 레벨 {level + 1}로 업그레이드되었습니다!");
                 }
 
                 // 노드 정보 업데이트
@@ -230,12 +230,12 @@ public class UpgradManager : MonoBehaviour
             else
             {
                 // UI로 코인 부족 메시지 띄우기 (예시에서는 Debug.Log로 대체)
-                Debug.Log("코인이 부족합니다!");
+                TestLogger.Log("코인이 부족합니다!");
             }
         }
         else
         {
-            Debug.LogError($"업그레이드 데이터가 없습니다! 노드 ID: {index}, 레벨: {level}");
+            TestLogger.LogError($"업그레이드 데이터가 없습니다! 노드 ID: {index}, 레벨: {level}");
         }
     }
     private (bool isPercentage, float amount) CalculateStatType(CalcType calcType, float value)
@@ -301,7 +301,7 @@ public class UpgradManager : MonoBehaviour
         TextAsset csvData = Resources.Load<TextAsset>("UpgradeValue");
         if (csvData == null)
         {
-            Debug.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
+            TestLogger.LogError("CSV 파일을 찾을 수 없습니다! Resources 폴더를 확인하세요.");
             return;
         }
 

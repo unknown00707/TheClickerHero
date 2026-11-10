@@ -135,9 +135,9 @@ public class DungeonManager : MonoBehaviour
         string clearText = isSuccessful ? LanguageManager.Instance.GetText(DUNGEON_REWARD_SUCCESS) 
                                          : LanguageManager.Instance.GetText(DUNGEON_REWARD_FAILED);
         clearRewardTxt.text = clearText;     
-        clearClickRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK).ReplaceTagsParams("GettenClick", totalGettenClick);
-        clearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN).ReplaceTagsParams("GettenCoin", totalGettenCoin);
-        clearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC).ReplaceTagsParams("GettenReic", $"{ColorPalette.Legend}Null{ColorPalette.End}");
+        clearClickRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_CLICK).ReplaceTags("GettenClick", totalGettenClick);
+        clearCoinRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_COIN).ReplaceTags("GettenCoin", totalGettenCoin);
+        clearRelicRewardTxt.text = LanguageManager.Instance.GetText(DUNGEON_REWARD_RELIC).ReplaceTags("GettenRelic", $"{ColorPalette.Legend}Null{ColorPalette.End}");
         clearUIObj.SetActive(isOpen);
     }   
     public void GetRewardEndDungeon() // --> return 버튼에 연결
