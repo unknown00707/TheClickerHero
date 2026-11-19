@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TMPro;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,6 +36,7 @@ public class AutoManager : MonoBehaviour
     public WeaponManager weaponManager;
     public EnemyManager enemyManager; // 적 매니저 참조
     public DungeonManager dungeonManager;
+    public GoodsManager goodsManager;
 
     [Header("Offline")]
     public GameObject offlineRewardObj;
@@ -59,7 +61,6 @@ public class AutoManager : MonoBehaviour
     public Image autoOnlineUpgradeIMG;
     public TextMeshProUGUI autoOnlineUpgradeTxt;
     public GameObject autoOnlineUpgradeLockBTN; // 잠금 상태일 때 버튼
-    public GameObject autoOnlineApplyBTN; // 단순 Sprite 바꾸는 버튼 --> 배경 꾸미기 용
     private readonly UnlockAutoOnlineUprade unlockAutoOnlineUprade = new();
 
     private float autoOnlineRewardCycle = 300f; 
@@ -68,7 +69,7 @@ public class AutoManager : MonoBehaviour
     
     private readonly string SAVE_UNLOCK_AUTO_ONLINE_UPGRADE_FILE_NAME = "UnlockAutoOnlineUprade.json"; // 저장 파일 이름
 
-    [Header("Auto Animation")]
+    [Header("Auto Battle Animation")]
     public Animator autoPlayerAnimator;
     public Animator autoPlayerWeaponAnimator;
     public Animator autoPlayerWeaponEffectAnimator;
@@ -93,8 +94,13 @@ public class AutoManager : MonoBehaviour
     private readonly Queue<EnemyAuto> _activeEnemies = new(); // 현재 활성화된 적들을 추적하기 위한 큐
     private Coroutine autobattleCoroutine = null;
     private bool isCanHardResetAutoBattleCoroutine = false; // 코루틴을 강제로 재시작할 수 있는지 여부
-
-
+    [Header("Auto Background")]
+    public AutoBackground[] autoBackgrounds; // 오토 배경 스크립트 배열
+    [Tooltip("오토 배경 이동 속도 배열 - layer1 부터")]
+    [Range(0.1f, 1f)]
+    public float[] autoBackgroundMoveSpeed; // 오토 배경 이동 속도 배열  - layer1 부터 
+    private Vector3 cachedBottomLeft;
+    private float cachedWorldOffsetY;
     void Awake()
     {
         // 게임 시작 시간 기록
@@ -111,6 +117,15 @@ public class AutoManager : MonoBehaviour
 
         // Pooling
         PoolInit(); // 적 인스턴스 풀링 초기화
+
+        // Auto Background
+        // 1. 씬 시작 시(가장 넓은 기본 뷰 상태일 때) 화면 경계와 216px 비율을 한 번만 저장
+        float camDist = Mathf.Abs(Camera.main.transform.position.z);
+        cachedBottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, camDist));
+        Vector3 topRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, camDist));
+
+        float worldHeight = topRight.y - cachedBottomLeft.y;
+        cachedWorldOffsetY = 216f * (worldHeight / Screen.height);
     }
 
     void Start()
@@ -236,11 +251,11 @@ public class AutoManager : MonoBehaviour
         if(isCoin)
         {
             gettenCoin += amoutCoin;
-            playerStatsManager.AddClickAndCoin(amoutClick, amoutCoin);
+            goodsManager.AddClickAndCoin(amoutClick, amoutCoin);
             // 코인 획득 애니메이션
             return;
         }
-        playerStatsManager.AddClickAndCoin(amoutClick, 0); // 코인 제외
+        goodsManager.AddClickAndCoin(amoutClick, 0); // 코인 제외
         // 클릭 획득 애니메이션
     }
     private IEnumerator UpdateAutoBattleRoutine()
@@ -261,26 +276,35 @@ public class AutoManager : MonoBehaviour
         // 현재 적 ID에 따라 적용 가능한 업그레이드 찾기
         AutoOnlineUpradeSo applyUISo = autoOnlineUpradeSo[currentSoID];
 
-        if (unlockAutoOnlineUprade.unlockedMaxID >= currentSoID) // 현재 해금된 업그레이드 ID와 비교
+        if (currentSoID - unlockAutoOnlineUprade.unlockedMaxID == 1) // 현재 해금된 업그레이드 ID와 비교 , 해금 할 놈
         {
-            autoOnlineUpgradeIMG.sprite = applyUISo.unlockSprite;
-            autoOnlineUpgradeTxt.text = $"업그레이드 필요 클릭: {applyUISo.needClick}\n" +
-                                        $"업그레이드 속도: {applyUISo.upgradeSpeedAmount}\n" +
-                                        $"희귀 확률: {applyUISo.rareProbabilityOfEnemy * 100}%";
-            autoOnlineApplyBTN.SetActive(true);
-            autoOnlineUpgradeLockBTN.SetActive(false);
+            string text = $"업그레이드 필요 클릭: {applyUISo.needClick}\n" +
+                            $"업그레이드 속도: {applyUISo.upgradeSpeedAmount}\n" +
+                            $"희귀 확률: {applyUISo.rareProbabilityOfEnemy * 100}%";
+            SetAutoOnlineUpgradUI(applyUISo.lockedSprite, true, text);
         }
-        else
+        else if (currentSoID <= unlockAutoOnlineUprade.unlockedMaxID) // 이미 해금 된 놈
         {
-            autoOnlineUpgradeIMG.sprite = applyUISo.lockedSprite; // 또는 기본 이미지로 설정
-            autoOnlineUpgradeTxt.text = "적용 가능한 업그레이드 없음";
-            autoOnlineApplyBTN.SetActive(false);
-            autoOnlineUpgradeLockBTN.SetActive(true);
+            string text = "업그레이드 완료";
+            SetAutoOnlineUpgradUI(applyUISo.unlockSprite, false, text);
         }
+        else // 해금이 안되고 단계를 뛰어 넘은 놈
+        {
+            // autoOnlineApplyBTN.SetActive(false); ==> 구조 바꿀 뜻
+            string text = "전 단계 업그레이드 필요";
+            SetAutoOnlineUpgradUI(applyUISo.lockedSprite, false, text);
+        }
+    }
+    private void SetAutoOnlineUpgradUI(Sprite sprite, bool isOpen, string text)
+    {
+        autoOnlineUpgradeIMG.sprite = sprite; // 또는 기본 이미지로 설정
+        autoOnlineUpgradeTxt.text = text;
+        autoOnlineUpgradeLockBTN.SetActive(isOpen);
     }
     public void UnlockAutoOnlineUpgrade(int currentSoID)
     {
-        if (currentSoID > unlockAutoOnlineUprade.unlockedMaxID)
+        if (currentSoID > unlockAutoOnlineUprade.unlockedMaxID 
+        && goodsManager.SpendClick(autoOnlineUpradeSo[currentSoID].needClick))
         {
             unlockAutoOnlineUprade.unlockedMaxID = currentSoID;
             SaveUnlockAutoOnlineUpgrade(); // 변경 사항 저장
@@ -316,7 +340,7 @@ public class AutoManager : MonoBehaviour
     
         autoPlayerAnimator.SetFloat(XHash, -1); // 왼쪽
         autoPlayerAnimator.SetFloat(YHash, 0); // 기본
-        autoPlayerAnimator.SetFloat(MoveSpeedHash, 1f);
+        autoPlayerAnimator.SetInteger(MoveSpeedHash, 1);
         autoPlayerAnimator.speed = 1f;
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, 1f);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, 1f);
@@ -349,7 +373,7 @@ public class AutoManager : MonoBehaviour
         if (currentSpeed <= 0) currentSpeed = 1f; 
 
         playerAttackAnimeCycle = originLength / currentSpeed; // 예: 5.0초 / 2배속 = 2.5초
-
+        TestLogger.Log($"{ColorPalette.Yellow}[{name}]{ColorPalette.End} attackANimeCycle : {playerAttackAnimeCycle}");
     }
     public void CalculateAutoBattleStats() // 적과 플레이어의 위치 차이 계산 및 적 이동 속도 계산
     {
@@ -394,14 +418,16 @@ public class AutoManager : MonoBehaviour
     }
     private void ApplyAutoAnimeSpeed()
     {
-        if (autoOnlineRewardCycle >= playerAttackAnimeCycle) return;
+        playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle;
+        
+        if (autoOnlineRewardCycle >= playerAttackAnimeCycle)
+            return;
 
         float speedMultiplier = playerAttackAnimeCycle / autoOnlineRewardCycle;
         autoPlayerAnimator.speed =  speedMultiplier;
         autoPlayerWeaponAnimator.SetFloat(AttackSpeedHash, speedMultiplier);
         autoPlayerWeaponEffectAnimator.SetFloat(AttackSpeedHash, speedMultiplier);
 
-        playerAttackTime = autoOnlineRewardCycle - playerAttackAnimeCycle;
     }
     private void TotalResetAutoBattleStats(string where = "Unknown")
     {
@@ -413,9 +439,12 @@ public class AutoManager : MonoBehaviour
         CalculateAutoBattleStats();     // 오토 배틀 스탯 계산 - autoEnemyMoveSpeed - enemyDieDurationTime
         ApplyAutoAnimeSpeed();
 
-        SaveUnlockAutoOnlineUpgrade();
+        SaveUnlockAutoOnlineUpgrade(); // 저장
 
+        // 코루틴 강제 재시작
         HardResetAutoBattleCoroutine();
+        UpdateAutoBackgroundSpeed(); // 오토 배경 이동 속도 업데이트
+        SetBackgroundPosInit(true);
     }
 
     private void HardResetAutoBattleCoroutine()
@@ -518,5 +547,58 @@ public class AutoManager : MonoBehaviour
     public void ReleaseActiveEnemy()
     {
         _activeEnemies.Dequeue();
+    }
+
+// --------------------- 오토 배경 이동 ---------------------//
+    private void UpdateAutoBackgroundSpeed()
+    {
+        for (int i = 0; i < autoBackgrounds.Length; i++)
+        {
+            autoBackgrounds[i].SetReady(false);
+
+            if (autoBackgrounds[i] != null && autoBackgrounds[i].Id == i)
+            {
+                if ( i == 0 )
+                {
+                    // autoBackgroudnMoveSpeed 는 layer1 부터 시작해서
+                    autoBackgrounds[i].SetMoveSpeed(autoEnemyMoveSpeed);
+                
+                    TestLogger.Log($"{i} AutoBackground move speed {autoEnemyMoveSpeed}");
+                }
+                else
+                {
+                    autoBackgrounds[i].SetMoveSpeed(autoEnemyMoveSpeed * autoBackgroundMoveSpeed[i - 1]); 
+                    TestLogger.Log($"{i} AutoBackground move speed {autoEnemyMoveSpeed * autoBackgroundMoveSpeed[i - 1]}");   
+                }
+
+                autoBackgrounds[i].SetReady(true);
+            }
+            else
+                TestLogger.LogWarning(@$"{ColorPalette.Yellow}[AutoManager]{ColorPalette.End} 
+                autoBackgrounds[{i}] - ID : {autoBackgrounds[i].Id} is null. Please check the inspector.");
+        }
+    }
+    private void SetBackgroundPosInit(bool init = false)
+    {
+        for (int i = 0; i < autoBackgrounds.Count(); i++)
+        {
+            Bounds bounds = autoBackgrounds[i].spriteRenderer.bounds;
+
+            // 캐싱해 둔 전체 화면 왼쪽 끝 기준으로 스프라이트 크기만큼만 재계산
+            float x = cachedBottomLeft.x + bounds.extents.x;
+            float y = cachedBottomLeft.y + bounds.extents.y;
+
+            if (i != 0)
+            {
+                y += cachedWorldOffsetY;
+            }
+
+            float offsetx = bounds.size.x;
+            Vector3 start = new(x - offsetx, y, 0);
+            Vector3 end = new(x + offsetx, y, 0);
+
+            autoBackgrounds[i].InitPos(start, end, offsetx, init);
+        }
+
     }
 }

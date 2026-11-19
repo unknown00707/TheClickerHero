@@ -58,7 +58,7 @@ public class WeaponManager : MonoBehaviour
     }
     public void UnlockWeapon()
     {
-        if (weaponDataArray[currentWeaponIndex].unlockCost > goodsManager.goodsData.GoodsCount)
+        if (weaponDataArray[currentWeaponIndex].unlockCost > goodsManager.GOODS)
         {
             Debug.Log("재화 부족으로 무기 잠금 해제 실패");
             return;
@@ -66,7 +66,7 @@ public class WeaponManager : MonoBehaviour
 
         if (!unlockWeaponData.weaponUnlockStatus.Contains(currentWeaponIndex))
         {
-            goodsManager.goodsData.GoodsCount -= weaponDataArray[currentWeaponIndex].unlockCost;
+            goodsManager.SpendClick(weaponDataArray[currentWeaponIndex].unlockCost);
             unlockWeaponData.weaponUnlockStatus.Add(currentWeaponIndex);
             UpdateWeaponUI(); // UI 업데이트
             SaveWeaponData(); // 무기 잠금 해제 후 저장

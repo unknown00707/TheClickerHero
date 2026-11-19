@@ -33,6 +33,7 @@ public class DungeonManager : MonoBehaviour
     [Header("Manager 참조")]
     public EnemyManager enemyManager;
     public PlayerStatsManager playerStatsManager;
+    public GoodsManager goodsManager;
     public ClickBTN clickBTN;
     [Header("던전 관련 설정")]
     public Transform playerTransform;
@@ -142,7 +143,7 @@ public class DungeonManager : MonoBehaviour
     }   
     public void GetRewardEndDungeon() // --> return 버튼에 연결
     {
-        playerStatsManager.AddClickAndCoin(totalGettenClick, totalGettenCoin);
+        goodsManager.AddClickAndCoin(totalGettenClick, totalGettenCoin);
     }
     public string[] ToTooltipByGetID(string id)
     {

@@ -189,15 +189,6 @@ public class PlayerStatsManager : MonoBehaviour
         UpDatePlayerStatsText();
         SavePlayerStats();
     }
-//-----Add Value Player Stats -----//
-    public void AddClickAndCoin(int click, int coin)
-    {
-        int totalAddClick = click + coin * playerStats.coinMulitplier;
-        playerStats.click.Upgrade(false, totalAddClick);
-
-        GameManger.instance.SaveGame();
-    }
-
 //------Save & Load Player Stats------//
     private void LoadBaseStatsFromCSV()
     {

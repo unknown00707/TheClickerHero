@@ -33,6 +33,10 @@ public class ClickBTN : MonoBehaviour
         {
             dungeonInfoTxtLocalizedText = dungeonInfoTxt.GetComponent<LocalizedText>();
         }
+    }
+
+    void Start()
+    {
         OpenTapByIndexDungeonSelect();
     }
     public void ClickBTNClick()

@@ -17,8 +17,10 @@ public class GoodsManager : MonoBehaviour
 {
     public PlayerStatsManager playerStatsManager;
     public TextMeshProUGUI  GoodsCountTxt;
-    public GoodsData goodsData = new();
+    private readonly GoodsData goodsData = new();
     private readonly string fileName = "SaveGoodsData.json";
+
+    public int GOODS => goodsData.GoodsCount;
 
     void Start()
     {
@@ -31,6 +33,28 @@ public class GoodsManager : MonoBehaviour
         goodsData.GoodsCount += (int)playerStatsManager.playerStats.Click;
         GoodTXTUpdate();
     }
+
+    public void AddClickAndCoin(int click, int coin)
+    {
+        int totalAddClick = click + coin * playerStatsManager.playerStats.coinMulitplier;
+        goodsData.GoodsCount += totalAddClick;
+        GoodTXTUpdate();
+
+        GameManger.instance.SaveGame();
+    }
+
+    public bool SpendClick(int amount)
+    {
+        if (amount > goodsData.GoodsCount)
+            return false;
+        else
+        {
+            Debug.Log($"{ColorPalette.Legend}{name}{ColorPalette.End} spend : {amount}");
+            goodsData.GoodsCount -= amount;
+            return true;
+        }
+    }
+
     public void GoodTXTUpdate()
     {
         GoodsCountTxt.text =  "Coins: " + goodsData.GoodsCount;

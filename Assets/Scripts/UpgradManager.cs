@@ -167,10 +167,10 @@ public class UpgradManager : MonoBehaviour
         if (upgradExplainDictionary.ContainsKey(index) && upgradExplainDictionary[index].ContainsKey(level))
         {
             // 업그레이드 가능 여부 체크
-            if (goodsManager.goodsData.GoodsCount >= upgradExplainDictionary[index][level].needGoods)
+            if (goodsManager.GOODS >= upgradExplainDictionary[index][level].needGoods)
             {
                 // 비용 차감
-                goodsManager.goodsData.GoodsCount -= upgradExplainDictionary[index][level].needGoods;
+                goodsManager.SpendClick(upgradExplainDictionary[index][level].needGoods);
                 goodsManager.GoodTXTUpdate();
 
                 // 레벨 업

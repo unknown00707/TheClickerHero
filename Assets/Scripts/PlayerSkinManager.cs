@@ -58,9 +58,9 @@ public class PlayerSkinManager : MonoBehaviour
     public void UnlockSkin()
     {
         if (!saveData.unlockedSkins.Contains(currentSkinIndex) && 
-        allSkins[currentSkinIndex].unlockCost < goodsManager.goodsData.GoodsCount)
+        allSkins[currentSkinIndex].unlockCost < goodsManager.GOODS)
         {
-            goodsManager.goodsData.GoodsCount -= allSkins[currentSkinIndex].unlockCost;
+            goodsManager.SpendClick(allSkins[currentSkinIndex].unlockCost);
             goodsManager.GoodTXTUpdate();
 
             saveData.unlockedSkins.Add(currentSkinIndex);
